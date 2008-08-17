@@ -9,6 +9,7 @@
 #define _UNZIP_H_
 
 extern int IsZipFile (char *buffer);
-int UnZipBuffer (unsigned char *outbuffer, u64 discoffset, int length, u8 UseSDCARD);
+int UnZipDVD (unsigned char *outbuffer, u64 discoffset, int length);
+int UnZipSDCARD (unsigned char *outbuffer, char *filename);
 
 #endif

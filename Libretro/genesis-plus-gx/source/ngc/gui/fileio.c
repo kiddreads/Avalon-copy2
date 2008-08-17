@@ -8,10 +8,9 @@
 #include "shared.h"
 #include "dvd.h"
 #include "font.h"
+#include "unzip.h"
 #include <zlib.h>
 
-/* SDCARD File access */
-extern FILE *sdfile;
 
 /*
  * PKWare Zip Header - adopted into zip standard
@@ -78,7 +77,7 @@ int IsZipFile (char *buffer)
  *
  * It should be noted that there is a limit of 5MB total size for any ROM
  ******************************************************************************/
-int UnZipBuffer (unsigned char *outbuffer, u64 discoffset, int length, u8 UseSDCARD)
+int UnZipDVD (unsigned char *outbuffer, u64 discoffset, int length)
 {
   PKZIPHEADER pkzip;
   int zipoffset = 0;
@@ -92,15 +91,7 @@ int UnZipBuffer (unsigned char *outbuffer, u64 discoffset, int length, u8 UseSDC
   char msg[128];
 
   /*** Read Zip Header ***/
-  if ( UseSDCARD )
-  {
-    fseek(sdfile, 0, SEEK_SET);
-    fread(readbuffer, 1, 2048, sdfile);
-  }
-  else
-  {
-    dvd_read (&readbuffer, 2048, discoffset);
-  }
+  dvd_read (&readbuffer, 2048, discoffset);
 
   /*** Copy PKZip header to local, used as info ***/
   memcpy (&pkzip, &readbuffer, sizeof (PKZIPHEADER));
@@ -156,15 +147,8 @@ int UnZipBuffer (unsigned char *outbuffer, u64 discoffset, int length, u8 UseSDC
     zipoffset = 0;
     zipchunk = ZIPCHUNK;
 	  
-    if (UseSDCARD)
-    {
-      fread(readbuffer, 1, 2048, sdfile);
-    }
-    else
-    {
-      discoffset += 2048;
-      dvd_read (&readbuffer, 2048, discoffset);
-    }
+    discoffset += 2048;
+    dvd_read (&readbuffer, 2048, discoffset);
   }
   while (res != Z_STREAM_END);
 
@@ -178,3 +162,73 @@ int UnZipBuffer (unsigned char *outbuffer, u64 discoffset, int length, u8 UseSDC
 
   return 0;
 }
+
+int UnZipSDCARD (unsigned char *outbuffer, char *filename)
+{
+  unzFile *fd = NULL;
+  unz_file_info info;
+  int ret = 0;
+  int size;
+  char msg[128];
+
+  /* Attempt to open the archive */
+  fd = unzOpen(filename);
+  if(!fd) return (0);
+
+  /* Go to first file in archive */
+  ret = unzGoToFirstFile(fd);
+  if(ret != UNZ_OK)
+  {
+    unzClose(fd);
+    return (0);
+  }
+
+  ret = unzGetCurrentFileInfo(fd, &info, NULL, 0, NULL, 0, NULL, 0);
+  if(ret != UNZ_OK)
+  {
+    unzClose(fd);
+    return (0);
+  }
+
+  /* Open the file for reading */
+  ret = unzOpenCurrentFile(fd);
+  if(ret != UNZ_OK)
+  {
+    unzClose(fd);
+    return (0);
+  }
+
+  /* Allocate file data buffer */
+  size = info.uncompressed_size;
+
+  sprintf (msg, "Unzipping %d bytes ... Wait", size);
+  ShowAction (msg);
+
+  /* Read (decompress) the file */
+  ret = unzReadCurrentFile(fd, outbuffer, info.uncompressed_size);
+  if(ret != info.uncompressed_size)
+  {
+    unzCloseCurrentFile(fd);
+    unzClose(fd);
+    return (0);
+  }
+
+  /* Close the current file */
+  ret = unzCloseCurrentFile(fd);
+  if(ret != UNZ_OK)
+  {
+    unzClose(fd);
+    return (0);
+  }
+
+  /* Close the archive */
+  ret = unzClose(fd);
+  if(ret != UNZ_OK)
+  {
+    return (0);
+  }
+
+  /* Update file size and return pointer to file data */
+  return (size);
+}
+
