@@ -30,8 +30,7 @@
 **   half length      : 340238
 **   increment        : 2381
 */
-#ifdef USE_SINC_BEST
-
+#ifndef NGC
 static const struct slow_high_qual_coeffs_s
 {	int increment ;
 	coeff_t coeffs [340239] ;
