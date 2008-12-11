@@ -1,16 +1,35 @@
-/****************************************************************************
- * FAT loading support
+/*
+ * file_fat.c
+ * 
+ *   generic FAT loading support
  *
- ***************************************************************************/
+ *   code by Eke-Eke (2008) 
+ *
+ *   This program is free software; you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation; either version 2 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program; if not, write to the Free Software
+ *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ ********************************************************************************/
+
 #include "shared.h"
 #include "font.h"
-#include "fileio_fat.h"
-#include "filesel.h"
-#include "fileio.h"
 #include "history.h"
+#include "unzip.h"
+#include "filesel.h"
+#include "file_fat.h"
 
 /* current FAT directory */
-static char fatdir[256];
+static char fatdir[MAXPATHLEN];
 
 /* current FAT device */
 static int fat_type   = 0;
@@ -149,7 +168,7 @@ int FAT_ParseDirectory()
  * This functions return the actual size of data copied into the buffer
  *
  ****************************************************************************/ 
-int FAT_LoadFile (unsigned char *buffer) 
+int FAT_LoadFile (u8 *buffer) 
 {
   /* If loading from history then we need to setup a few more things. */
   if(useHistory)
@@ -203,6 +222,9 @@ int FAT_LoadFile (unsigned char *buffer)
       sdfile = fopen(fname, "rb");
       if (sdfile)
       {
+        char msg[50];
+        sprintf(msg,"Loading %d bytes...", length);
+        ShowAction(msg);
         fread(buffer, 1, length, sdfile);
         fclose(sdfile);
         return length;
@@ -211,7 +233,7 @@ int FAT_LoadFile (unsigned char *buffer)
     else
     {
       /* unzip file */
-      return UnZipFAT(buffer, fname);
+      return UnZipBuffer (buffer, 0, fname);
     }
   }
 
@@ -223,7 +245,7 @@ int FAT_LoadFile (unsigned char *buffer)
  *
  * Function to load a FAT directory and display to user.
  ****************************************************************************/ 
-int FAT_Open(int type)
+int FAT_Open(int type, u8 *buffer)
 {
   int max = 0;
   char root[10] = "";
@@ -299,7 +321,7 @@ int FAT_Open(int type)
       selection     = 0;
       old_offset    = 0;
       old_selection = 0;
-      return FileSelector ();
+      return FileSelector (buffer);
     }
     else
     {
@@ -309,5 +331,5 @@ int FAT_Open(int type)
     }
   }
 
-  return FileSelector ();
+  return FileSelector (buffer);
 }

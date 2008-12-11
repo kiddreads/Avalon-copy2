@@ -19,7 +19,7 @@
 /*
 ** This code is part of Secret Rabibt Code aka libsamplerate. A commercial
 ** use license for this code is available, please see:
-**		http://www.mega-nerd.com/SRC/procedure.html
+**    http://www.mega-nerd.com/SRC/procedure.html
 */
 
 /*
@@ -31,10 +31,10 @@
 **   increment        : 2381
 */
 static const struct slow_high_qual_coeffs_s
-{	int increment ;
-	coeff_t coeffs [340239] ;
+{  int increment ;
+  coeff_t coeffs [340239] ;
 } slow_high_qual_coeffs =
-{	2381,
+{  2381,
 {
  9.657284235393746030e-01,
  9.657281621412726613e-01,

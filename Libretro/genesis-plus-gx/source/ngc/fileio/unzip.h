@@ -5,11 +5,10 @@
  * Only partial support is included, in that only the first file within the archive
  * is considered to be a ROM image.
  ***************************************************************************/
-#ifndef _FILEIO_H_
-#define _FILEIO_H_
+#ifndef _UNZIP_H_
+#define _UNZIP_H_
 
 extern int IsZipFile (char *buffer);
-int UnZipDVD (unsigned char *outbuffer, u64 discoffset, int length);
-int UnZipFAT (unsigned char *outbuffer, char *filename);
+int UnZipBuffer (unsigned char *outbuffer, u64 discoffset, char *filename);
 
 #endif

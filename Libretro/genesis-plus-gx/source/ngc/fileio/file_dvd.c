@@ -1,14 +1,31 @@
-/****************************************************************************
+/*
+ * file_dvd.c
+ * 
+ *   generic ISO9660/Joliet DVD loading support
  *
- * DVD ISO9660/Joliet loading support
+ *   code by Eke-Eke (2008) 
  *
- ***************************************************************************/
+ *   This program is free software; you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation; either version 2 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program; if not, write to the Free Software
+ *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ ********************************************************************************/
+
 #include "shared.h"
 #include "font.h"
-#include "fileio_dvd.h"
-#include "filesel.h"
-#include "fileio.h"
 #include "dvd.h"
+#include "unzip.h"
+#include "filesel.h"
 
 #ifdef HW_RVL
 #include "di/di.h"
@@ -269,7 +286,7 @@ int DVD_ParseDirectory ()
  * This functions return the actual size of data copied into the buffer
  *
  ****************************************************************************/ 
-int DVD_LoadFile (unsigned char *buffer) 
+int DVD_LoadFile (u8 *buffer) 
 {
   /* file size */
   int length = filelist[selection].length;
@@ -284,6 +301,9 @@ int DVD_LoadFile (unsigned char *buffer)
     /* determine file type */
     if (!IsZipFile ((char *) readbuffer))
     {
+      char msg[50];
+      sprintf(msg,"Loading %d bytes...", length);
+      ShowAction(msg);
       /* How many 2k blocks to read */
       int blocks = length / 2048;
       int readoffset = 0;
@@ -310,7 +330,7 @@ int DVD_LoadFile (unsigned char *buffer)
     }
     else
     {
-      return UnZipDVD (buffer, discoffset, length);
+      return UnZipBuffer (buffer, discoffset, NULL);
     }
   }
 
@@ -323,7 +343,7 @@ int DVD_LoadFile (unsigned char *buffer)
  * Function to load a DVD directory and display to user.
  ****************************************************************************/ 
 
-int DVD_Open ()
+int DVD_Open (u8 *buffer)
 {
   /* reset flags */
   useFAT      = 0;
@@ -385,7 +405,7 @@ int DVD_Open ()
       selection     = 0;
       old_offset    = 0;
       old_selection = 0;
-      return FileSelector ();
+      return FileSelector (buffer);
     }
     else
     {
@@ -395,5 +415,5 @@ int DVD_Open ()
     }
   }
 
-  return FileSelector ();
+  return FileSelector (buffer);
 }

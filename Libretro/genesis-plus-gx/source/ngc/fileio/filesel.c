@@ -1,19 +1,30 @@
-/****************************************************************************
- * ROM Selection Interface
+/*
+ * filesel.c
+ * 
+ *   File Selection menu
  *
- * The following features are implemented:
- *   . SDCARD access with LFN support (through softdev's VFAT library)
- *   . DVD access
- *   . easy subdirectory browsing
- *   . ROM browser
- *   . alphabetical file sorting (Marty Disibio)
- *   . load from history list (Marty Disibio)
+ *   code by Softdev (2006), Eke-Eke (2007,2008) 
  *
- ***************************************************************************/
+ *   This program is free software; you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation; either version 2 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program; if not, write to the Free Software
+ *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ ********************************************************************************/
+
 #include "shared.h"
 #include "font.h"
-#include "fileio_dvd.h"
-#include "fileio_fat.h"
+#include "file_dvd.h"
+#include "file_fat.h"
 #include "filesel.h"
 
 /* Global Variables */
@@ -27,6 +38,7 @@ int useHistory    = 0;
 int haveDVDdir    = 0;
 int haveFATdir    = 0;
 
+FILEENTRIES filelist[MAXFILES];
 
 /***************************************************************************
  * ShowFiles
@@ -46,8 +58,8 @@ static void ShowFiles (int offset, int selection)
     memset(text,0,MAXJOLIET+2);
     if (filelist[i].flags) sprintf(text, "[%s]", filelist[i].filename + filelist[i].filename_offset);
     else sprintf (text, "%s", filelist[i].filename + filelist[i].filename_offset);
-    if (j == (selection - offset)) WriteCentre_HL ((j * fheight) + 120, text);
-    else WriteCentre ((j * fheight) + 120, text);
+    if (j == (selection - offset)) WriteCentre_HL ((j * fheight) + PAGEOFFSET, text);
+    else WriteCentre ((j * fheight) + PAGEOFFSET, text);
     j++;
   }
   SetScreen ();
@@ -57,8 +69,11 @@ static void ShowFiles (int offset, int selection)
  * FileSelector
  *
  * Let user select a file from the File listing
+.* ROM file buffer is provided as input
+ * ROM size is returned
+ *
  ****************************************************************************/ 
-int FileSelector() 
+int FileSelector(unsigned char *buffer) 
 {
   short p;
   int redraw = 1;
@@ -168,10 +183,15 @@ int FileSelector()
       if (filelist[selection].flags)
       {
         /* get new directory */
-        ret = useFAT ? FAT_UpdateDir(go_up) : DVD_UpdateDir(go_up);
+        if (useFAT) ret =FAT_UpdateDir(go_up);
+        else ret = DVD_UpdateDir(go_up);
 
         /* get new entry list or quit */
-        if (ret) maxfiles = useFAT ? FAT_ParseDirectory() : DVD_ParseDirectory();
+        if (ret)
+        {
+          if (useFAT) maxfiles = FAT_ParseDirectory();
+          else maxfiles = DVD_ParseDirectory();
+        }
         else return 0;
       }
 
@@ -179,16 +199,8 @@ int FileSelector()
       else 
       {
         /* Load file */
-        genromsize = useFAT ? FAT_LoadFile(cart_rom) : DVD_LoadFile(cart_rom);
-        if (genromsize)
-        {
-          memfile_autosave();
-          reloadrom();
-          memfile_autoload();
-          return 1;
-        }
-
-        return 0;
+        if (useFAT) return FAT_LoadFile(buffer);
+        else return  DVD_LoadFile(buffer);
       }
       redraw = 1;
     }
