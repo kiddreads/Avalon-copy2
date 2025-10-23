@@ -31,7 +31,33 @@
   [self.mfiSwitch addValueChangedTarget:self action:@selector(mfiChanged)];
   
   self.userFolderPathLabel.text = [UserFolderUtil getUserFolder];
-  self.jitStatusLabel.text = [JitManager shared].acquiredJit ? @"Acquired" : @"Not Acquired";
+  
+  if ([JitManager shared].acquiredJit)
+  {
+    NSString* jitType;
+    
+    if (@available(iOS 26, *))
+    {
+      if ([JitManager shared].deviceHasTxm)
+      {
+        jitType = @"TXM";
+      }
+      else
+      {
+        jitType = @"No TXM";
+      }
+    }
+    else
+    {
+      jitType = @"Legacy";
+    }
+    
+    self.jitStatusLabel.text = [NSString stringWithFormat:@"Acquired (%@)", jitType];
+  }
+  else
+  {
+    self.jitStatusLabel.text = @"Not Acquired";
+  }
   
   NSString* jitError = [JitManager shared].acquisitionError;
   self.jitErrorLabel.text = jitError != nil ? jitError : @"(none)";
