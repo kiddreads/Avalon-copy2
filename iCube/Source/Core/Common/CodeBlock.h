@@ -62,7 +62,7 @@ public:
     T::SetCodePtr(region, region + size);
   
 #ifdef IPHONEOS
-    writable_region_diff = Common::GetWritableRegionDiff();
+    writable_region_diff = Common::AllocateWritableRegionAndGetDiff(region, size);
 #endif
 
     T::SetWritableRegionDiff(writable_region_diff);
@@ -81,6 +81,7 @@ public:
   {
     ASSERT(!m_is_child);
 #ifdef IPHONEOS
+    Common::FreeWritableRegion(region, total_region_size, writable_region_diff);
     Common::FreeExecutableMemory(region, total_region_size);
 #else
     Common::FreeMemoryPages(region, total_region_size);

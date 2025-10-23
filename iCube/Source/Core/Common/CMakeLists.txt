@@ -242,6 +242,7 @@ elseif(IOS)
     JITMemoryTracker.cpp
     MemArenaDarwin.cpp
     MemoryUtil_iOS_Legacy.cpp
+    MemoryUtil_iOS_LuckNoTXM.cpp
     MemoryUtil_iOS_LuckTXM.cpp
     MemoryUtil_iOS.cpp
   )

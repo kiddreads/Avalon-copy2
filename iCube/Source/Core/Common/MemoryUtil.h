@@ -63,6 +63,7 @@ size_t MemPhysical();
 enum class JitType
 {
   Legacy,
+  LuckNoTXM,
   LuckTXM
 };
 
@@ -71,13 +72,21 @@ void SetJitType(JitType type);
 void* AllocateExecutableMemory(size_t size);
 void FreeExecutableMemory(void* ptr, size_t size);
 void AllocateExecutableMemoryRegion();
-ptrdiff_t GetWritableRegionDiff();
+ptrdiff_t AllocateWritableRegionAndGetDiff(void* rx_ptr, size_t size);
+void FreeWritableRegion(void* rx_ptr, size_t size, ptrdiff_t diff);
 
 // LuckTXM
 void* AllocateExecutableMemory_LuckTXM(size_t size);
 void FreeExecutableMemory_LuckTXM(void* ptr);
 void AllocateExecutableMemoryRegion_LuckTXM();
-ptrdiff_t GetWritableRegionDiff_LuckTXM();
+ptrdiff_t AllocateWritableRegionAndGetDiff_LuckTXM();
+
+// LuckNoTXM
+void* AllocateExecutableMemory_LuckNoTXM(size_t size);
+void FreeExecutableMemory_LuckNoTXM(void* ptr, size_t size);
+ptrdiff_t GetWritableRegionDiff_LuckNoTXM(void* rx_ptr, size_t size);
+void FreeWritableRegion_LuckNoTXM(void* rx_ptr, size_t size, ptrdiff_t diff);
+ptrdiff_t AllocateWritableRegionAndGetDiff_LuckNoTXM(void* rx_ptr, size_t size);
 
 // Legacy
 void* AllocateExecutableMemory_Legacy(size_t size);

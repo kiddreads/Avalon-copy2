@@ -27,6 +27,11 @@ void* AllocateExecutableMemory(size_t size)
     return AllocateExecutableMemory_Legacy(size);
   }
 
+  if (g_jit_type == JitType::LuckNoTXM)
+  {
+    return AllocateExecutableMemory_LuckNoTXM(size);
+  }
+
   PanicAlertFmt("AllocateExecutableMemory failed!\nUnknown JIT type set");
   return nullptr;
 }
@@ -36,6 +41,10 @@ void FreeExecutableMemory(void* ptr, size_t size)
   if (g_jit_type == JitType::LuckTXM)
   {
     FreeExecutableMemory_LuckTXM(ptr);
+  }
+  else if (g_jit_type == JitType::LuckNoTXM)
+  {
+    FreeExecutableMemory_LuckNoTXM(ptr, size);
   }
   else if (g_jit_type == JitType::Legacy)
   {
@@ -51,14 +60,27 @@ void AllocateExecutableMemoryRegion()
   }
 }
 
-ptrdiff_t GetWritableRegionDiff()
+ptrdiff_t AllocateWritableRegionAndGetDiff(void* rx_ptr, size_t size)
 {
   if (g_jit_type == JitType::LuckTXM)
   {
-    return GetWritableRegionDiff_LuckTXM();
+    return AllocateWritableRegionAndGetDiff_LuckTXM();
+  }
+
+  if (g_jit_type == JitType::LuckNoTXM)
+  {
+    return AllocateWritableRegionAndGetDiff_LuckNoTXM(rx_ptr, size);
   }
 
   return 0;
+}
+
+void FreeWritableRegion(void* rx_ptr, size_t size, ptrdiff_t diff)
+{
+  if (g_jit_type == JitType::LuckNoTXM)
+  {
+    return FreeWritableRegion_LuckNoTXM(rx_ptr, size, diff);
+  }
 }
 
 void JITPageWriteEnableExecuteDisable(void* ptr)

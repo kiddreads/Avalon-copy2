@@ -109,7 +109,14 @@
     
     if ([JitManager shared].acquiredJit)
     {
-      Common::SetJitType([JitManager shared].deviceHasTxm ? Common::JitType::LuckTXM : Common::JitType::Legacy);
+      if (@available(iOS 26, *))
+      {
+        Common::SetJitType([JitManager shared].deviceHasTxm ? Common::JitType::LuckTXM : Common::JitType::LuckNoTXM);
+      }
+      else
+      {
+        Common::SetJitType(Common::JitType::Legacy);
+      }
       
       Config::SetBase(Config::GFX_VERTEX_LOADER_TYPE, VertexLoaderType::Native);
       

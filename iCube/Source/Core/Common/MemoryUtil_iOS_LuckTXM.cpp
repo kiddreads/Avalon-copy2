@@ -83,7 +83,7 @@ void AllocateExecutableMemoryRegion_LuckTXM()
   g_rw_region_diff = rw_ptr - rx_ptr;
 }
 
-ptrdiff_t GetWritableRegionDiff_LuckTXM()
+ptrdiff_t AllocateWritableRegionAndGetDiff_LuckTXM()
 {
   return g_rw_region_diff;
 }
