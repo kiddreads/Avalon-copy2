@@ -994,25 +994,31 @@ static void check_variables(void)
    var.key = "nestopia_palette"; // Palette
    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var))
    {
+      bool decoder = false;
       if (strcmp(var.value, "consumer") == 0) {
          video.GetPalette().SetMode(Api::Video::Palette::MODE_YUV);
          video.SetDecoder(Api::Video::DECODER_CONSUMER);
+         decoder = true;
       }
       else if (strcmp(var.value, "canonical") == 0) {
          video.GetPalette().SetMode(Api::Video::Palette::MODE_YUV);
          video.SetDecoder(Api::Video::DECODER_CANONICAL);
+         decoder = true;
       }
       else if (strcmp(var.value, "alternative") == 0) {
          video.GetPalette().SetMode(Api::Video::Palette::MODE_YUV);
          video.SetDecoder(Api::Video::DECODER_ALTERNATIVE);
+         decoder = true;
       }
       else if (strcmp(var.value, "cxa2025as") == 0) {
          video.GetPalette().SetMode(Api::Video::Palette::MODE_YUV);
          video.SetDecoder(Api::Video::DECODER_CXA2025AS_US);
+         decoder = true;
       }
       else if (strcmp(var.value, "cxa2025as_jp") == 0) {
          video.GetPalette().SetMode(Api::Video::Palette::MODE_YUV);
          video.SetDecoder(Api::Video::DECODER_CXA2025AS_JP);
+         decoder = true;
       }
       else if (strcmp(var.value, "rgb") == 0) {
          video.GetPalette().SetMode(Api::Video::Palette::MODE_RGB);
@@ -1083,6 +1089,21 @@ static void check_variables(void)
       else if (strcmp(var.value, "custom") == 0) {
          video.GetPalette().SetMode(Api::Video::Palette::MODE_CUSTOM);
          video.GetPalette().SetCustom((const byte(*)[3])custpal, Api::Video::Palette::STD_PALETTE);
+      }
+
+      // Fix up palette for VS. System
+      Api::Cartridge cart(emulator);
+      if (!machine.Is(Api::Machine::DISK) && cart.GetProfile()) {
+         switch (cart.GetProfile()->system.type) {
+            case Api::Cartridge::Profile::System::VS_UNISYSTEM:
+            case Api::Cartridge::Profile::System::VS_DUALSYSTEM: {
+               if (!decoder) { // If we're using an internal decoder, no override
+                  video.GetPalette().SetMode(Api::Video::Palette::MODE_YUV);
+                  video.SetDecoder(Api::Video::DECODER_CONSUMER);
+               }
+            }
+            default: break;
+         }
       }
    }
 
