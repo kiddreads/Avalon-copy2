@@ -58348,6 +58348,1582 @@ struct retro_core_options_v2 options_sv = {
    option_defs_sv
 };
 
+/* RETRO_LANGUAGE_TH */
+
+#define CATEGORY_SYSTEM_LABEL_TH NULL
+#define CATEGORY_SYSTEM_INFO_0_TH NULL
+#define CATEGORY_VIDEO_LABEL_TH "วิดีโอ"
+#define CATEGORY_VIDEO_INFO_0_TH NULL
+#define CATEGORY_AUDIO_LABEL_TH "เสียง"
+#define CATEGORY_AUDIO_INFO_0_TH NULL
+#define CATEGORY_INPUT_LABEL_TH "การควบคุม"
+#define CATEGORY_INPUT_INFO_0_TH NULL
+#define CATEGORY_HACKS_LABEL_TH NULL
+#define CATEGORY_HACKS_INFO_0_TH NULL
+#define CATEGORY_CHANNEL_VOLUME_LABEL_TH "ตั้งค่าระดับเสียงแยกช่องสัญญาณขั้นสูง"
+#define CATEGORY_CHANNEL_VOLUME_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_SYSTEM_HW_LABEL_TH NULL
+#define GENESIS_PLUS_GX_SYSTEM_HW_INFO_0_TH NULL
+#define OPTION_VAL_AUTO_TH NULL
+#define OPTION_VAL_SG_1000_TH NULL
+#define OPTION_VAL_SG_1000_II_TH NULL
+#define OPTION_VAL_SG_1000_II_RAM_EXT_TH NULL
+#define OPTION_VAL_MARK_III_TH NULL
+#define OPTION_VAL_MASTER_SYSTEM_TH NULL
+#define OPTION_VAL_MASTER_SYSTEM_II_TH NULL
+#define OPTION_VAL_GAME_GEAR_TH NULL
+#define OPTION_VAL_MEGA_DRIVE_GENESIS_TH NULL
+#define GENESIS_PLUS_GX_REGION_DETECT_LABEL_TH NULL
+#define GENESIS_PLUS_GX_REGION_DETECT_INFO_0_TH NULL
+#define OPTION_VAL_NTSC_U_TH NULL
+#define OPTION_VAL_PAL_TH NULL
+#define OPTION_VAL_NTSC_J_TH NULL
+#define GENESIS_PLUS_GX_VDP_MODE_LABEL_TH NULL
+#define GENESIS_PLUS_GX_VDP_MODE_INFO_0_TH NULL
+#define OPTION_VAL_60HZ_TH NULL
+#define OPTION_VAL_50HZ_TH NULL
+#define GENESIS_PLUS_GX_BIOS_LABEL_TH NULL
+#define GENESIS_PLUS_GX_BIOS_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_SYSTEM_BRAM_LABEL_TH NULL
+#define GENESIS_PLUS_GX_SYSTEM_BRAM_INFO_0_TH NULL
+#define OPTION_VAL_PER_BIOS_TH NULL
+#define OPTION_VAL_PER_GAME_TH NULL
+#define GENESIS_PLUS_GX_CART_BRAM_LABEL_TH NULL
+#define GENESIS_PLUS_GX_CART_BRAM_INFO_0_TH NULL
+#define OPTION_VAL_PER_CART_TH NULL
+#define GENESIS_PLUS_GX_CART_SIZE_LABEL_TH NULL
+#define GENESIS_PLUS_GX_CART_SIZE_INFO_0_TH NULL
+#define OPTION_VAL_128K_TH NULL
+#define OPTION_VAL_256K_TH NULL
+#define OPTION_VAL_512K_TH NULL
+#define OPTION_VAL_1MEG_TH NULL
+#define OPTION_VAL_2MEG_TH NULL
+#define OPTION_VAL_4MEG_TH NULL
+#define GENESIS_PLUS_GX_ADD_ON_LABEL_TH NULL
+#define GENESIS_PLUS_GX_ADD_ON_INFO_0_TH NULL
+#define OPTION_VAL_SEGA_MEGA_CD_TH NULL
+#define OPTION_VAL_MEGASD_TH NULL
+#define OPTION_VAL_NONE_TH NULL
+#define GENESIS_PLUS_GX_LOCK_ON_LABEL_TH NULL
+#define GENESIS_PLUS_GX_LOCK_ON_INFO_0_TH NULL
+#define OPTION_VAL_GAME_GENIE_TH NULL
+#define OPTION_VAL_ACTION_REPLAY_PRO_TH NULL
+#define OPTION_VAL_SONIC_KNUCKLES_TH NULL
+#define GENESIS_PLUS_GX_ASPECT_RATIO_LABEL_TH NULL
+#define GENESIS_PLUS_GX_ASPECT_RATIO_INFO_0_TH NULL
+#define OPTION_VAL_NTSC_PAR_TH NULL
+#define OPTION_VAL_PAL_PAR_TH NULL
+#define OPTION_VAL_4_3_TH NULL
+#define OPTION_VAL_UNCORRECTED_TH NULL
+#define GENESIS_PLUS_GX_OVERSCAN_LABEL_TH NULL
+#define GENESIS_PLUS_GX_OVERSCAN_INFO_0_TH NULL
+#define OPTION_VAL_TOP_BOTTOM_TH NULL
+#define OPTION_VAL_LEFT_RIGHT_TH NULL
+#define OPTION_VAL_FULL_TH NULL
+#define GENESIS_PLUS_GX_LEFT_BORDER_LABEL_TH NULL
+#define GENESIS_PLUS_GX_LEFT_BORDER_INFO_0_TH NULL
+#define OPTION_VAL_LEFT_BORDER_TH NULL
+#define OPTION_VAL_LEFT_RIGHT_BORDERS_TH NULL
+#define GENESIS_PLUS_GX_GG_EXTRA_LABEL_TH NULL
+#define GENESIS_PLUS_GX_GG_EXTRA_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_BLARGG_NTSC_FILTER_LABEL_TH NULL
+#define GENESIS_PLUS_GX_BLARGG_NTSC_FILTER_INFO_0_TH NULL
+#define OPTION_VAL_MONOCHROME_TH NULL
+#define OPTION_VAL_COMPOSITE_TH NULL
+#define OPTION_VAL_SVIDEO_TH NULL
+#define OPTION_VAL_RGB_TH NULL
+#define GENESIS_PLUS_GX_LCD_FILTER_LABEL_TH NULL
+#define GENESIS_PLUS_GX_LCD_FILTER_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_RENDER_LABEL_TH NULL
+#define GENESIS_PLUS_GX_RENDER_INFO_0_TH NULL
+#define OPTION_VAL_SINGLE_FIELD_TH NULL
+#define OPTION_VAL_DOUBLE_FIELD_TH NULL
+#define GENESIS_PLUS_GX_FRAMESKIP_LABEL_TH NULL
+#define GENESIS_PLUS_GX_FRAMESKIP_INFO_0_TH NULL
+#define OPTION_VAL_MANUAL_TH NULL
+#define GENESIS_PLUS_GX_FRAMESKIP_THRESHOLD_LABEL_TH NULL
+#define GENESIS_PLUS_GX_FRAMESKIP_THRESHOLD_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_YM2413_LABEL_TH NULL
+#define GENESIS_PLUS_GX_YM2413_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_YM2413_CORE_LABEL_TH NULL
+#define GENESIS_PLUS_GX_YM2413_CORE_INFO_0_TH NULL
+#define OPTION_VAL_MAME_TH NULL
+#define OPTION_VAL_NUKED_TH NULL
+#define GENESIS_PLUS_GX_YM2612_LABEL_TH NULL
+#define GENESIS_PLUS_GX_YM2612_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_YM2612_INFO_1_TH NULL
+#define OPTION_VAL_MAME_YM2612_TH NULL
+#define OPTION_VAL_MAME_ASIC_YM3438_TH NULL
+#define OPTION_VAL_MAME_ENHANCED_YM3438_TH NULL
+#define OPTION_VAL_NUKED_YM2612_TH NULL
+#define OPTION_VAL_NUKED_YM3438_TH NULL
+#define GENESIS_PLUS_GX_SOUND_OUTPUT_LABEL_TH NULL
+#define GENESIS_PLUS_GX_SOUND_OUTPUT_INFO_0_TH NULL
+#define OPTION_VAL_STEREO_TH NULL
+#define OPTION_VAL_MONO_TH NULL
+#define GENESIS_PLUS_GX_AUDIO_FILTER_LABEL_TH NULL
+#define GENESIS_PLUS_GX_AUDIO_FILTER_INFO_0_TH NULL
+#define OPTION_VAL_LOW_PASS_TH NULL
+#define OPTION_VAL_EQ_TH NULL
+#define GENESIS_PLUS_GX_LOWPASS_RANGE_LABEL_TH NULL
+#define GENESIS_PLUS_GX_LOWPASS_RANGE_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_PSG_PREAMP_LABEL_TH NULL
+#define GENESIS_PLUS_GX_PSG_PREAMP_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_FM_PREAMP_LABEL_TH NULL
+#define GENESIS_PLUS_GX_FM_PREAMP_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_CDDA_VOLUME_LABEL_TH NULL
+#define GENESIS_PLUS_GX_CDDA_VOLUME_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_PCM_VOLUME_LABEL_TH NULL
+#define GENESIS_PLUS_GX_PCM_VOLUME_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_AUDIO_EQ_LOW_LABEL_TH NULL
+#define GENESIS_PLUS_GX_AUDIO_EQ_LOW_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_AUDIO_EQ_MID_LABEL_TH NULL
+#define GENESIS_PLUS_GX_AUDIO_EQ_MID_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_AUDIO_EQ_HIGH_LABEL_TH NULL
+#define GENESIS_PLUS_GX_AUDIO_EQ_HIGH_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_GUN_INPUT_LABEL_TH NULL
+#define GENESIS_PLUS_GX_GUN_INPUT_INFO_0_TH NULL
+#define OPTION_VAL_LIGHTGUN_TH NULL
+#define OPTION_VAL_TOUCHSCREEN_TH NULL
+#define GENESIS_PLUS_GX_GUN_CURSOR_LABEL_TH NULL
+#define GENESIS_PLUS_GX_GUN_CURSOR_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_INVERT_MOUSE_LABEL_TH NULL
+#define GENESIS_PLUS_GX_INVERT_MOUSE_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_NO_SPRITE_LIMIT_LABEL_TH NULL
+#define GENESIS_PLUS_GX_NO_SPRITE_LIMIT_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_ENHANCED_VSCROLL_LABEL_TH NULL
+#define GENESIS_PLUS_GX_ENHANCED_VSCROLL_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_ENHANCED_VSCROLL_LIMIT_LABEL_TH NULL
+#define GENESIS_PLUS_GX_ENHANCED_VSCROLL_LIMIT_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_OVERCLOCK_LABEL_TH NULL
+#define GENESIS_PLUS_GX_OVERCLOCK_INFO_0_TH NULL
+#define OPTION_VAL_100_TH NULL
+#define OPTION_VAL_125_TH NULL
+#define OPTION_VAL_150_TH NULL
+#define OPTION_VAL_175_TH NULL
+#define OPTION_VAL_200_TH NULL
+#define OPTION_VAL_225_TH NULL
+#define OPTION_VAL_250_TH NULL
+#define OPTION_VAL_275_TH NULL
+#define OPTION_VAL_300_TH NULL
+#define OPTION_VAL_325_TH NULL
+#define OPTION_VAL_350_TH NULL
+#define OPTION_VAL_375_TH NULL
+#define OPTION_VAL_400_TH NULL
+#define OPTION_VAL_425_TH NULL
+#define OPTION_VAL_450_TH NULL
+#define OPTION_VAL_475_TH NULL
+#define OPTION_VAL_500_TH NULL
+#define GENESIS_PLUS_GX_FORCE_DTACK_LABEL_TH NULL
+#define GENESIS_PLUS_GX_FORCE_DTACK_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_ADDR_ERROR_LABEL_TH NULL
+#define GENESIS_PLUS_GX_ADDR_ERROR_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_CD_LATENCY_LABEL_TH NULL
+#define GENESIS_PLUS_GX_CD_LATENCY_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_CD_PRECACHE_LABEL_TH NULL
+#define GENESIS_PLUS_GX_CD_PRECACHE_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_SHOW_ADVANCED_AUDIO_SETTINGS_LABEL_TH NULL
+#define GENESIS_PLUS_GX_SHOW_ADVANCED_AUDIO_SETTINGS_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_PSG_CHANNEL_0_VOLUME_LABEL_TH NULL
+#define GENESIS_PLUS_GX_PSG_CHANNEL_0_VOLUME_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_PSG_CHANNEL_1_VOLUME_LABEL_TH NULL
+#define GENESIS_PLUS_GX_PSG_CHANNEL_1_VOLUME_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_PSG_CHANNEL_2_VOLUME_LABEL_TH NULL
+#define GENESIS_PLUS_GX_PSG_CHANNEL_2_VOLUME_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_PSG_CHANNEL_3_VOLUME_LABEL_TH NULL
+#define GENESIS_PLUS_GX_PSG_CHANNEL_3_VOLUME_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_MD_CHANNEL_0_VOLUME_LABEL_TH NULL
+#define GENESIS_PLUS_GX_MD_CHANNEL_0_VOLUME_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_MD_CHANNEL_1_VOLUME_LABEL_TH NULL
+#define GENESIS_PLUS_GX_MD_CHANNEL_1_VOLUME_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_MD_CHANNEL_2_VOLUME_LABEL_TH NULL
+#define GENESIS_PLUS_GX_MD_CHANNEL_2_VOLUME_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_MD_CHANNEL_3_VOLUME_LABEL_TH NULL
+#define GENESIS_PLUS_GX_MD_CHANNEL_3_VOLUME_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_MD_CHANNEL_4_VOLUME_LABEL_TH NULL
+#define GENESIS_PLUS_GX_MD_CHANNEL_4_VOLUME_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_MD_CHANNEL_5_VOLUME_LABEL_TH NULL
+#define GENESIS_PLUS_GX_MD_CHANNEL_5_VOLUME_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_0_VOLUME_LABEL_TH NULL
+#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_0_VOLUME_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_1_VOLUME_LABEL_TH NULL
+#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_1_VOLUME_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_2_VOLUME_LABEL_TH NULL
+#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_2_VOLUME_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_3_VOLUME_LABEL_TH NULL
+#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_3_VOLUME_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_4_VOLUME_LABEL_TH NULL
+#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_4_VOLUME_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_5_VOLUME_LABEL_TH NULL
+#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_5_VOLUME_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_6_VOLUME_LABEL_TH NULL
+#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_6_VOLUME_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_7_VOLUME_LABEL_TH NULL
+#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_7_VOLUME_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_8_VOLUME_LABEL_TH NULL
+#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_8_VOLUME_INFO_0_TH NULL
+
+struct retro_core_option_v2_category option_cats_th[] = {
+   {
+      "system",
+      CATEGORY_SYSTEM_LABEL_TH,
+      CATEGORY_SYSTEM_INFO_0_TH
+   },
+   {
+      "video",
+      CATEGORY_VIDEO_LABEL_TH,
+      CATEGORY_VIDEO_INFO_0_TH
+   },
+   {
+      "audio",
+      CATEGORY_AUDIO_LABEL_TH,
+      CATEGORY_AUDIO_INFO_0_TH
+   },
+   {
+      "input",
+      CATEGORY_INPUT_LABEL_TH,
+      CATEGORY_INPUT_INFO_0_TH
+   },
+   {
+      "hacks",
+      CATEGORY_HACKS_LABEL_TH,
+      CATEGORY_HACKS_INFO_0_TH
+   },
+   {
+      "channel_volume",
+      CATEGORY_CHANNEL_VOLUME_LABEL_TH,
+      CATEGORY_CHANNEL_VOLUME_INFO_0_TH
+   },
+   { NULL, NULL, NULL },
+};
+struct retro_core_option_v2_definition option_defs_th[] = {
+   {
+      "genesis_plus_gx_system_hw",
+      GENESIS_PLUS_GX_SYSTEM_HW_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_SYSTEM_HW_INFO_0_TH,
+      NULL,
+      "system",
+      {
+         { "auto",                 OPTION_VAL_AUTO_TH                 },
+         { "sg-1000",              OPTION_VAL_SG_1000_TH              },
+         { "sg-1000 II",           OPTION_VAL_SG_1000_II_TH           },
+         { "sg-1000 II + ram ext.",OPTION_VAL_SG_1000_II_RAM_EXT_TH},
+         { "mark-III",             OPTION_VAL_MARK_III_TH             },
+         { "master system",        OPTION_VAL_MASTER_SYSTEM_TH        },
+         { "master system II",     OPTION_VAL_MASTER_SYSTEM_II_TH     },
+         { "game gear",            OPTION_VAL_GAME_GEAR_TH            },
+         { "mega drive / genesis", OPTION_VAL_MEGA_DRIVE_GENESIS_TH   },
+         { NULL, NULL },
+      },
+      "auto"
+   },
+   {
+      "genesis_plus_gx_region_detect",
+      GENESIS_PLUS_GX_REGION_DETECT_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_REGION_DETECT_INFO_0_TH,
+      NULL,
+      "system",
+      {
+         { "auto",    OPTION_VAL_AUTO_TH   },
+         { "ntsc-u",  OPTION_VAL_NTSC_U_TH },
+         { "pal",     OPTION_VAL_PAL_TH    },
+         { "ntsc-j",  OPTION_VAL_NTSC_J_TH },
+         { NULL, NULL },
+      },
+      "auto"
+   },
+   {
+      "genesis_plus_gx_vdp_mode",
+      GENESIS_PLUS_GX_VDP_MODE_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_VDP_MODE_INFO_0_TH,
+      NULL,
+      "system",
+      {
+         { "auto",  "Disabled" },
+         { "60hz",  OPTION_VAL_60HZ_TH },
+         { "50hz",  OPTION_VAL_50HZ_TH },
+         { NULL, NULL },
+      },
+      "auto"
+   },
+   {
+      "genesis_plus_gx_bios",
+      GENESIS_PLUS_GX_BIOS_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_BIOS_INFO_0_TH,
+      NULL,
+      "system",
+      {
+         { "disabled", NULL },
+         { "enabled",  NULL },
+         { NULL, NULL },
+      },
+      "disabled"
+   },
+   {
+      "genesis_plus_gx_system_bram",
+      GENESIS_PLUS_GX_SYSTEM_BRAM_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_SYSTEM_BRAM_INFO_0_TH,
+      NULL,
+      "system",
+      {
+         { "per bios", OPTION_VAL_PER_BIOS_TH },
+         { "per game", OPTION_VAL_PER_GAME_TH },
+         { NULL, NULL },
+      },
+      "per bios"
+   },
+   {
+      "genesis_plus_gx_cart_bram",
+      GENESIS_PLUS_GX_CART_BRAM_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_CART_BRAM_INFO_0_TH,
+      NULL,
+      "system",
+      {
+         { "per cart", OPTION_VAL_PER_CART_TH },
+         { "per game", OPTION_VAL_PER_GAME_TH },
+         { NULL, NULL },
+      },
+      "per cart"
+   },
+   {
+      "genesis_plus_gx_cart_size",
+      GENESIS_PLUS_GX_CART_SIZE_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_CART_SIZE_INFO_0_TH,
+      NULL,
+      "system",
+      {
+         { "disabled", "Disabled" },
+         { "128k",     OPTION_VAL_128K_TH  },
+         { "256k",     OPTION_VAL_256K_TH  },
+         { "512k",     OPTION_VAL_512K_TH  },
+         { "1meg",     OPTION_VAL_1MEG_TH    },
+         { "2meg",     OPTION_VAL_2MEG_TH    },
+         { "4meg",     OPTION_VAL_4MEG_TH    },
+         { NULL, NULL },
+      },
+      "4meg"
+   },
+   {
+      "genesis_plus_gx_add_on",
+      GENESIS_PLUS_GX_ADD_ON_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_ADD_ON_INFO_0_TH,
+      NULL,
+      "system",
+      {
+         { "auto",         OPTION_VAL_AUTO_TH },
+         { "sega/mega cd", OPTION_VAL_SEGA_MEGA_CD_TH },
+         { "megasd",       OPTION_VAL_MEGASD_TH },
+         { "none",         OPTION_VAL_NONE_TH },
+         { NULL, NULL },
+      },
+      "auto"
+   },
+   {
+      "genesis_plus_gx_lock_on",
+      GENESIS_PLUS_GX_LOCK_ON_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_LOCK_ON_INFO_0_TH,
+      NULL,
+      "system",
+      {
+         { "disabled",            NULL },
+         { "game genie",          OPTION_VAL_GAME_GENIE_TH },
+         { "action replay (pro)", OPTION_VAL_ACTION_REPLAY_PRO_TH },
+         { "sonic & knuckles",    OPTION_VAL_SONIC_KNUCKLES_TH },
+         { NULL, NULL },
+      },
+      "disabled"
+   },
+   {
+      "genesis_plus_gx_aspect_ratio",
+      GENESIS_PLUS_GX_ASPECT_RATIO_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_ASPECT_RATIO_INFO_0_TH,
+      NULL,
+      "video",
+      {
+         { "auto",     OPTION_VAL_AUTO_TH },
+         { "NTSC PAR", OPTION_VAL_NTSC_PAR_TH },
+         { "PAL PAR",  OPTION_VAL_PAL_PAR_TH },
+         { "4:3",  OPTION_VAL_4_3_TH },
+         { "Uncorrected",  OPTION_VAL_UNCORRECTED_TH },
+      },
+      "auto"
+   },
+   {
+      "genesis_plus_gx_overscan",
+      GENESIS_PLUS_GX_OVERSCAN_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_OVERSCAN_INFO_0_TH,
+      NULL,
+      "video",
+      {
+         { "disabled",   NULL },
+         { "top/bottom", OPTION_VAL_TOP_BOTTOM_TH },
+         { "left/right", OPTION_VAL_LEFT_RIGHT_TH },
+         { "full",       OPTION_VAL_FULL_TH },
+         { NULL, NULL },
+      },
+      "disabled"
+   },
+   {
+      "genesis_plus_gx_left_border",
+      GENESIS_PLUS_GX_LEFT_BORDER_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_LEFT_BORDER_INFO_0_TH,
+      NULL,
+      "video",
+      {
+         { "disabled", NULL },
+         { "left border", OPTION_VAL_LEFT_BORDER_TH },
+         { "left & right borders", OPTION_VAL_LEFT_RIGHT_BORDERS_TH },
+         { NULL, NULL },
+      },
+      "disabled"
+   },
+   {
+      "genesis_plus_gx_gg_extra",
+      GENESIS_PLUS_GX_GG_EXTRA_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_GG_EXTRA_INFO_0_TH,
+      NULL,
+      "video",
+      {
+         { "disabled", NULL },
+         { "enabled",  NULL },
+         { NULL, NULL },
+      },
+      "disabled"
+   },
+   {
+      "genesis_plus_gx_blargg_ntsc_filter",
+      GENESIS_PLUS_GX_BLARGG_NTSC_FILTER_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_BLARGG_NTSC_FILTER_INFO_0_TH,
+      NULL,
+      "video",
+      {
+         { "disabled",   NULL },
+         { "monochrome", OPTION_VAL_MONOCHROME_TH },
+         { "composite",  OPTION_VAL_COMPOSITE_TH },
+         { "svideo",     OPTION_VAL_SVIDEO_TH },
+         { "rgb",        OPTION_VAL_RGB_TH },
+         { NULL, NULL },
+      },
+      "disabled"
+   },
+   {
+      "genesis_plus_gx_lcd_filter",
+      GENESIS_PLUS_GX_LCD_FILTER_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_LCD_FILTER_INFO_0_TH,
+      NULL,
+      "video",
+      {
+         { "disabled", NULL },
+         { "enabled",  NULL },
+         { NULL, NULL },
+      },
+      "disabled"
+   },
+   {
+      "genesis_plus_gx_render",
+      GENESIS_PLUS_GX_RENDER_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_RENDER_INFO_0_TH,
+      NULL,
+      "video",
+      {
+         { "single field", OPTION_VAL_SINGLE_FIELD_TH },
+         { "double field", OPTION_VAL_DOUBLE_FIELD_TH },
+         { NULL, NULL },
+      },
+      "single field"
+   },
+   {
+      "genesis_plus_gx_frameskip",
+      GENESIS_PLUS_GX_FRAMESKIP_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_FRAMESKIP_INFO_0_TH,
+      NULL,
+      "video",
+      {
+         { "disabled", NULL },
+         { "auto",     OPTION_VAL_AUTO_TH },
+         { "manual",   OPTION_VAL_MANUAL_TH },
+         { NULL, NULL },
+      },
+      "disabled"
+   },
+   {
+      "genesis_plus_gx_frameskip_threshold",
+      GENESIS_PLUS_GX_FRAMESKIP_THRESHOLD_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_FRAMESKIP_THRESHOLD_INFO_0_TH,
+      NULL,
+      "video",
+      {
+         { "15", NULL },
+         { "18", NULL },
+         { "21", NULL },
+         { "24", NULL },
+         { "27", NULL },
+         { "30", NULL },
+         { "33", NULL },
+         { "36", NULL },
+         { "39", NULL },
+         { "42", NULL },
+         { "45", NULL },
+         { "48", NULL },
+         { "51", NULL },
+         { "54", NULL },
+         { "57", NULL },
+         { "60", NULL },
+         { NULL, NULL },
+      },
+      "33"
+   },
+   {
+      "genesis_plus_gx_ym2413",
+      GENESIS_PLUS_GX_YM2413_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_YM2413_INFO_0_TH,
+      NULL,
+      "audio",
+      {
+         { "auto",     OPTION_VAL_AUTO_TH },
+         { "disabled", NULL },
+         { "enabled",  NULL },
+         { NULL, NULL },
+      },
+      "auto"
+   },
+#ifdef HAVE_OPLL_CORE
+   {
+      "genesis_plus_gx_ym2413_core",
+      GENESIS_PLUS_GX_YM2413_CORE_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_YM2413_CORE_INFO_0_TH,
+      NULL,
+      "audio",
+      {
+         { "mame",  OPTION_VAL_MAME_TH },
+         { "nuked", OPTION_VAL_NUKED_TH },
+         { NULL, NULL },
+      },
+      "mame"
+   },
+#endif
+   {
+      "genesis_plus_gx_ym2612",
+      GENESIS_PLUS_GX_YM2612_LABEL_TH,
+      NULL,
+#ifdef HAVE_YM3438_CORE
+      GENESIS_PLUS_GX_YM2612_INFO_0_TH,
+#else
+      GENESIS_PLUS_GX_YM2612_INFO_1_TH,
+#endif
+      NULL,
+      "audio",
+      {
+         { "mame (ym2612)",          OPTION_VAL_MAME_YM2612_TH },
+         { "mame (asic ym3438)",     OPTION_VAL_MAME_ASIC_YM3438_TH },
+         { "mame (enhanced ym3438)", OPTION_VAL_MAME_ENHANCED_YM3438_TH },
+#ifdef HAVE_YM3438_CORE
+         { "nuked (ym2612)",         OPTION_VAL_NUKED_YM2612_TH },
+         { "nuked (ym3438)",         OPTION_VAL_NUKED_YM3438_TH },
+#endif
+         { NULL, NULL },
+      },
+      "mame (ym2612)"
+   },
+   {
+      "genesis_plus_gx_sound_output",
+      GENESIS_PLUS_GX_SOUND_OUTPUT_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_SOUND_OUTPUT_INFO_0_TH,
+      NULL,
+      "audio",
+      {
+         { "stereo", OPTION_VAL_STEREO_TH },
+         { "mono",   OPTION_VAL_MONO_TH },
+         { NULL, NULL },
+      },
+      "stereo"
+   },
+   {
+      "genesis_plus_gx_audio_filter",
+      GENESIS_PLUS_GX_AUDIO_FILTER_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_AUDIO_FILTER_INFO_0_TH,
+      NULL,
+      "audio",
+      {
+         { "disabled", NULL },
+         { "low-pass", OPTION_VAL_LOW_PASS_TH },
+#ifdef HAVE_EQ
+         { "EQ",       OPTION_VAL_EQ_TH },
+#endif
+         { NULL, NULL },
+      },
+      "disabled"
+   },
+   {
+      "genesis_plus_gx_lowpass_range",
+      GENESIS_PLUS_GX_LOWPASS_RANGE_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_LOWPASS_RANGE_INFO_0_TH,
+      NULL,
+      "audio",
+      {
+         { "5",  NULL },
+         { "10", NULL },
+         { "15", NULL },
+         { "20", NULL },
+         { "25", NULL },
+         { "30", NULL },
+         { "35", NULL },
+         { "40", NULL },
+         { "45", NULL },
+         { "50", NULL },
+         { "55", NULL },
+         { "60", NULL },
+         { "65", NULL },
+         { "70", NULL },
+         { "75", NULL },
+         { "80", NULL },
+         { "85", NULL },
+         { "90", NULL },
+         { "95", NULL },
+         { NULL, NULL },
+      },
+      "60"
+   },
+   {
+      "genesis_plus_gx_psg_preamp",
+      GENESIS_PLUS_GX_PSG_PREAMP_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_PSG_PREAMP_INFO_0_TH,
+      NULL,
+      "audio",
+      {
+         { "0",   NULL },
+         { "5",   NULL },
+         { "10",  NULL },
+         { "15",  NULL },
+         { "20",  NULL },
+         { "25",  NULL },
+         { "30",  NULL },
+         { "35",  NULL },
+         { "40",  NULL },
+         { "45",  NULL },
+         { "50",  NULL },
+         { "55",  NULL },
+         { "60",  NULL },
+         { "65",  NULL },
+         { "70",  NULL },
+         { "75",  NULL },
+         { "80",  NULL },
+         { "85",  NULL },
+         { "90",  NULL },
+         { "95",  NULL },
+         { "100", NULL },
+         { "105", NULL },
+         { "110", NULL },
+         { "115", NULL },
+         { "120", NULL },
+         { "125", NULL },
+         { "130", NULL },
+         { "135", NULL },
+         { "140", NULL },
+         { "145", NULL },
+         { "150", NULL },
+         { "155", NULL },
+         { "160", NULL },
+         { "165", NULL },
+         { "170", NULL },
+         { "175", NULL },
+         { "180", NULL },
+         { "185", NULL },
+         { "190", NULL },
+         { "195", NULL },
+         { "200", NULL },
+         { NULL, NULL },
+      },
+      "150"
+   },
+   {
+      "genesis_plus_gx_fm_preamp",
+      GENESIS_PLUS_GX_FM_PREAMP_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_FM_PREAMP_INFO_0_TH,
+      NULL,
+      "audio",
+      {
+         { "0",   NULL },
+         { "5",   NULL },
+         { "10",  NULL },
+         { "15",  NULL },
+         { "20",  NULL },
+         { "25",  NULL },
+         { "30",  NULL },
+         { "35",  NULL },
+         { "40",  NULL },
+         { "45",  NULL },
+         { "50",  NULL },
+         { "55",  NULL },
+         { "60",  NULL },
+         { "65",  NULL },
+         { "70",  NULL },
+         { "75",  NULL },
+         { "80",  NULL },
+         { "85",  NULL },
+         { "90",  NULL },
+         { "95",  NULL },
+         { "100", NULL },
+         { "105", NULL },
+         { "110", NULL },
+         { "115", NULL },
+         { "120", NULL },
+         { "125", NULL },
+         { "130", NULL },
+         { "135", NULL },
+         { "140", NULL },
+         { "145", NULL },
+         { "150", NULL },
+         { "155", NULL },
+         { "160", NULL },
+         { "165", NULL },
+         { "170", NULL },
+         { "175", NULL },
+         { "180", NULL },
+         { "185", NULL },
+         { "190", NULL },
+         { "195", NULL },
+         { "200", NULL },
+         { NULL, NULL },
+      },
+      "100"
+   },
+   {
+      "genesis_plus_gx_cdda_volume",
+      GENESIS_PLUS_GX_CDDA_VOLUME_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_CDDA_VOLUME_INFO_0_TH,
+      NULL,
+      "audio",
+      {
+         { "0",   NULL },
+         { "5",   NULL },
+         { "10",  NULL },
+         { "15",  NULL },
+         { "20",  NULL },
+         { "25",  NULL },
+         { "30",  NULL },
+         { "35",  NULL },
+         { "40",  NULL },
+         { "45",  NULL },
+         { "50",  NULL },
+         { "55",  NULL },
+         { "60",  NULL },
+         { "65",  NULL },
+         { "70",  NULL },
+         { "75",  NULL },
+         { "80",  NULL },
+         { "85",  NULL },
+         { "90",  NULL },
+         { "95",  NULL },
+         { "100", NULL },
+         { NULL, NULL },
+      },
+      "100"
+   },
+   {
+      "genesis_plus_gx_pcm_volume",
+      GENESIS_PLUS_GX_PCM_VOLUME_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_PCM_VOLUME_INFO_0_TH,
+      NULL,
+      "audio",
+      {
+         { "0",   NULL },
+         { "5",   NULL },
+         { "10",  NULL },
+         { "15",  NULL },
+         { "20",  NULL },
+         { "25",  NULL },
+         { "30",  NULL },
+         { "35",  NULL },
+         { "40",  NULL },
+         { "45",  NULL },
+         { "50",  NULL },
+         { "55",  NULL },
+         { "60",  NULL },
+         { "65",  NULL },
+         { "70",  NULL },
+         { "75",  NULL },
+         { "80",  NULL },
+         { "85",  NULL },
+         { "90",  NULL },
+         { "95",  NULL },
+         { "100", NULL },
+         { NULL, NULL },
+      },
+      "100"
+   },
+#ifdef HAVE_EQ
+   {
+      "genesis_plus_gx_audio_eq_low",
+      GENESIS_PLUS_GX_AUDIO_EQ_LOW_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_AUDIO_EQ_LOW_INFO_0_TH,
+      NULL,
+      "audio",
+      {
+         { "0",   NULL },
+         { "5",   NULL },
+         { "10",  NULL },
+         { "15",  NULL },
+         { "20",  NULL },
+         { "25",  NULL },
+         { "30",  NULL },
+         { "35",  NULL },
+         { "40",  NULL },
+         { "45",  NULL },
+         { "50",  NULL },
+         { "55",  NULL },
+         { "60",  NULL },
+         { "65",  NULL },
+         { "70",  NULL },
+         { "75",  NULL },
+         { "80",  NULL },
+         { "85",  NULL },
+         { "90",  NULL },
+         { "95",  NULL },
+         { "100", NULL },
+         { NULL, NULL },
+      },
+      "100"
+   },
+   {
+      "genesis_plus_gx_audio_eq_mid",
+      GENESIS_PLUS_GX_AUDIO_EQ_MID_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_AUDIO_EQ_MID_INFO_0_TH,
+      NULL,
+      "audio",
+      {
+         { "0",   NULL },
+         { "5",   NULL },
+         { "10",  NULL },
+         { "15",  NULL },
+         { "20",  NULL },
+         { "25",  NULL },
+         { "30",  NULL },
+         { "35",  NULL },
+         { "40",  NULL },
+         { "45",  NULL },
+         { "50",  NULL },
+         { "55",  NULL },
+         { "60",  NULL },
+         { "65",  NULL },
+         { "70",  NULL },
+         { "75",  NULL },
+         { "80",  NULL },
+         { "85",  NULL },
+         { "90",  NULL },
+         { "95",  NULL },
+         { "100", NULL },
+         { NULL, NULL },
+      },
+      "100"
+   },
+   {
+      "genesis_plus_gx_audio_eq_high",
+      GENESIS_PLUS_GX_AUDIO_EQ_HIGH_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_AUDIO_EQ_HIGH_INFO_0_TH,
+      NULL,
+      "audio",
+      {
+         { "0",   NULL },
+         { "5",   NULL },
+         { "10",  NULL },
+         { "15",  NULL },
+         { "20",  NULL },
+         { "25",  NULL },
+         { "30",  NULL },
+         { "35",  NULL },
+         { "40",  NULL },
+         { "45",  NULL },
+         { "50",  NULL },
+         { "55",  NULL },
+         { "60",  NULL },
+         { "65",  NULL },
+         { "70",  NULL },
+         { "75",  NULL },
+         { "80",  NULL },
+         { "85",  NULL },
+         { "90",  NULL },
+         { "95",  NULL },
+         { "100", NULL },
+         { NULL, NULL },
+      },
+      "100"
+   },
+#endif
+   {
+      "genesis_plus_gx_gun_input",
+      GENESIS_PLUS_GX_GUN_INPUT_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_GUN_INPUT_INFO_0_TH,
+      NULL,
+      "input",
+      {
+         { "lightgun",    OPTION_VAL_LIGHTGUN_TH },
+         { "touchscreen", OPTION_VAL_TOUCHSCREEN_TH },
+         { NULL, NULL },
+      },
+      "lightgun"
+   },
+   {
+      "genesis_plus_gx_gun_cursor",
+      GENESIS_PLUS_GX_GUN_CURSOR_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_GUN_CURSOR_INFO_0_TH,
+      NULL,
+      "input",
+      {
+         { "disabled", NULL },
+         { "enabled",  NULL },
+         { NULL, NULL },
+      },
+      "disabled"
+   },
+   {
+      "genesis_plus_gx_invert_mouse",
+      GENESIS_PLUS_GX_INVERT_MOUSE_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_INVERT_MOUSE_INFO_0_TH,
+      NULL,
+      "input",
+      {
+         { "disabled", NULL },
+         { "enabled",  NULL },
+         { NULL, NULL },
+      },
+      "disabled"
+   },
+   {
+      "genesis_plus_gx_no_sprite_limit",
+      GENESIS_PLUS_GX_NO_SPRITE_LIMIT_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_NO_SPRITE_LIMIT_INFO_0_TH,
+      NULL,
+      "hacks",
+      {
+         { "disabled", NULL },
+         { "enabled",  NULL },
+         { NULL, NULL },
+      },
+      "disabled"
+   },
+   {
+      "genesis_plus_gx_enhanced_vscroll",
+      GENESIS_PLUS_GX_ENHANCED_VSCROLL_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_ENHANCED_VSCROLL_INFO_0_TH,
+      NULL,
+      "hacks",
+      {
+         { "disabled", NULL },
+         { "enabled",  NULL },
+         { NULL, NULL },
+      },
+      "disabled"
+   },
+   {
+      "genesis_plus_gx_enhanced_vscroll_limit",
+      GENESIS_PLUS_GX_ENHANCED_VSCROLL_LIMIT_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_ENHANCED_VSCROLL_LIMIT_INFO_0_TH,
+      NULL,
+      "hacks",
+      {
+         { "2", NULL },
+         { "3",  NULL },
+         { "4", NULL },
+         { "5",  NULL },
+         { "6", NULL },
+         { "7",  NULL },
+         { "8", NULL },
+         { "9",  NULL },
+         { "10", NULL },
+         { "11",  NULL },
+         { "12", NULL },
+         { "13",  NULL },
+         { "14", NULL },
+         { "15",  NULL },
+         { "16", NULL },
+         { NULL, NULL },
+      },
+      "8"
+   },
+#ifdef HAVE_OVERCLOCK
+   {
+      "genesis_plus_gx_overclock",
+      GENESIS_PLUS_GX_OVERCLOCK_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_OVERCLOCK_INFO_0_TH,
+      NULL,
+      "hacks",
+      {
+         { "100", OPTION_VAL_100_TH },
+         { "125", OPTION_VAL_125_TH },
+         { "150", OPTION_VAL_150_TH },
+         { "175", OPTION_VAL_175_TH },
+         { "200", OPTION_VAL_200_TH },
+         { "225", OPTION_VAL_225_TH },
+         { "250", OPTION_VAL_250_TH },
+         { "275", OPTION_VAL_275_TH },
+         { "300", OPTION_VAL_300_TH },
+         { "325", OPTION_VAL_325_TH },
+         { "350", OPTION_VAL_350_TH },
+         { "375", OPTION_VAL_375_TH },
+         { "400", OPTION_VAL_400_TH },
+         { "425", OPTION_VAL_425_TH },
+         { "450", OPTION_VAL_450_TH },
+         { "475", OPTION_VAL_475_TH },
+         { "500", OPTION_VAL_500_TH },
+         { NULL, NULL },
+      },
+      "100%"
+   },
+#endif
+   {
+      "genesis_plus_gx_force_dtack",
+      GENESIS_PLUS_GX_FORCE_DTACK_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_FORCE_DTACK_INFO_0_TH,
+      NULL,
+      "hacks",
+      {
+         { "enabled",  NULL },
+         { "disabled", NULL },
+         { NULL, NULL },
+      },
+      "enabled"
+   },
+   {
+      "genesis_plus_gx_addr_error",
+      GENESIS_PLUS_GX_ADDR_ERROR_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_ADDR_ERROR_INFO_0_TH,
+      NULL,
+      "hacks",
+      {
+         { "enabled",  NULL },
+         { "disabled", NULL },
+         { NULL, NULL },
+      },
+      "enabled"
+   },
+   {
+      "genesis_plus_gx_cd_latency",
+      GENESIS_PLUS_GX_CD_LATENCY_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_CD_LATENCY_INFO_0_TH,
+      NULL,
+      "hacks",
+      {
+         { "enabled",  NULL },
+         { "disabled", NULL },
+         { NULL, NULL },
+      },
+      "enabled"
+   },
+   {
+      "genesis_plus_gx_cd_precache",
+      GENESIS_PLUS_GX_CD_PRECACHE_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_CD_PRECACHE_INFO_0_TH,
+      NULL,
+      "hacks",
+      {
+         { "disabled", NULL },
+         { "enabled",  NULL },
+         { NULL, NULL },
+      },
+      "disabled"
+   },
+#ifdef USE_PER_SOUND_CHANNELS_CONFIG
+   {
+      "genesis_plus_gx_show_advanced_audio_settings",
+      GENESIS_PLUS_GX_SHOW_ADVANCED_AUDIO_SETTINGS_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_SHOW_ADVANCED_AUDIO_SETTINGS_INFO_0_TH,
+      NULL,
+      "channel_volume",
+      {
+         { "enabled",  NULL },
+         { "disabled", NULL },
+         { NULL, NULL},
+      },
+      "disabled"
+   },
+   {
+      "genesis_plus_gx_psg_channel_0_volume",
+      GENESIS_PLUS_GX_PSG_CHANNEL_0_VOLUME_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_PSG_CHANNEL_0_VOLUME_INFO_0_TH,
+      NULL,
+      "channel_volume",
+      {
+         { "0",   NULL },
+         { "10",  NULL },
+         { "20",  NULL },
+         { "30",  NULL },
+         { "40",  NULL },
+         { "50",  NULL },
+         { "60",  NULL },
+         { "70",  NULL },
+         { "80",  NULL },
+         { "90",  NULL },
+         { "100", NULL },
+         { NULL, NULL },
+      },
+      "100"
+   },
+   {
+      "genesis_plus_gx_psg_channel_1_volume",
+      GENESIS_PLUS_GX_PSG_CHANNEL_1_VOLUME_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_PSG_CHANNEL_1_VOLUME_INFO_0_TH,
+      NULL,
+      "channel_volume",
+      {
+         { "0",   NULL },
+         { "10",  NULL },
+         { "20",  NULL },
+         { "30",  NULL },
+         { "40",  NULL },
+         { "50",  NULL },
+         { "60",  NULL },
+         { "70",  NULL },
+         { "80",  NULL },
+         { "90",  NULL },
+         { "100", NULL },
+         { NULL, NULL },
+      },
+      "100"
+   },
+   {
+      "genesis_plus_gx_psg_channel_2_volume",
+      GENESIS_PLUS_GX_PSG_CHANNEL_2_VOLUME_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_PSG_CHANNEL_2_VOLUME_INFO_0_TH,
+      NULL,
+      "channel_volume",
+      {
+         { "0",   NULL },
+         { "10",  NULL },
+         { "20",  NULL },
+         { "30",  NULL },
+         { "40",  NULL },
+         { "50",  NULL },
+         { "60",  NULL },
+         { "70",  NULL },
+         { "80",  NULL },
+         { "90",  NULL },
+         { "100", NULL },
+         { NULL, NULL },
+      },
+      "100"
+   },
+   {
+      "genesis_plus_gx_psg_channel_3_volume",
+      GENESIS_PLUS_GX_PSG_CHANNEL_3_VOLUME_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_PSG_CHANNEL_3_VOLUME_INFO_0_TH,
+      NULL,
+      "channel_volume",
+      {
+         { "0",   NULL },
+         { "10",  NULL },
+         { "20",  NULL },
+         { "30",  NULL },
+         { "40",  NULL },
+         { "50",  NULL },
+         { "60",  NULL },
+         { "70",  NULL },
+         { "80",  NULL },
+         { "90",  NULL },
+         { "100", NULL },
+         { NULL, NULL },
+      },
+      "100"
+   },
+   {
+      "genesis_plus_gx_md_channel_0_volume",
+      GENESIS_PLUS_GX_MD_CHANNEL_0_VOLUME_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_MD_CHANNEL_0_VOLUME_INFO_0_TH,
+      NULL,
+      "channel_volume",
+      {
+         { "0",   NULL },
+         { "10",  NULL },
+         { "20",  NULL },
+         { "30",  NULL },
+         { "40",  NULL },
+         { "50",  NULL },
+         { "60",  NULL },
+         { "70",  NULL },
+         { "80",  NULL },
+         { "90",  NULL },
+         { "100", NULL },
+         { NULL, NULL },
+      },
+      "100"
+   },
+   {
+      "genesis_plus_gx_md_channel_1_volume",
+      GENESIS_PLUS_GX_MD_CHANNEL_1_VOLUME_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_MD_CHANNEL_1_VOLUME_INFO_0_TH,
+      NULL,
+      "channel_volume",
+      {
+         { "0",   NULL },
+         { "10",  NULL },
+         { "20",  NULL },
+         { "30",  NULL },
+         { "40",  NULL },
+         { "50",  NULL },
+         { "60",  NULL },
+         { "70",  NULL },
+         { "80",  NULL },
+         { "90",  NULL },
+         { "100", NULL },
+         { NULL, NULL },
+      },
+      "100"
+   },
+   {
+      "genesis_plus_gx_md_channel_2_volume",
+      GENESIS_PLUS_GX_MD_CHANNEL_2_VOLUME_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_MD_CHANNEL_2_VOLUME_INFO_0_TH,
+      NULL,
+      "channel_volume",
+      {
+         { "0",   NULL },
+         { "10",  NULL },
+         { "20",  NULL },
+         { "30",  NULL },
+         { "40",  NULL },
+         { "50",  NULL },
+         { "60",  NULL },
+         { "70",  NULL },
+         { "80",  NULL },
+         { "90",  NULL },
+         { "100", NULL },
+         { NULL, NULL },
+      },
+      "100"
+   },
+   {
+      "genesis_plus_gx_md_channel_3_volume",
+      GENESIS_PLUS_GX_MD_CHANNEL_3_VOLUME_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_MD_CHANNEL_3_VOLUME_INFO_0_TH,
+      NULL,
+      "channel_volume",
+      {
+         { "0",   NULL },
+         { "10",  NULL },
+         { "20",  NULL },
+         { "30",  NULL },
+         { "40",  NULL },
+         { "50",  NULL },
+         { "60",  NULL },
+         { "70",  NULL },
+         { "80",  NULL },
+         { "90",  NULL },
+         { "100", NULL },
+         { NULL, NULL },
+      },
+      "100"
+   },
+   {
+      "genesis_plus_gx_md_channel_4_volume",
+      GENESIS_PLUS_GX_MD_CHANNEL_4_VOLUME_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_MD_CHANNEL_4_VOLUME_INFO_0_TH,
+      NULL,
+      "channel_volume",
+      {
+         { "0",   NULL },
+         { "10",  NULL },
+         { "20",  NULL },
+         { "30",  NULL },
+         { "40",  NULL },
+         { "50",  NULL },
+         { "60",  NULL },
+         { "70",  NULL },
+         { "80",  NULL },
+         { "90",  NULL },
+         { "100", NULL },
+         { NULL, NULL },
+      },
+      "100"
+   },
+   {
+      "genesis_plus_gx_md_channel_5_volume",
+      GENESIS_PLUS_GX_MD_CHANNEL_5_VOLUME_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_MD_CHANNEL_5_VOLUME_INFO_0_TH,
+      NULL,
+      "channel_volume",
+      {
+         { "0",   NULL },
+         { "10",  NULL },
+         { "20",  NULL },
+         { "30",  NULL },
+         { "40",  NULL },
+         { "50",  NULL },
+         { "60",  NULL },
+         { "70",  NULL },
+         { "80",  NULL },
+         { "90",  NULL },
+         { "100", NULL },
+         { NULL, NULL },
+      },
+      "100"
+   },
+   {
+      "genesis_plus_gx_sms_fm_channel_0_volume",
+      GENESIS_PLUS_GX_SMS_FM_CHANNEL_0_VOLUME_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_SMS_FM_CHANNEL_0_VOLUME_INFO_0_TH,
+      NULL,
+      "channel_volume",
+      {
+         { "0",   NULL },
+         { "10",  NULL },
+         { "20",  NULL },
+         { "30",  NULL },
+         { "40",  NULL },
+         { "50",  NULL },
+         { "60",  NULL },
+         { "70",  NULL },
+         { "80",  NULL },
+         { "90",  NULL },
+         { "100", NULL },
+         { NULL, NULL },
+      },
+      "100"
+   },
+   {
+      "genesis_plus_gx_sms_fm_channel_1_volume",
+      GENESIS_PLUS_GX_SMS_FM_CHANNEL_1_VOLUME_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_SMS_FM_CHANNEL_1_VOLUME_INFO_0_TH,
+      NULL,
+      "channel_volume",
+      {
+         { "0",   NULL },
+         { "10",  NULL },
+         { "20",  NULL },
+         { "30",  NULL },
+         { "40",  NULL },
+         { "50",  NULL },
+         { "60",  NULL },
+         { "70",  NULL },
+         { "80",  NULL },
+         { "90",  NULL },
+         { "100", NULL },
+         { NULL, NULL },
+      },
+      "100"
+   },
+   {
+      "genesis_plus_gx_sms_fm_channel_2_volume",
+      GENESIS_PLUS_GX_SMS_FM_CHANNEL_2_VOLUME_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_SMS_FM_CHANNEL_2_VOLUME_INFO_0_TH,
+      NULL,
+      "channel_volume",
+      {
+         { "0",   NULL },
+         { "10",  NULL },
+         { "20",  NULL },
+         { "30",  NULL },
+         { "40",  NULL },
+         { "50",  NULL },
+         { "60",  NULL },
+         { "70",  NULL },
+         { "80",  NULL },
+         { "90",  NULL },
+         { "100", NULL },
+         { NULL, NULL },
+      },
+      "100"
+   },
+   {
+      "genesis_plus_gx_sms_fm_channel_3_volume",
+      GENESIS_PLUS_GX_SMS_FM_CHANNEL_3_VOLUME_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_SMS_FM_CHANNEL_3_VOLUME_INFO_0_TH,
+      NULL,
+      "channel_volume",
+      {
+         { "0",   NULL },
+         { "10",  NULL },
+         { "20",  NULL },
+         { "30",  NULL },
+         { "40",  NULL },
+         { "50",  NULL },
+         { "60",  NULL },
+         { "70",  NULL },
+         { "80",  NULL },
+         { "90",  NULL },
+         { "100", NULL },
+         { NULL, NULL },
+      },
+      "100"
+   },
+   {
+      "genesis_plus_gx_sms_fm_channel_4_volume",
+      GENESIS_PLUS_GX_SMS_FM_CHANNEL_4_VOLUME_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_SMS_FM_CHANNEL_4_VOLUME_INFO_0_TH,
+      NULL,
+      "channel_volume",
+      {
+         { "0",   NULL },
+         { "10",  NULL },
+         { "20",  NULL },
+         { "30",  NULL },
+         { "40",  NULL },
+         { "50",  NULL },
+         { "60",  NULL },
+         { "70",  NULL },
+         { "80",  NULL },
+         { "90",  NULL },
+         { "100", NULL },
+         { NULL, NULL },
+      },
+      "100"
+   },
+   {
+      "genesis_plus_gx_sms_fm_channel_5_volume",
+      GENESIS_PLUS_GX_SMS_FM_CHANNEL_5_VOLUME_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_SMS_FM_CHANNEL_5_VOLUME_INFO_0_TH,
+      NULL,
+      "channel_volume",
+      {
+         { "0",   NULL },
+         { "10",  NULL },
+         { "20",  NULL },
+         { "30",  NULL },
+         { "40",  NULL },
+         { "50",  NULL },
+         { "60",  NULL },
+         { "70",  NULL },
+         { "80",  NULL },
+         { "90",  NULL },
+         { "100", NULL },
+         { NULL, NULL },
+      },
+      "100"
+   },
+   {
+      "genesis_plus_gx_sms_fm_channel_6_volume",
+      GENESIS_PLUS_GX_SMS_FM_CHANNEL_6_VOLUME_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_SMS_FM_CHANNEL_6_VOLUME_INFO_0_TH,
+      NULL,
+      "channel_volume",
+      {
+         { "0",   NULL },
+         { "10",  NULL },
+         { "20",  NULL },
+         { "30",  NULL },
+         { "40",  NULL },
+         { "50",  NULL },
+         { "60",  NULL },
+         { "70",  NULL },
+         { "80",  NULL },
+         { "90",  NULL },
+         { "100", NULL },
+         { NULL, NULL },
+      },
+      "100"
+   },
+   {
+      "genesis_plus_gx_sms_fm_channel_7_volume",
+      GENESIS_PLUS_GX_SMS_FM_CHANNEL_7_VOLUME_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_SMS_FM_CHANNEL_7_VOLUME_INFO_0_TH,
+      NULL,
+      "channel_volume",
+      {
+         { "0",   NULL },
+         { "10",  NULL },
+         { "20",  NULL },
+         { "30",  NULL },
+         { "40",  NULL },
+         { "50",  NULL },
+         { "60",  NULL },
+         { "70",  NULL },
+         { "80",  NULL },
+         { "90",  NULL },
+         { "100", NULL },
+         { NULL, NULL },
+      },
+      "100"
+   },
+   {
+      "genesis_plus_gx_sms_fm_channel_8_volume",
+      GENESIS_PLUS_GX_SMS_FM_CHANNEL_8_VOLUME_LABEL_TH,
+      NULL,
+      GENESIS_PLUS_GX_SMS_FM_CHANNEL_8_VOLUME_INFO_0_TH,
+      NULL,
+      "channel_volume",
+      {
+         { "0",   NULL },
+         { "10",  NULL },
+         { "20",  NULL },
+         { "30",  NULL },
+         { "40",  NULL },
+         { "50",  NULL },
+         { "60",  NULL },
+         { "70",  NULL },
+         { "80",  NULL },
+         { "90",  NULL },
+         { "100", NULL },
+         { NULL, NULL },
+      },
+      "100"
+   },
+#endif
+   { NULL, NULL, NULL, NULL, NULL, NULL, {{0}}, NULL },
+};
+struct retro_core_options_v2 options_th = {
+   option_cats_th,
+   option_defs_th
+};
+
 /* RETRO_LANGUAGE_TR */
 
 #define CATEGORY_SYSTEM_LABEL_TR "Sistem"
