@@ -58351,20 +58351,20 @@ struct retro_core_options_v2 options_sv = {
 /* RETRO_LANGUAGE_TH */
 
 #define CATEGORY_SYSTEM_LABEL_TH "ระบบ"
-#define CATEGORY_SYSTEM_INFO_0_TH NULL
+#define CATEGORY_SYSTEM_INFO_0_TH "เปลี่ยนการเลือกฮาร์ดแวร์พื้นฐาน, ภูมิภาค, BIOS และการตั้งค่าไฟล์บันทึก Sega CD/Mega-CD"
 #define CATEGORY_VIDEO_LABEL_TH "วิดีโอ"
-#define CATEGORY_VIDEO_INFO_0_TH NULL
+#define CATEGORY_VIDEO_INFO_0_TH "เปลี่ยนอัตราส่วนภาพ, การครอบตัดการแสดงผล, ตัวกรองวิดีโอ และการตั้งค่าการข้ามเฟรม"
 #define CATEGORY_AUDIO_LABEL_TH "เสียง"
-#define CATEGORY_AUDIO_INFO_0_TH NULL
+#define CATEGORY_AUDIO_INFO_0_TH "เปลี่ยนการตั้งค่าอุปกรณ์เสียง"
 #define CATEGORY_INPUT_LABEL_TH "การควบคุม"
-#define CATEGORY_INPUT_INFO_0_TH NULL
+#define CATEGORY_INPUT_INFO_0_TH "เปลี่ยนการตั้งค่าอินพุต Light Gun และ/หรือ เมาส์"
 #define CATEGORY_HACKS_LABEL_TH NULL
-#define CATEGORY_HACKS_INFO_0_TH NULL
+#define CATEGORY_HACKS_INFO_0_TH "เปลี่ยนการโอเวอร์คล็อกโปรเซสเซอร์และการตั้งค่าความแม่นยำในการจำลอง ซึ่งส่งผลต่อประสิทธิภาพระดับต่ำ และความเข้ากันได้ของระบบ"
 #define CATEGORY_CHANNEL_VOLUME_LABEL_TH "ตั้งค่าระดับเสียงแยกช่องสัญญาณขั้นสูง"
-#define CATEGORY_CHANNEL_VOLUME_INFO_0_TH NULL
-#define GENESIS_PLUS_GX_SYSTEM_HW_LABEL_TH NULL
-#define GENESIS_PLUS_GX_SYSTEM_HW_INFO_0_TH NULL
-#define OPTION_VAL_AUTO_TH NULL
+#define CATEGORY_CHANNEL_VOLUME_INFO_0_TH "เปลี่ยนระดับเสียงของแต่ละช่องสัญญาณเสียงของฮาร์ดแวร์"
+#define GENESIS_PLUS_GX_SYSTEM_HW_LABEL_TH "ฮาร์ดแวร์ระบบ"
+#define GENESIS_PLUS_GX_SYSTEM_HW_INFO_0_TH "รันเนื้อหาที่โหลดด้วยคอนโซลจำลองที่ระบุ 'อัตโนมัติ' จะเลือกระบบที่เหมาะสมที่สุดสำหรับเกมปัจจุบัน"
+#define OPTION_VAL_AUTO_TH "อัตโนมัติ"
 #define OPTION_VAL_SG_1000_TH NULL
 #define OPTION_VAL_SG_1000_II_TH NULL
 #define OPTION_VAL_SG_1000_II_RAM_EXT_TH NULL
@@ -58374,38 +58374,38 @@ struct retro_core_options_v2 options_sv = {
 #define OPTION_VAL_GAME_GEAR_TH NULL
 #define OPTION_VAL_MEGA_DRIVE_GENESIS_TH NULL
 #define GENESIS_PLUS_GX_REGION_DETECT_LABEL_TH "ภูมิภาคระบบ"
-#define GENESIS_PLUS_GX_REGION_DETECT_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_REGION_DETECT_INFO_0_TH "ระบุภูมิภาคที่เป็นต้นกำเนิดของระบบ สำหรับคอนโซลอื่นที่ไม่ใช่ Game Gear 'PAL' จะอยู่ที่ 50 Hz ในขณะที่ 'NTSC' จะอยู่ที่ 60 Hz เกมอาจรันเร็วหรือช้ากว่าปกติหากเลือกภูมิภาคไม่ถูกต้อง"
 #define OPTION_VAL_NTSC_U_TH NULL
 #define OPTION_VAL_PAL_TH NULL
 #define OPTION_VAL_NTSC_J_TH NULL
-#define GENESIS_PLUS_GX_VDP_MODE_LABEL_TH NULL
-#define GENESIS_PLUS_GX_VDP_MODE_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_VDP_MODE_LABEL_TH "บังคับโหมด VDP"
+#define GENESIS_PLUS_GX_VDP_MODE_INFO_0_TH "แทนที่โหมด VDP เพื่อบังคับให้รันที่ NTSC 60Hz หรือ PAL 50Hz โดยไม่คำนึงถึงภูมิภาคของระบบ"
 #define OPTION_VAL_60HZ_TH NULL
 #define OPTION_VAL_50HZ_TH NULL
 #define GENESIS_PLUS_GX_BIOS_LABEL_TH NULL
-#define GENESIS_PLUS_GX_BIOS_INFO_0_TH NULL
-#define GENESIS_PLUS_GX_SYSTEM_BRAM_LABEL_TH NULL
-#define GENESIS_PLUS_GX_SYSTEM_BRAM_INFO_0_TH NULL
-#define OPTION_VAL_PER_BIOS_TH NULL
-#define OPTION_VAL_PER_GAME_TH NULL
-#define GENESIS_PLUS_GX_CART_BRAM_LABEL_TH NULL
-#define GENESIS_PLUS_GX_CART_BRAM_INFO_0_TH NULL
-#define OPTION_VAL_PER_CART_TH NULL
-#define GENESIS_PLUS_GX_CART_SIZE_LABEL_TH NULL
-#define GENESIS_PLUS_GX_CART_SIZE_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_BIOS_INFO_0_TH "ใช้ BIOS/Bootloader ทางการสำหรับฮาร์ดแวร์ที่จำลอง หากมีอยู่ในไดเรกทอรีระบบของ RetroArch จะแสดงลำดับการเริ่มทำงาน/แอนิเมชันเฉพาะของคอนโซลนั้นๆ จากนั้นจึงรันเนื้อหาที่โหลดไว้"
+#define GENESIS_PLUS_GX_SYSTEM_BRAM_LABEL_TH "CD System BRAM (ต้องเริ่มระบบใหม่)"
+#define GENESIS_PLUS_GX_SYSTEM_BRAM_INFO_0_TH "เมื่อรันเนื้อหา Sega CD/Mega-CD จะระบุว่าจะใช้ไฟล์บันทึกร่วมกันเพียงไฟล์เดียวระหว่างทุกเกมจากภูมิภาคที่กำหนด (ต่อ BIOS) หรือจะสร้างไฟล์บันทึกแยกกันสำหรับแต่ละเกม (ต่อเกม) โปรดทราบว่า Sega CD/Mega-CD มีพื้นที่เก็บข้อมูลภายในที่จำกัด ซึ่งเพียงพอสำหรับเกมเพียงไม่กี่เกมเท่านั้น เพื่อหลีกเลี่ยงไม่ให้พื้นที่เต็ม แนะนำให้ใช้การตั้งค่าแบบ 'ต่อเกม'"
+#define OPTION_VAL_PER_BIOS_TH "ต่อ BIOS"
+#define OPTION_VAL_PER_GAME_TH "ต่อ เกม"
+#define GENESIS_PLUS_GX_CART_BRAM_LABEL_TH "CD Backup Cart BRAM (ต้องเริ่มระบบใหม่)"
+#define GENESIS_PLUS_GX_CART_BRAM_INFO_0_TH "เมื่อรันเนื้อหา Sega CD/Mega-CD จะระบุว่าจะใช้ตลับสำรอง RAM ร่วมกันเพียงตลับเดียวสำหรับทุกเกม (ต่อตลับ) หรือจะสร้างตลับสำรอง RAM แยกกันสำหรับแต่ละเกม (ต่อเกม)"
+#define OPTION_VAL_PER_CART_TH "ต่อ ตลับ"
+#define GENESIS_PLUS_GX_CART_SIZE_LABEL_TH "CD Backup Cart BRAM Size (ต้องเริ่มระบบใหม่)"
+#define GENESIS_PLUS_GX_CART_SIZE_INFO_0_TH "ตั้งค่าขนาดตลับสำรอง RAM เมื่อรันเนื้อหา Sega CD/Mega-CD มีประโยชน์เมื่อตั้งค่าตลับสำรอง RAM แบบต่อเกม เพื่อหลีกเลี่ยงการใช้ขนาดตลับที่ใหญ่เกินความจำเป็นหลายตลับ"
 #define OPTION_VAL_128K_TH NULL
 #define OPTION_VAL_256K_TH NULL
 #define OPTION_VAL_512K_TH NULL
 #define OPTION_VAL_1MEG_TH NULL
 #define OPTION_VAL_2MEG_TH NULL
 #define OPTION_VAL_4MEG_TH NULL
-#define GENESIS_PLUS_GX_ADD_ON_LABEL_TH NULL
-#define GENESIS_PLUS_GX_ADD_ON_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_ADD_ON_LABEL_TH "CD add-on (MD mode) (ต้องเริ่มระบบใหม่)"
+#define GENESIS_PLUS_GX_ADD_ON_INFO_0_TH "ระบุว่าจะใช้อุปกรณ์เสริมใดสำหรับการเล่นเสียงจาก CD กับเกม Mega Drive/Genesis ที่รองรับ"
 #define OPTION_VAL_SEGA_MEGA_CD_TH NULL
 #define OPTION_VAL_MEGASD_TH NULL
-#define OPTION_VAL_NONE_TH NULL
-#define GENESIS_PLUS_GX_LOCK_ON_LABEL_TH NULL
-#define GENESIS_PLUS_GX_LOCK_ON_INFO_0_TH NULL
+#define OPTION_VAL_NONE_TH "ไม่แชร์อินพุต"
+#define GENESIS_PLUS_GX_LOCK_ON_LABEL_TH "ตลับ Lock-On"
+#define GENESIS_PLUS_GX_LOCK_ON_INFO_0_TH "เทคโนโลยี Lock-On คือคุณสมบัติของ Mega Drive/Genesis ที่อนุญาตให้เกมนามเดิมเชื่อมต่อเข้ากับพอร์ต Pass-through ของตลับเกมพิเศษ เพื่อขยายหรือเปลี่ยนแปลงรูปแบบการเล่น ตัวเลือกนี้ระบุประเภทของตลับ 'lock-on' พิเศษที่จะจำลอง ทั้งนี้ต้องมีไฟล์ BIOS ที่เกี่ยวข้องอยู่ในไดเรกทอรีระบบของ RetroArch ด้วย"
 #define OPTION_VAL_GAME_GENIE_TH NULL
 #define OPTION_VAL_ACTION_REPLAY_PRO_TH NULL
 #define OPTION_VAL_SONIC_KNUCKLES_TH NULL
@@ -58428,7 +58428,7 @@ struct retro_core_options_v2 options_sv = {
 #define GENESIS_PLUS_GX_GG_EXTRA_INFO_0_TH NULL
 #define GENESIS_PLUS_GX_BLARGG_NTSC_FILTER_LABEL_TH "ฟิลเตอร์ Blargg NTSC"
 #define GENESIS_PLUS_GX_BLARGG_NTSC_FILTER_INFO_0_TH NULL
-#define OPTION_VAL_MONOCHROME_TH NULL
+#define OPTION_VAL_MONOCHROME_TH "ขาวดำ"
 #define OPTION_VAL_COMPOSITE_TH NULL
 #define OPTION_VAL_SVIDEO_TH NULL
 #define OPTION_VAL_RGB_TH NULL
@@ -58440,7 +58440,7 @@ struct retro_core_options_v2 options_sv = {
 #define OPTION_VAL_DOUBLE_FIELD_TH NULL
 #define GENESIS_PLUS_GX_FRAMESKIP_LABEL_TH NULL
 #define GENESIS_PLUS_GX_FRAMESKIP_INFO_0_TH NULL
-#define OPTION_VAL_MANUAL_TH NULL
+#define OPTION_VAL_MANUAL_TH "กำหนดเอง"
 #define GENESIS_PLUS_GX_FRAMESKIP_THRESHOLD_LABEL_TH NULL
 #define GENESIS_PLUS_GX_FRAMESKIP_THRESHOLD_INFO_0_TH NULL
 #define GENESIS_PLUS_GX_YM2413_LABEL_TH NULL
@@ -58461,32 +58461,32 @@ struct retro_core_options_v2 options_sv = {
 #define GENESIS_PLUS_GX_SOUND_OUTPUT_INFO_0_TH NULL
 #define OPTION_VAL_STEREO_TH NULL
 #define OPTION_VAL_MONO_TH NULL
-#define GENESIS_PLUS_GX_AUDIO_FILTER_LABEL_TH NULL
-#define GENESIS_PLUS_GX_AUDIO_FILTER_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_AUDIO_FILTER_LABEL_TH "ตัวกรองเสียง"
+#define GENESIS_PLUS_GX_AUDIO_FILTER_INFO_0_TH "เปิดใช้งานฟิลเตอร์กรองเสียงความถี่ต่ำ เพื่อจำลองลักษณะเสียงที่เป็นเอกลักษณ์ของเครื่อง Mega Drive/Genesis รุ่น Model 1 ให้ดียิ่งขึ้น"
 #define OPTION_VAL_LOW_PASS_TH NULL
 #define OPTION_VAL_EQ_TH NULL
 #define GENESIS_PLUS_GX_LOWPASS_RANGE_LABEL_TH NULL
-#define GENESIS_PLUS_GX_LOWPASS_RANGE_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_LOWPASS_RANGE_INFO_0_TH "ระบุความถี่คัตออฟ ของฟิลเตอร์กรองเสียงความถี่ต่ำ ค่าที่สูงขึ้นจะเพิ่มความรู้สึกถึง 'ความแรง' ของฟิลเตอร์ เนื่องจากช่วงความถี่สูงที่กว้างกว่าจะถูกลดทอนลง"
 #define GENESIS_PLUS_GX_PSG_PREAMP_LABEL_TH NULL
-#define GENESIS_PLUS_GX_PSG_PREAMP_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_PSG_PREAMP_INFO_0_TH "ตั้งค่าระดับการขยายสัญญาณเสียง สำหรับชิป SN76496 Programmable Sound Generator แบบ 4 ช่องสัญญาณที่จำลองขึ้น ซึ่งพบได้ในเครื่อง SG-1000, Sega Mark III, Master System, Game Gear และ Mega Drive/Genesis"
 #define GENESIS_PLUS_GX_FM_PREAMP_LABEL_TH NULL
-#define GENESIS_PLUS_GX_FM_PREAMP_INFO_0_TH NULL
-#define GENESIS_PLUS_GX_CDDA_VOLUME_LABEL_TH NULL
-#define GENESIS_PLUS_GX_CDDA_VOLUME_INFO_0_TH NULL
-#define GENESIS_PLUS_GX_PCM_VOLUME_LABEL_TH NULL
-#define GENESIS_PLUS_GX_PCM_VOLUME_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_FM_PREAMP_INFO_0_TH "ตั้งค่าระดับการขยายสัญญาณเสียง (Audio preamplifier level) สำหรับตัวสังเคราะห์เสียง FM ของ Mega Drive/Genesis หรือหน่วยเสียง FM ของ Sega Mark III/Master System ที่จำลองขึ้น"
+#define GENESIS_PLUS_GX_CDDA_VOLUME_LABEL_TH "ระดับเสียง CD-DA"
+#define GENESIS_PLUS_GX_CDDA_VOLUME_INFO_0_TH "ปรับระดับความดังในการผสมสัญญาณเสียงสำหรับการเล่นเสียงจาก CD ที่จำลองขึ้น"
+#define GENESIS_PLUS_GX_PCM_VOLUME_LABEL_TH "ระดับเสียง PCM"
+#define GENESIS_PLUS_GX_PCM_VOLUME_INFO_0_TH "ปรับระดับความดังในการผสมสัญญาณเสียงสำหรับเอาต์พุตของตัวกำเนิดเสียง RF5C164 PCM ที่จำลองขึ้นของ Sega CD/Mega-CD"
 #define GENESIS_PLUS_GX_AUDIO_EQ_LOW_LABEL_TH NULL
-#define GENESIS_PLUS_GX_AUDIO_EQ_LOW_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_AUDIO_EQ_LOW_INFO_0_TH "ปรับระดับย่านความถี่ต่ำของอีควอไลเซอร์เสียงภายในเครื่อง"
 #define GENESIS_PLUS_GX_AUDIO_EQ_MID_LABEL_TH NULL
-#define GENESIS_PLUS_GX_AUDIO_EQ_MID_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_AUDIO_EQ_MID_INFO_0_TH "ปรับระดับย่านความถี่กลางของอีควอไลเซอร์เสียงภายในเครื่อง"
 #define GENESIS_PLUS_GX_AUDIO_EQ_HIGH_LABEL_TH NULL
-#define GENESIS_PLUS_GX_AUDIO_EQ_HIGH_INFO_0_TH NULL
-#define GENESIS_PLUS_GX_GUN_INPUT_LABEL_TH NULL
-#define GENESIS_PLUS_GX_GUN_INPUT_INFO_0_TH NULL
-#define OPTION_VAL_LIGHTGUN_TH NULL
-#define OPTION_VAL_TOUCHSCREEN_TH NULL
-#define GENESIS_PLUS_GX_GUN_CURSOR_LABEL_TH NULL
-#define GENESIS_PLUS_GX_GUN_CURSOR_INFO_0_TH NULL
+#define GENESIS_PLUS_GX_AUDIO_EQ_HIGH_INFO_0_TH "ปรับระดับย่านความถี่สูงของอีควอไลเซอร์เสียงภายในเครื่อง"
+#define GENESIS_PLUS_GX_GUN_INPUT_LABEL_TH "อินพุตจอยปืน"
+#define GENESIS_PLUS_GX_GUN_INPUT_INFO_0_TH "ใช้อินพุต 'จอยปืน' หรือ 'หน้าจอสัมผัส' ที่ควบคุมด้วยเมาส์"
+#define OPTION_VAL_LIGHTGUN_TH "ปืนแสง"
+#define OPTION_VAL_TOUCHSCREEN_TH "หน้าจอสัมผัส"
+#define GENESIS_PLUS_GX_GUN_CURSOR_LABEL_TH "แสดงเป้าเล็งของจอยปืน"
+#define GENESIS_PLUS_GX_GUN_CURSOR_INFO_0_TH "แสดงเป้าเล็งของจอยปืนเมื่อใช้อุปกรณ์อินพุตประเภท MD Menacer, MD Justifiers และ MS Light Phaser"
 #define GENESIS_PLUS_GX_INVERT_MOUSE_LABEL_TH NULL
 #define GENESIS_PLUS_GX_INVERT_MOUSE_INFO_0_TH NULL
 #define GENESIS_PLUS_GX_NO_SPRITE_LIMIT_LABEL_TH NULL
