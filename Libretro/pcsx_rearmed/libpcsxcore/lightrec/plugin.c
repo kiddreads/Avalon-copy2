@@ -673,6 +673,7 @@ static void lightrec_plugin_execute_internal(bool block_only)
 			u32 hlec = op & 0x03ffffff;
 			if ((op >> 26) == 0x3b && hlec < ARRAY_SIZE(psxHLEt) && Config.HLE) {
 				lightrec_plugin_sync_regs_to_pcsx(0);
+				psxRegs.pc += 4; // match psxinterpreter
 				psxHLEt[hlec]();
 				lightrec_plugin_sync_regs_from_pcsx(0);
 			}
