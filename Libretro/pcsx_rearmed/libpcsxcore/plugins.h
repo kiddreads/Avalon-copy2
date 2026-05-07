@@ -39,7 +39,7 @@ typedef long (CALLBACK *SIO1open)(unsigned long *);
 
 int LoadPlugins();
 void ReleasePlugins();
-int OpenPlugins();
+int OpenPlugins(int load_memcards);
 void ClosePlugins();
 int ReloadCdromPlugin();
 

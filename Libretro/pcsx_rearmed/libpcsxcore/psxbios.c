@@ -76,7 +76,7 @@ const char * const biosA0n[256] = {
 	"realloc",	"InitHeap",	"_exit",	"getchar",
 	"putchar",	"gets",		"puts",		"printf",
 // 0x40
-	"SystemErrorUnresolvedException", "LoadTest",		"Load",		"Exec",
+	"SystemErrorUnresolvedException", "LoadHeader",		"Load",		"Exec",
 	"FlushCache",		"InstallInterruptHandler",	"GPU_dw",	"mem2vram",
 	"SendGPUStatus",	"GPU_cw",			"GPU_cwb",	"SendPackets",
 	"sys_a0_4c",		"GetGPUStatus",				"GPU_sync",	"sys_a0_4f",
@@ -1760,7 +1760,8 @@ static void cdrom_cmd_and_wait(u8 cmd, int arg_cnt, int resp_cnt, ...)
  *	long Load(char *name, struct EXEC *header);
  */
 
-void psxBios_Load() { // 0x42
+static void psxBios_Load_(boolean full)
+{
 	u8 time[3] = { 2, 0, 0x16 };
 	EXE_HEADER eheader;
 	char path[256];
@@ -1769,7 +1770,6 @@ void psxBios_Load() { // 0x42
 
 	pa0 = Ra0;
 	pa1 = Ra1;
-	PSXBIOS_LOG("psxBios_%s %x(%s), %x\n", biosA0n[0x42], a0, pa0, a1);
 	if (pa0 == INVALID_PTR || pa1 == INVALID_PTR) {
 		mips_return(0);
 		return;
@@ -1783,10 +1783,11 @@ void psxBios_Load() { // 0x42
 	else
 		snprintf(path, sizeof(path), "%s", (char *)pa0);
 
-	if (LoadCdromFile(path, &eheader, time) == 0) {
+	if (LoadCdromFile(path, full, &eheader, time) == 0) {
 		memcpy(pa1, ((char*)&eheader)+16, sizeof(EXEC));
 		psxCpu->Clear(a1, sizeof(EXEC) / 4);
-		FlushCache();
+		if (full)
+			FlushCache();
 		v0 = 1;
 	} else v0 = 0;
 	PSXBIOS_LOG(" -> %d\n", v0);
@@ -1803,6 +1804,18 @@ void psxBios_Load() { // 0x42
 	cdrom_cmd_and_wait(0x15, 0, 2); // CdlSeekL
 	psxHwWrite16(0x1f801070, ~4);
 	MTC0(&psxRegs, 12, psxRegs.CP0.n.SR | 0x404);
+}
+
+static void psxBios_LoadHeader() // 0x41
+{
+	PSXBIOS_LOG("psxBios_%s %x(%s), %x\n", biosA0n[0x41], a0, Ra0, a1);
+	psxBios_Load_(0);
+}
+
+static void psxBios_Load() // 0x42
+{
+	PSXBIOS_LOG("psxBios_%s %x(%s), %x\n", biosA0n[0x42], a0, Ra0, a1);
+	psxBios_Load_(1);
 }
 
 /*
@@ -2587,7 +2600,7 @@ static u32 psxBios_PAD_dr_() {
 }
 
 static void psxBios_PAD_dr() { // 16
-	PSXBIOS_LOG("psxBios_%s\n", biosB0n[0x16]);
+	//PSXBIOS_LOG("psxBios_%s\n", biosB0n[0x16]);
 	u32 ret = psxBios_PAD_dr_();
 	mips_return(ret);
 }
@@ -3870,7 +3883,7 @@ void psxBiosInit() {
 	biosA0[0x3e] = psxBios_puts;
 	biosA0[0x3f] = psxBios_printf;
 	biosA0[0x40] = psxBios_SystemErrorUnresolvedException;
-	//biosA0[0x41] = psxBios_LoadTest;
+	biosA0[0x41] = psxBios_LoadHeader;
 	biosA0[0x42] = psxBios_Load;
 	biosA0[0x43] = psxBios_Exec;
 	biosA0[0x44] = psxBios_FlushCache;

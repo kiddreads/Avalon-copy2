@@ -677,7 +677,7 @@ int main(int argc, char *argv[])
 	}
 	pcnt_hook_plugins();
 
-	if (OpenPlugins() == -1) {
+	if (OpenPlugins(1) == -1) {
 		return 1;
 	}
 
@@ -944,14 +944,15 @@ static int _OpenPlugins(void) {
 	return 0;
 }
 
-int OpenPlugins() {
+int OpenPlugins(int load_memcards) {
 	int ret;
 
 	while ((ret = _OpenPlugins()) == -2) {
 		ReleasePlugins();
-		LoadMcds(Config.Mcd1, Config.Mcd2);
 		if (LoadPlugins() == -1) return -1;
 	}
+	if (load_memcards)
+		LoadMcds(Config.Mcd1, Config.Mcd2);
 	return ret;
 }
 

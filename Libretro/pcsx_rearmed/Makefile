@@ -543,6 +543,11 @@ endif
 clean: $(PLAT_CLEAN) clean_plugins
 	$(RM) $(TARGET) *.o $(OBJS) $(OBJS:.o=.d) $(TARGET).map include/revision.h
 
+ifeq ($(STATIC_LINKING), 1)
+link_test: frontend/libretro-link-test.o $(TARGET)
+	$(CC_LINK) $(CFLAGS) $^ $(EXTRA_LDFLAGS)
+endif
+
 ifneq ($(PLUGINS),)
 plugins_: $(PLUGINS)
 
@@ -566,7 +571,7 @@ $(OBJS:.o=.d): ;
 -include $(OBJS:.o=.d)
 endif
 
-.PHONY: all clean target_ plugins_ clean_plugins FORCE
+.PHONY: all clean target_ plugins_ clean_plugins link_test FORCE
 
 ifneq "$(PLATFORM)" "pandora"
 ifdef CPATH

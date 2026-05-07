@@ -316,7 +316,7 @@ int main(int argc, char **argv)
 	if (discNumber > 0)
 		cdrIsoMultidiskSelect = discNumber - 1;
 
-	if (OpenPlugins() == -1) {
+	if (OpenPlugins(1) == -1) {
 		return 1;
 	}
 	plugin_call_rearmed_cbs();
