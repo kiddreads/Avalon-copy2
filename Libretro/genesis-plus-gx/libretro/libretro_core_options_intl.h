@@ -20526,15 +20526,15 @@ struct retro_core_options_v2 options_en = {
 
 /* RETRO_LANGUAGE_EO */
 
-#define CATEGORY_SYSTEM_LABEL_EO NULL
+#define CATEGORY_SYSTEM_LABEL_EO "Sistemo"
 #define CATEGORY_SYSTEM_INFO_0_EO NULL
 #define CATEGORY_VIDEO_LABEL_EO NULL
-#define CATEGORY_VIDEO_INFO_0_EO NULL
+#define CATEGORY_VIDEO_INFO_0_EO "Ŝanĝi agordojn pri bilda proporcio, ekrana stucado, videa filtrilo kaj filmera preterpaso."
 #define CATEGORY_AUDIO_LABEL_EO "Sono"
 #define CATEGORY_AUDIO_INFO_0_EO NULL
 #define CATEGORY_INPUT_LABEL_EO "Enigo"
 #define CATEGORY_INPUT_INFO_0_EO NULL
-#define CATEGORY_HACKS_LABEL_EO NULL
+#define CATEGORY_HACKS_LABEL_EO "Imitadaj kodumoj"
 #define CATEGORY_HACKS_INFO_0_EO NULL
 #define CATEGORY_CHANNEL_VOLUME_LABEL_EO "Altnivelaj agordoj de volumeno de kanaloj"
 #define CATEGORY_CHANNEL_VOLUME_INFO_0_EO NULL
@@ -20549,7 +20549,7 @@ struct retro_core_options_v2 options_en = {
 #define OPTION_VAL_MASTER_SYSTEM_II_EO NULL
 #define OPTION_VAL_GAME_GEAR_EO NULL
 #define OPTION_VAL_MEGA_DRIVE_GENESIS_EO NULL
-#define GENESIS_PLUS_GX_REGION_DETECT_LABEL_EO NULL
+#define GENESIS_PLUS_GX_REGION_DETECT_LABEL_EO "Sistema regiono"
 #define GENESIS_PLUS_GX_REGION_DETECT_INFO_0_EO NULL
 #define OPTION_VAL_NTSC_U_EO NULL
 #define OPTION_VAL_PAL_EO NULL
@@ -20585,24 +20585,24 @@ struct retro_core_options_v2 options_en = {
 #define OPTION_VAL_GAME_GENIE_EO NULL
 #define OPTION_VAL_ACTION_REPLAY_PRO_EO NULL
 #define OPTION_VAL_SONIC_KNUCKLES_EO NULL
-#define GENESIS_PLUS_GX_ASPECT_RATIO_LABEL_EO NULL
+#define GENESIS_PLUS_GX_ASPECT_RATIO_LABEL_EO "Bilda proporcio provizita de kerno"
 #define GENESIS_PLUS_GX_ASPECT_RATIO_INFO_0_EO "Elekti la preferatan bildan proporcion de la enhavo. Ĉi tio nur aplikiĝos kiam la bilda proporcio de RetroArch estas agordita al \"Provizita de kerno\" en la agordojn Video."
 #define OPTION_VAL_NTSC_PAR_EO NULL
 #define OPTION_VAL_PAL_PAR_EO NULL
 #define OPTION_VAL_4_3_EO NULL
-#define OPTION_VAL_UNCORRECTED_EO NULL
+#define OPTION_VAL_UNCORRECTED_EO "Nekorektita"
 #define GENESIS_PLUS_GX_OVERSCAN_LABEL_EO NULL
 #define GENESIS_PLUS_GX_OVERSCAN_INFO_0_EO NULL
 #define OPTION_VAL_TOP_BOTTOM_EO NULL
 #define OPTION_VAL_LEFT_RIGHT_EO NULL
-#define OPTION_VAL_FULL_EO NULL
+#define OPTION_VAL_FULL_EO "Plena"
 #define GENESIS_PLUS_GX_LEFT_BORDER_LABEL_EO NULL
 #define GENESIS_PLUS_GX_LEFT_BORDER_INFO_0_EO NULL
 #define OPTION_VAL_LEFT_BORDER_EO NULL
 #define OPTION_VAL_LEFT_RIGHT_BORDERS_EO NULL
 #define GENESIS_PLUS_GX_GG_EXTRA_LABEL_EO NULL
 #define GENESIS_PLUS_GX_GG_EXTRA_INFO_0_EO NULL
-#define GENESIS_PLUS_GX_BLARGG_NTSC_FILTER_LABEL_EO NULL
+#define GENESIS_PLUS_GX_BLARGG_NTSC_FILTER_LABEL_EO "Filtrilo NTSC de Blargg"
 #define GENESIS_PLUS_GX_BLARGG_NTSC_FILTER_INFO_0_EO NULL
 #define OPTION_VAL_MONOCHROME_EO "Unukolora"
 #define OPTION_VAL_COMPOSITE_EO "Kunmetita"
@@ -20614,11 +20614,11 @@ struct retro_core_options_v2 options_en = {
 #define GENESIS_PLUS_GX_RENDER_INFO_0_EO NULL
 #define OPTION_VAL_SINGLE_FIELD_EO NULL
 #define OPTION_VAL_DOUBLE_FIELD_EO NULL
-#define GENESIS_PLUS_GX_FRAMESKIP_LABEL_EO NULL
-#define GENESIS_PLUS_GX_FRAMESKIP_INFO_0_EO NULL
+#define GENESIS_PLUS_GX_FRAMESKIP_LABEL_EO "Filmera preterpaso"
+#define GENESIS_PLUS_GX_FRAMESKIP_INFO_0_EO "Preterpasi filmerojn por eviti saturi la sonan bufron (krevsonoj). Plibonigas rendimenton kontraŭ vida glateco. \"Aŭtomata\" preterpasas filmerojn kiam admonita de la fasado. \"Permana\" utiligas la agordon \"Sojlo de filmera preterpaso (%)\"."
 #define OPTION_VAL_MANUAL_EO "Permana"
-#define GENESIS_PLUS_GX_FRAMESKIP_THRESHOLD_LABEL_EO NULL
-#define GENESIS_PLUS_GX_FRAMESKIP_THRESHOLD_INFO_0_EO NULL
+#define GENESIS_PLUS_GX_FRAMESKIP_THRESHOLD_LABEL_EO "Sojlo de filmera preterpaso (%)"
+#define GENESIS_PLUS_GX_FRAMESKIP_THRESHOLD_INFO_0_EO "Kiam \"Filmera preterpaso\" estas agordita al \"Permana\", ĝi specifas la okupadan sojlon de la sona bufro (je procento) sub kiu filmeroj estos preterpasataj. Ju pli altaj valoroj, des malpli da risko de krevsonoj, malpliigante la filmerojn pli ofte."
 #define GENESIS_PLUS_GX_YM2413_LABEL_EO NULL
 #define GENESIS_PLUS_GX_YM2413_INFO_0_EO NULL
 #define GENESIS_PLUS_GX_YM2413_CORE_LABEL_EO NULL
@@ -20637,7 +20637,7 @@ struct retro_core_options_v2 options_en = {
 #define GENESIS_PLUS_GX_SOUND_OUTPUT_INFO_0_EO NULL
 #define OPTION_VAL_STEREO_EO NULL
 #define OPTION_VAL_MONO_EO NULL
-#define GENESIS_PLUS_GX_AUDIO_FILTER_LABEL_EO NULL
+#define GENESIS_PLUS_GX_AUDIO_FILTER_LABEL_EO "Sonfiltrilo"
 #define GENESIS_PLUS_GX_AUDIO_FILTER_INFO_0_EO NULL
 #define OPTION_VAL_LOW_PASS_EO NULL
 #define OPTION_VAL_EQ_EO NULL
@@ -20659,8 +20659,8 @@ struct retro_core_options_v2 options_en = {
 #define GENESIS_PLUS_GX_AUDIO_EQ_HIGH_INFO_0_EO NULL
 #define GENESIS_PLUS_GX_GUN_INPUT_LABEL_EO NULL
 #define GENESIS_PLUS_GX_GUN_INPUT_INFO_0_EO NULL
-#define OPTION_VAL_LIGHTGUN_EO NULL
-#define OPTION_VAL_TOUCHSCREEN_EO NULL
+#define OPTION_VAL_LIGHTGUN_EO "\"Light Gun\""
+#define OPTION_VAL_TOUCHSCREEN_EO "Tuŝekrano"
 #define GENESIS_PLUS_GX_GUN_CURSOR_LABEL_EO NULL
 #define GENESIS_PLUS_GX_GUN_CURSOR_INFO_0_EO NULL
 #define GENESIS_PLUS_GX_INVERT_MOUSE_LABEL_EO NULL
@@ -52052,7 +52052,7 @@ struct retro_core_options_v2 options_pt_pt = {
 #define CATEGORY_VIDEO_INFO_0_RU "Настройки соотношения сторон, кадрирования, графических фильтров и пропуска кадров."
 #define CATEGORY_AUDIO_LABEL_RU "Аудио"
 #define CATEGORY_AUDIO_INFO_0_RU "Настройки звуковых устройств."
-#define CATEGORY_INPUT_LABEL_RU "Устройства ввода"
+#define CATEGORY_INPUT_LABEL_RU "Управление"
 #define CATEGORY_INPUT_INFO_0_RU "Настройки ввода для мыши и/или светового пистолета."
 #define CATEGORY_HACKS_LABEL_RU "Хаки эмуляции"
 #define CATEGORY_HACKS_INFO_0_RU "Настройка разгона процессора и параметров точности эмуляции, влияющих на производительность и совместимость."
