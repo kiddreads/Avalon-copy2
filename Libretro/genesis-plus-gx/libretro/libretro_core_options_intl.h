@@ -20527,152 +20527,152 @@ struct retro_core_options_v2 options_en = {
 /* RETRO_LANGUAGE_EO */
 
 #define CATEGORY_SYSTEM_LABEL_EO "Sistemo"
-#define CATEGORY_SYSTEM_INFO_0_EO NULL
+#define CATEGORY_SYSTEM_INFO_0_EO "Ŝanĝi agordojn pri elekto de baza aparataro, regiono, BIOS kaj konservdosiero de Sega CD/Mega-CD."
 #define CATEGORY_VIDEO_LABEL_EO NULL
 #define CATEGORY_VIDEO_INFO_0_EO "Ŝanĝi agordojn pri bilda proporcio, ekrana stucado, videa filtrilo kaj filmera preterpaso."
 #define CATEGORY_AUDIO_LABEL_EO "Sono"
-#define CATEGORY_AUDIO_INFO_0_EO NULL
+#define CATEGORY_AUDIO_INFO_0_EO "Ŝanĝi sonaparatajn agordojn."
 #define CATEGORY_INPUT_LABEL_EO "Enigo"
-#define CATEGORY_INPUT_INFO_0_EO NULL
+#define CATEGORY_INPUT_INFO_0_EO "Ŝanĝi enigajn agordojn de \"light gun\" kaj/aŭ muso."
 #define CATEGORY_HACKS_LABEL_EO "Imitadaj kodumoj"
-#define CATEGORY_HACKS_INFO_0_EO NULL
+#define CATEGORY_HACKS_INFO_0_EO "Ŝanĝi agordojn pri procesora trorapidigo kaj imitada precizeco influantajn malaltnivelan rendimenton kaj kongruecon."
 #define CATEGORY_CHANNEL_VOLUME_LABEL_EO "Altnivelaj agordoj de volumeno de kanaloj"
-#define CATEGORY_CHANNEL_VOLUME_INFO_0_EO NULL
-#define GENESIS_PLUS_GX_SYSTEM_HW_LABEL_EO NULL
-#define GENESIS_PLUS_GX_SYSTEM_HW_INFO_0_EO NULL
+#define CATEGORY_CHANNEL_VOLUME_INFO_0_EO "Ŝanĝi la volumenon de individuaj aparataraj sonkanaloj."
+#define GENESIS_PLUS_GX_SYSTEM_HW_LABEL_EO "Sistema aparataro"
+#define GENESIS_PLUS_GX_SYSTEM_HW_INFO_0_EO "Ruli ŝargitan enhavon kun specifita imitata konzolo. \"Aŭtomata\" elektos la plej taŭga sistemo por la kuranta ludo."
 #define OPTION_VAL_AUTO_EO "Aŭtomata"
 #define OPTION_VAL_SG_1000_EO NULL
 #define OPTION_VAL_SG_1000_II_EO NULL
-#define OPTION_VAL_SG_1000_II_RAM_EXT_EO NULL
+#define OPTION_VAL_SG_1000_II_RAM_EXT_EO "SG-1000 II + ĉefmemora etendaĵo"
 #define OPTION_VAL_MARK_III_EO NULL
 #define OPTION_VAL_MASTER_SYSTEM_EO NULL
 #define OPTION_VAL_MASTER_SYSTEM_II_EO NULL
 #define OPTION_VAL_GAME_GEAR_EO NULL
 #define OPTION_VAL_MEGA_DRIVE_GENESIS_EO NULL
 #define GENESIS_PLUS_GX_REGION_DETECT_LABEL_EO "Sistema regiono"
-#define GENESIS_PLUS_GX_REGION_DETECT_INFO_0_EO NULL
+#define GENESIS_PLUS_GX_REGION_DETECT_INFO_0_EO "Specifi la regionon, el kiu venas la sistemo. Por konzoloj, kiuj ne estas la Game Gear, \"PAL\" estas 50 Hz, dum \"NTSC\" estas 60 Hz. Ludoj povas ruliĝi pli rapide aŭ malrapide ol normale se la neĝusta regiono estas elektita."
 #define OPTION_VAL_NTSC_U_EO NULL
 #define OPTION_VAL_PAL_EO NULL
 #define OPTION_VAL_NTSC_J_EO NULL
-#define GENESIS_PLUS_GX_VDP_MODE_LABEL_EO NULL
-#define GENESIS_PLUS_GX_VDP_MODE_INFO_0_EO NULL
+#define GENESIS_PLUS_GX_VDP_MODE_LABEL_EO "Devigi reĝimon VDP"
+#define GENESIS_PLUS_GX_VDP_MODE_INFO_0_EO "Transpasas la reĝimon VDP por devigi al ĝi ruliĝi je ĉu NTSC 60Hz aŭ PAL 50Hz, senridarde de sistema regiono."
 #define OPTION_VAL_60HZ_EO NULL
 #define OPTION_VAL_50HZ_EO NULL
-#define GENESIS_PLUS_GX_BIOS_LABEL_EO NULL
-#define GENESIS_PLUS_GX_BIOS_INFO_0_EO NULL
-#define GENESIS_PLUS_GX_SYSTEM_BRAM_LABEL_EO NULL
-#define GENESIS_PLUS_GX_SYSTEM_BRAM_INFO_0_EO NULL
-#define OPTION_VAL_PER_BIOS_EO NULL
-#define OPTION_VAL_PER_GAME_EO NULL
-#define GENESIS_PLUS_GX_CART_BRAM_LABEL_EO NULL
-#define GENESIS_PLUS_GX_CART_BRAM_INFO_0_EO NULL
-#define OPTION_VAL_PER_CART_EO NULL
-#define GENESIS_PLUS_GX_CART_SIZE_LABEL_EO NULL
-#define GENESIS_PLUS_GX_CART_SIZE_INFO_0_EO NULL
+#define GENESIS_PLUS_GX_BIOS_LABEL_EO "Sistema startiga ROM"
+#define GENESIS_PLUS_GX_BIOS_INFO_0_EO "Uzi oficialan BIOS/praŝargilon por imitata aparataro, se ĉeestanta en sistema dosierujo de RetroArch. Montras konzolspecifan startan sekvencon/animacion, tiam rulas ŝargitan enhavon."
+#define GENESIS_PLUS_GX_SYSTEM_BRAM_LABEL_EO "BRAM de KD-sistemo (bezonas restartigon)"
+#define GENESIS_PLUS_GX_SYSTEM_BRAM_INFO_0_EO "Kiam rulante enhavon de Sega CD/Mega-CD, specifas ĉu kunhavigi ununuran konservdosieron inter ĉiuj ludoj el specifa regiono (Laŭ BIOS) aŭ ĉu krei apartan konservdosieron por ĉiu ludo (Laŭ ludo). Notu, ke Sega CD/Mega-CD havas limigitan internan konservejon, nur sufiĉe por kelkaj verkoj. Por eviti elĉerpigi la spacon, la agordon \"Laŭ ludo\" oni rekomendas."
+#define OPTION_VAL_PER_BIOS_EO "Laŭ BIOS"
+#define OPTION_VAL_PER_GAME_EO "Laŭ ludo"
+#define GENESIS_PLUS_GX_CART_BRAM_LABEL_EO "Retropaŝa kartoĉo BRAM de KD (bezonas restartigon)"
+#define GENESIS_PLUS_GX_CART_BRAM_INFO_0_EO "Kiam rulante enhavon de Sega CD/Mega-CD, specifas ĉu kunhavigi ununuran retropaŝan ĉefmemoran kartoĉon por ĉiuj ludoj (Laŭ kartoĉo) aŭ ĉu krei apartan retropaŝan ĉefmemoran kartoĉon por ĉiu ludo (Laŭ ludo)."
+#define OPTION_VAL_PER_CART_EO "Laŭ kartoĉo"
+#define GENESIS_PLUS_GX_CART_SIZE_LABEL_EO "Grando de BRAM de retropaŝa kartoĉo de KD (bezonas restartigon)"
+#define GENESIS_PLUS_GX_CART_SIZE_INFO_0_EO "Agordas la grandon de la retropaŝa ĉefmemoro kiam rulante enhavon de Sega CD/Mega-CD. Utila kiam agordante la kartoĉo de retropaŝa ĉefmemoro je \"Laŭ ludo\" por eviti pli grandaj kartoĉoj."
 #define OPTION_VAL_128K_EO NULL
 #define OPTION_VAL_256K_EO NULL
 #define OPTION_VAL_512K_EO NULL
 #define OPTION_VAL_1MEG_EO NULL
 #define OPTION_VAL_2MEG_EO NULL
 #define OPTION_VAL_4MEG_EO NULL
-#define GENESIS_PLUS_GX_ADD_ON_LABEL_EO NULL
-#define GENESIS_PLUS_GX_ADD_ON_INFO_0_EO NULL
+#define GENESIS_PLUS_GX_ADD_ON_LABEL_EO "KD-a kromaĵo (reĝimo MD) (bezonas restartigon)"
+#define GENESIS_PLUS_GX_ADD_ON_INFO_0_EO "Specifi kiun kromaĵon uzi por KD-a sonludado kun subtenataj ludoj de Mega Drive/Genesis."
 #define OPTION_VAL_SEGA_MEGA_CD_EO NULL
 #define OPTION_VAL_MEGASD_EO NULL
-#define OPTION_VAL_NONE_EO "Neniom"
-#define GENESIS_PLUS_GX_LOCK_ON_LABEL_EO NULL
-#define GENESIS_PLUS_GX_LOCK_ON_INFO_0_EO NULL
+#define OPTION_VAL_NONE_EO "Neniu"
+#define GENESIS_PLUS_GX_LOCK_ON_LABEL_EO "Kartoĉa Lock-on"
+#define GENESIS_PLUS_GX_LOCK_ON_INFO_0_EO "Lock-On Technology estas funkcio de Mega Drive/Genesis, kio permesis al malnova ludo konektiĝi al konektejo de speciala kartoĉo por etendita aŭ ŝanĝita ludado. Ĉi tiu opcio specifas la specon de speciala kartoĉo \"lock-on\", kiun ĝi imitos. Koresponda BIOS-dosiero devas ĉeesti en la sistema dosierujo de RetroArch."
 #define OPTION_VAL_GAME_GENIE_EO NULL
 #define OPTION_VAL_ACTION_REPLAY_PRO_EO NULL
 #define OPTION_VAL_SONIC_KNUCKLES_EO NULL
 #define GENESIS_PLUS_GX_ASPECT_RATIO_LABEL_EO "Bilda proporcio provizita de kerno"
 #define GENESIS_PLUS_GX_ASPECT_RATIO_INFO_0_EO "Elekti la preferatan bildan proporcion de la enhavo. Ĉi tio nur aplikiĝos kiam la bilda proporcio de RetroArch estas agordita al \"Provizita de kerno\" en la agordojn Video."
-#define OPTION_VAL_NTSC_PAR_EO NULL
-#define OPTION_VAL_PAL_PAR_EO NULL
+#define OPTION_VAL_NTSC_PAR_EO "Bildera proporcio de NTSC"
+#define OPTION_VAL_PAL_PAR_EO "Bildera proporcio de PAL"
 #define OPTION_VAL_4_3_EO NULL
 #define OPTION_VAL_UNCORRECTED_EO "Nekorektita"
-#define GENESIS_PLUS_GX_OVERSCAN_LABEL_EO NULL
-#define GENESIS_PLUS_GX_OVERSCAN_INFO_0_EO NULL
-#define OPTION_VAL_TOP_BOTTOM_EO NULL
-#define OPTION_VAL_LEFT_RIGHT_EO NULL
+#define GENESIS_PLUS_GX_OVERSCAN_LABEL_EO "Randoj"
+#define GENESIS_PLUS_GX_OVERSCAN_INFO_0_EO "Ebligi ĉi tion por montri la superskanajn regiojnn ĉe la (mal)supro kaj/aŭ (mal)dekstro de la ekrano. Ĉi tiuj kutime estos kaŝitaj de la nigraj randoj ĉirkaŭ la eĝo de norme distingiva televidilo."
+#define OPTION_VAL_TOP_BOTTOM_EO "(Mal)supro"
+#define OPTION_VAL_LEFT_RIGHT_EO "(Mal)dekstro"
 #define OPTION_VAL_FULL_EO "Plena"
-#define GENESIS_PLUS_GX_LEFT_BORDER_LABEL_EO NULL
-#define GENESIS_PLUS_GX_LEFT_BORDER_INFO_0_EO NULL
-#define OPTION_VAL_LEFT_BORDER_EO NULL
-#define OPTION_VAL_LEFT_RIGHT_BORDERS_EO NULL
-#define GENESIS_PLUS_GX_GG_EXTRA_LABEL_EO NULL
-#define GENESIS_PLUS_GX_GG_EXTRA_INFO_0_EO NULL
+#define GENESIS_PLUS_GX_LEFT_BORDER_LABEL_EO "Kaŝi flankajn randojn de Master System"
+#define GENESIS_PLUS_GX_LEFT_BORDER_INFO_0_EO "Fortranĉi 8 bilderojn el ĉu la maldekstra flanko de la ekrano, aŭ kaj la dekstra kaj maldekstra flankoj kiam rulante ludojn de Master System."
+#define OPTION_VAL_LEFT_BORDER_EO "Nur maldekstra rando"
+#define OPTION_VAL_LEFT_RIGHT_BORDERS_EO "Dekstra k malekstra randoj"
+#define GENESIS_PLUS_GX_GG_EXTRA_LABEL_EO "Etendita ekrano de Game Gear"
+#define GENESIS_PLUS_GX_GG_EXTRA_INFO_0_EO "Devigas al verkoj de Game Gear ruliĝi en reĝimo SMS, kun pliigita distingivo de 256x192. Povus montri kroman enhavon, sed norme montras randon de difektitaj/nedezirataj bildaj datumoj."
 #define GENESIS_PLUS_GX_BLARGG_NTSC_FILTER_LABEL_EO "Filtrilo NTSC de Blargg"
-#define GENESIS_PLUS_GX_BLARGG_NTSC_FILTER_INFO_0_EO NULL
+#define GENESIS_PLUS_GX_BLARGG_NTSC_FILTER_INFO_0_EO "Apliki videofiltrilon por imiti plurajn TV-ajn singalojn de NTSC."
 #define OPTION_VAL_MONOCHROME_EO "Unukolora"
 #define OPTION_VAL_COMPOSITE_EO "Kunmetita"
 #define OPTION_VAL_SVIDEO_EO NULL
 #define OPTION_VAL_RGB_EO NULL
-#define GENESIS_PLUS_GX_LCD_FILTER_LABEL_EO NULL
-#define GENESIS_PLUS_GX_LCD_FILTER_INFO_0_EO NULL
-#define GENESIS_PLUS_GX_RENDER_LABEL_EO NULL
-#define GENESIS_PLUS_GX_RENDER_INFO_0_EO NULL
-#define OPTION_VAL_SINGLE_FIELD_EO NULL
-#define OPTION_VAL_DOUBLE_FIELD_EO NULL
+#define GENESIS_PLUS_GX_LCD_FILTER_LABEL_EO "Filtrilo de fantasmigo de LCD"
+#define GENESIS_PLUS_GX_LCD_FILTER_INFO_0_EO "Apliki bildan \"fantasmigan\" filtrilon por imiti la ekranajn trajtojn de la paneloj LCD de Game Gear kaj Genesis Nomad."
+#define GENESIS_PLUS_GX_RENDER_LABEL_EO "Eligo de interplektita reĝimo 2"
+#define GENESIS_PLUS_GX_RENDER_INFO_0_EO "Interplektita reĝimo 2 permesas al Mega Drive/Genesis eligi bildon je duobla alto (altdistingiva) 320x448, desegnante alternativajn skanliniojn ĉiu filmero (ĉi tio estas uzata de la plurludantaj reĝimoj de Sonic the Hedgehog 2 kaj Combat Cars). \"Duobla kampo\" imitas la originala aparataro, produktante akran bildon kun flagrantaj/interplektitaj artefaktoj. \"Ununura kampo\" aplikiĝas malinterplektan filtrilon, kiu stabiligas la bildon sed povas kaŭzi mildan malklarecon."
+#define OPTION_VAL_SINGLE_FIELD_EO "Ununura kampo"
+#define OPTION_VAL_DOUBLE_FIELD_EO "Duobla kampo"
 #define GENESIS_PLUS_GX_FRAMESKIP_LABEL_EO "Filmera preterpaso"
 #define GENESIS_PLUS_GX_FRAMESKIP_INFO_0_EO "Preterpasi filmerojn por eviti saturi la sonan bufron (krevsonoj). Plibonigas rendimenton kontraŭ vida glateco. \"Aŭtomata\" preterpasas filmerojn kiam admonita de la fasado. \"Permana\" utiligas la agordon \"Sojlo de filmera preterpaso (%)\"."
 #define OPTION_VAL_MANUAL_EO "Permana"
 #define GENESIS_PLUS_GX_FRAMESKIP_THRESHOLD_LABEL_EO "Sojlo de filmera preterpaso (%)"
 #define GENESIS_PLUS_GX_FRAMESKIP_THRESHOLD_INFO_0_EO "Kiam \"Filmera preterpaso\" estas agordita al \"Permana\", ĝi specifas la okupadan sojlon de la sona bufro (je procento) sub kiu filmeroj estos preterpasataj. Ju pli altaj valoroj, des malpli da risko de krevsonoj, malpliigante la filmerojn pli ofte."
-#define GENESIS_PLUS_GX_YM2413_LABEL_EO NULL
-#define GENESIS_PLUS_GX_YM2413_INFO_0_EO NULL
-#define GENESIS_PLUS_GX_YM2413_CORE_LABEL_EO NULL
-#define GENESIS_PLUS_GX_YM2413_CORE_INFO_0_EO NULL
+#define GENESIS_PLUS_GX_YM2413_LABEL_EO "FM de Master System (YM2413)"
+#define GENESIS_PLUS_GX_YM2413_INFO_0_EO "Ebligi imitadon de la sona unuo FM uzata de kelkaj ludoj de Sega Mark III/Master System por plibonigita sona eligo."
+#define GENESIS_PLUS_GX_YM2413_CORE_LABEL_EO "Kerno de FM de Master System (YM2413)"
+#define GENESIS_PLUS_GX_YM2413_CORE_INFO_0_EO "Elekti metodon uzotan por imiti la sona unuo FM de Sega Mark III/Master System. Opcio \"MAME\" estas rapida, kaj ruliĝas plenrapide en la plej multo da sistemoj. Opcio \"Nuked\" estas cikle preciza, tre alte kvalita, kaj havas altajn ĉefprocesorajn postulojn."
 #define OPTION_VAL_MAME_EO NULL
 #define OPTION_VAL_NUKED_EO NULL
 #define GENESIS_PLUS_GX_YM2612_LABEL_EO NULL
-#define GENESIS_PLUS_GX_YM2612_INFO_0_EO NULL
-#define GENESIS_PLUS_GX_YM2612_INFO_1_EO NULL
+#define GENESIS_PLUS_GX_YM2612_INFO_0_EO "Elekti metodon uzotan por imiti la sintezilon FM (ĉefa sona generilo) de Mega Drive/Genesis. Opcioj \"MAME\" estas rapidaj, kaj ruliĝas plenrapide en la plej multo da sistemoj. Opcioj \"Nuked\" estas cikle precizaj, tre alte kvalitaj, kaj havas altajn ĉefprocesorajn postulojn. La blato YM2612 estas uzata de la originala Model 1 Mega Drive/Genesis. La YM3438 estas uzata en postaj versioj de Mega Drive/Genesis."
+#define GENESIS_PLUS_GX_YM2612_INFO_1_EO "Elekti metodon uzotan por imiti la sintezilon FM (ĉefa sona generilo) de Mega Drive/Genesis. La blato YM2612 estas uzata de la originala Model 1 Mega Drive/Genesis. La YM3438 estas uzata en postaj versioj de Mega Drive/Genesis."
 #define OPTION_VAL_MAME_YM2612_EO NULL
 #define OPTION_VAL_MAME_ASIC_YM3438_EO NULL
-#define OPTION_VAL_MAME_ENHANCED_YM3438_EO NULL
+#define OPTION_VAL_MAME_ENHANCED_YM3438_EO "MAME (Plibonigita YM3438)"
 #define OPTION_VAL_NUKED_YM2612_EO NULL
 #define OPTION_VAL_NUKED_YM3438_EO NULL
-#define GENESIS_PLUS_GX_SOUND_OUTPUT_LABEL_EO NULL
-#define GENESIS_PLUS_GX_SOUND_OUTPUT_INFO_0_EO NULL
-#define OPTION_VAL_STEREO_EO NULL
-#define OPTION_VAL_MONO_EO NULL
+#define GENESIS_PLUS_GX_SOUND_OUTPUT_LABEL_EO "Sona eligo"
+#define GENESIS_PLUS_GX_SOUND_OUTPUT_INFO_0_EO "Elekti ĉu dukanalan, ĉu unukanalan sonan ludadon"
+#define OPTION_VAL_STEREO_EO "Dukanala"
+#define OPTION_VAL_MONO_EO "Unukanala"
 #define GENESIS_PLUS_GX_AUDIO_FILTER_LABEL_EO "Sonfiltrilo"
-#define GENESIS_PLUS_GX_AUDIO_FILTER_INFO_0_EO NULL
-#define OPTION_VAL_LOW_PASS_EO NULL
+#define GENESIS_PLUS_GX_AUDIO_FILTER_INFO_0_EO "Ebligi malaltpasan sonfiltrilon por pli bone imiti la karakterizan sonon de Model 1 Mega Drive/Genesis."
+#define OPTION_VAL_LOW_PASS_EO "Malaltpasa"
 #define OPTION_VAL_EQ_EO NULL
-#define GENESIS_PLUS_GX_LOWPASS_RANGE_LABEL_EO NULL
-#define GENESIS_PLUS_GX_LOWPASS_RANGE_INFO_0_EO NULL
-#define GENESIS_PLUS_GX_PSG_PREAMP_LABEL_EO NULL
-#define GENESIS_PLUS_GX_PSG_PREAMP_INFO_0_EO NULL
-#define GENESIS_PLUS_GX_FM_PREAMP_LABEL_EO NULL
-#define GENESIS_PLUS_GX_FM_PREAMP_INFO_0_EO NULL
-#define GENESIS_PLUS_GX_CDDA_VOLUME_LABEL_EO NULL
-#define GENESIS_PLUS_GX_CDDA_VOLUME_INFO_0_EO NULL
-#define GENESIS_PLUS_GX_PCM_VOLUME_LABEL_EO NULL
-#define GENESIS_PLUS_GX_PCM_VOLUME_INFO_0_EO NULL
-#define GENESIS_PLUS_GX_AUDIO_EQ_LOW_LABEL_EO NULL
-#define GENESIS_PLUS_GX_AUDIO_EQ_LOW_INFO_0_EO NULL
-#define GENESIS_PLUS_GX_AUDIO_EQ_MID_LABEL_EO NULL
-#define GENESIS_PLUS_GX_AUDIO_EQ_MID_INFO_0_EO NULL
-#define GENESIS_PLUS_GX_AUDIO_EQ_HIGH_LABEL_EO NULL
-#define GENESIS_PLUS_GX_AUDIO_EQ_HIGH_INFO_0_EO NULL
-#define GENESIS_PLUS_GX_GUN_INPUT_LABEL_EO NULL
-#define GENESIS_PLUS_GX_GUN_INPUT_INFO_0_EO NULL
+#define GENESIS_PLUS_GX_LOWPASS_RANGE_LABEL_EO "Malaltpasa filtrilo (%)"
+#define GENESIS_PLUS_GX_LOWPASS_RANGE_INFO_0_EO "Specifi la fortranĉitan frekvencon el la sona malaltpasa filtrilo. Ju pli alta la valoro, des pli da perceptata \"forto\" de la filtrilo, ĉar pli larĝa gamo de la altfrekvenca spektro estas mildigita."
+#define GENESIS_PLUS_GX_PSG_PREAMP_LABEL_EO "Antaŭamplifa nivelo de PSG"
+#define GENESIS_PLUS_GX_PSG_PREAMP_INFO_0_EO "Agordi la sonan antaŭamplifan nivelon de la imitata 4-kanala PSG (programebla sona generilo) SN76496 trovata en la SG-1000, Sega Mark III, Master System, Game Gear kaj Mega Drive/Genesis."
+#define GENESIS_PLUS_GX_FM_PREAMP_LABEL_EO "Antaŭamplifa nivelo de FM"
+#define GENESIS_PLUS_GX_FM_PREAMP_INFO_0_EO "Agordi la sonan antaŭamplifan nivelon de la imitata FM-a sona sintezilo de Mega Drive/Genesis aŭ FM-a sona unuo de Sega Mark III/Master System."
+#define GENESIS_PLUS_GX_CDDA_VOLUME_LABEL_EO "Volumeno de CD-DA (%)"
+#define GENESIS_PLUS_GX_CDDA_VOLUME_INFO_0_EO "Alĝustigi la miksadon de volumeno de la eligo de sona ludado de imitata KD."
+#define GENESIS_PLUS_GX_PCM_VOLUME_LABEL_EO "Volumeno de PCM (%)"
+#define GENESIS_PLUS_GX_PCM_VOLUME_INFO_0_EO "Alĝustigi la miksadon de volumeno de la eligo de sona generilo PCM RF5C164 de imitata Sega CD/Mega-CD."
+#define GENESIS_PLUS_GX_AUDIO_EQ_LOW_LABEL_EO "EQ malaltaj"
+#define GENESIS_PLUS_GX_AUDIO_EQ_LOW_INFO_0_EO "Alĝustigi la bendon de malalta gamo de la interna sona \"equalizer\"."
+#define GENESIS_PLUS_GX_AUDIO_EQ_MID_LABEL_EO "EQ mezaltaj"
+#define GENESIS_PLUS_GX_AUDIO_EQ_MID_INFO_0_EO "Alĝustigi la bendon de mezalta gamo de la interna sona \"equalizer\"."
+#define GENESIS_PLUS_GX_AUDIO_EQ_HIGH_LABEL_EO "EQ altaj"
+#define GENESIS_PLUS_GX_AUDIO_EQ_HIGH_INFO_0_EO ""
+#define GENESIS_PLUS_GX_GUN_INPUT_LABEL_EO "Enigo de \"light gun\""
+#define GENESIS_PLUS_GX_GUN_INPUT_INFO_0_EO "Uzi musregatan enigon de \"Light Gun\" aŭ \"Tuŝekrano\"."
 #define OPTION_VAL_LIGHTGUN_EO "\"Light Gun\""
 #define OPTION_VAL_TOUCHSCREEN_EO "Tuŝekrano"
-#define GENESIS_PLUS_GX_GUN_CURSOR_LABEL_EO NULL
-#define GENESIS_PLUS_GX_GUN_CURSOR_INFO_0_EO NULL
-#define GENESIS_PLUS_GX_INVERT_MOUSE_LABEL_EO NULL
-#define GENESIS_PLUS_GX_INVERT_MOUSE_INFO_0_EO NULL
-#define GENESIS_PLUS_GX_NO_SPRITE_LIMIT_LABEL_EO NULL
-#define GENESIS_PLUS_GX_NO_SPRITE_LIMIT_INFO_0_EO NULL
-#define GENESIS_PLUS_GX_ENHANCED_VSCROLL_LABEL_EO NULL
-#define GENESIS_PLUS_GX_ENHANCED_VSCROLL_INFO_0_EO NULL
-#define GENESIS_PLUS_GX_ENHANCED_VSCROLL_LIMIT_LABEL_EO NULL
-#define GENESIS_PLUS_GX_ENHANCED_VSCROLL_LIMIT_INFO_0_EO NULL
-#define GENESIS_PLUS_GX_OVERCLOCK_LABEL_EO NULL
-#define GENESIS_PLUS_GX_OVERCLOCK_INFO_0_EO NULL
+#define GENESIS_PLUS_GX_GUN_CURSOR_LABEL_EO "Montri celilon de \"light gun\""
+#define GENESIS_PLUS_GX_GUN_CURSOR_INFO_0_EO ""
+#define GENESIS_PLUS_GX_INVERT_MOUSE_LABEL_EO "Inversigi musan Y-akson"
+#define GENESIS_PLUS_GX_INVERT_MOUSE_INFO_0_EO "Inversigas la Y-akson de la enigaparatan specon MD Mouse."
+#define GENESIS_PLUS_GX_NO_SPRITE_LIMIT_LABEL_EO "Forigi limigon de \"sprites\" laŭ linio."
+#define GENESIS_PLUS_GX_NO_SPRITE_LIMIT_INFO_0_EO "Forigas la originalan aparataran limon de \"sprite\" laŭ skanlinio. Ĉi tio malpliigas flagradon sed povas kaŭzi vidajn missignalojn, ĉar kelkaj ludoj misuzas la aparataran limon por generi specialajn efikojn."
+#define GENESIS_PLUS_GX_ENHANCED_VSCROLL_LABEL_EO "Plibonigita vertikala rulumado laŭ kahelo"
+#define GENESIS_PLUS_GX_ENHANCED_VSCROLL_INFO_0_EO ""
+#define GENESIS_PLUS_GX_ENHANCED_VSCROLL_LIMIT_LABEL_EO "Plibonigita limo de vertikala rulumado laŭ kahelo"
+#define GENESIS_PLUS_GX_ENHANCED_VSCROLL_LIMIT_INFO_0_EO "Nur kiam Plibonigita vertikala rulumado laŭ kahelo estas ebligita. Alĝustigas la limon de la vertikala plibonigo. Kiam la diferenco de \"vscroll\" inter apudaj kaheloj estas pli granda ol ĉi tiu limo, la plibonigo malebliĝas."
+#define GENESIS_PLUS_GX_OVERCLOCK_LABEL_EO "ĉefprocesora rapido"
+#define GENESIS_PLUS_GX_OVERCLOCK_INFO_0_EO "Trorapidigi la imitatan ĉefprocesoro. Povas malpliigi malrapidigon, sed povus kaŭzi missignalojn."
 #define OPTION_VAL_100_EO NULL
 #define OPTION_VAL_125_EO NULL
 #define OPTION_VAL_150_EO NULL
@@ -20690,54 +20690,54 @@ struct retro_core_options_v2 options_en = {
 #define OPTION_VAL_450_EO "450 %"
 #define OPTION_VAL_475_EO "475 %"
 #define OPTION_VAL_500_EO "500 %"
-#define GENESIS_PLUS_GX_FORCE_DTACK_LABEL_EO NULL
-#define GENESIS_PLUS_GX_FORCE_DTACK_INFO_0_EO NULL
-#define GENESIS_PLUS_GX_ADDR_ERROR_LABEL_EO NULL
-#define GENESIS_PLUS_GX_ADDR_ERROR_INFO_0_EO NULL
-#define GENESIS_PLUS_GX_CD_LATENCY_LABEL_EO NULL
-#define GENESIS_PLUS_GX_CD_LATENCY_INFO_0_EO NULL
-#define GENESIS_PLUS_GX_CD_PRECACHE_LABEL_EO NULL
-#define GENESIS_PLUS_GX_CD_PRECACHE_INFO_0_EO NULL
-#define GENESIS_PLUS_GX_SHOW_ADVANCED_AUDIO_SETTINGS_LABEL_EO NULL
-#define GENESIS_PLUS_GX_SHOW_ADVANCED_AUDIO_SETTINGS_INFO_0_EO NULL
-#define GENESIS_PLUS_GX_PSG_CHANNEL_0_VOLUME_LABEL_EO NULL
-#define GENESIS_PLUS_GX_PSG_CHANNEL_0_VOLUME_INFO_0_EO NULL
-#define GENESIS_PLUS_GX_PSG_CHANNEL_1_VOLUME_LABEL_EO NULL
-#define GENESIS_PLUS_GX_PSG_CHANNEL_1_VOLUME_INFO_0_EO NULL
-#define GENESIS_PLUS_GX_PSG_CHANNEL_2_VOLUME_LABEL_EO NULL
-#define GENESIS_PLUS_GX_PSG_CHANNEL_2_VOLUME_INFO_0_EO NULL
-#define GENESIS_PLUS_GX_PSG_CHANNEL_3_VOLUME_LABEL_EO NULL
-#define GENESIS_PLUS_GX_PSG_CHANNEL_3_VOLUME_INFO_0_EO NULL
-#define GENESIS_PLUS_GX_MD_CHANNEL_0_VOLUME_LABEL_EO NULL
-#define GENESIS_PLUS_GX_MD_CHANNEL_0_VOLUME_INFO_0_EO NULL
-#define GENESIS_PLUS_GX_MD_CHANNEL_1_VOLUME_LABEL_EO NULL
-#define GENESIS_PLUS_GX_MD_CHANNEL_1_VOLUME_INFO_0_EO NULL
-#define GENESIS_PLUS_GX_MD_CHANNEL_2_VOLUME_LABEL_EO NULL
-#define GENESIS_PLUS_GX_MD_CHANNEL_2_VOLUME_INFO_0_EO NULL
-#define GENESIS_PLUS_GX_MD_CHANNEL_3_VOLUME_LABEL_EO NULL
-#define GENESIS_PLUS_GX_MD_CHANNEL_3_VOLUME_INFO_0_EO NULL
-#define GENESIS_PLUS_GX_MD_CHANNEL_4_VOLUME_LABEL_EO NULL
-#define GENESIS_PLUS_GX_MD_CHANNEL_4_VOLUME_INFO_0_EO NULL
-#define GENESIS_PLUS_GX_MD_CHANNEL_5_VOLUME_LABEL_EO NULL
-#define GENESIS_PLUS_GX_MD_CHANNEL_5_VOLUME_INFO_0_EO NULL
-#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_0_VOLUME_LABEL_EO NULL
-#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_0_VOLUME_INFO_0_EO NULL
-#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_1_VOLUME_LABEL_EO NULL
-#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_1_VOLUME_INFO_0_EO NULL
-#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_2_VOLUME_LABEL_EO NULL
-#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_2_VOLUME_INFO_0_EO NULL
-#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_3_VOLUME_LABEL_EO NULL
-#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_3_VOLUME_INFO_0_EO NULL
-#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_4_VOLUME_LABEL_EO NULL
-#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_4_VOLUME_INFO_0_EO NULL
-#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_5_VOLUME_LABEL_EO NULL
-#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_5_VOLUME_INFO_0_EO NULL
-#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_6_VOLUME_LABEL_EO NULL
-#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_6_VOLUME_INFO_0_EO NULL
-#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_7_VOLUME_LABEL_EO NULL
-#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_7_VOLUME_INFO_0_EO NULL
-#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_8_VOLUME_LABEL_EO NULL
-#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_8_VOLUME_INFO_0_EO NULL
+#define GENESIS_PLUS_GX_FORCE_DTACK_LABEL_EO "Sistemaj fiksadoj"
+#define GENESIS_PLUS_GX_FORCE_DTACK_INFO_0_EO "Imiti sistemajn fiksadojn, kio okazas je reala aparataro kiam realigante atingon al neleĝa adreso. Ĉi tio nur devus esti malebligita kiam ludante certajn provoversiojn kaj dehejmajn ludojn kiuj bezonas neleĝan konduton por ĝusta funkciado."
+#define GENESIS_PLUS_GX_ADDR_ERROR_LABEL_EO "Adresa eraro de 68K"
+#define GENESIS_PLUS_GX_ADDR_ERROR_INFO_0_EO "La ĉefprocesoro de Mega Drive/Genesis (Motorola 68000) generas escepton de Adresa eraro (kolapso) kiam provante plenumi nerektigitan memoran aliron. Ebligi ĉi tion imitos ĉi tiun konduton. Ĝi nur devus esti malebligita kiam ludante ROM-kodumojn, ĉar tiuj tipe estas programitaj uzante malpli precizajn imitilojn kaj povas bezoni nevalidan ĉefmemoran aliron por ĝusta funkciado."
+#define GENESIS_PLUS_GX_CD_LATENCY_LABEL_EO "KD-a alira tempo"
+#define GENESIS_PLUS_GX_CD_LATENCY_INFO_0_EO ""
+#define GENESIS_PLUS_GX_CD_PRECACHE_LABEL_EO "Kaŝmemoro de kopio de KD."
+#define GENESIS_PLUS_GX_CD_PRECACHE_INFO_0_EO "Ŝargi kopion de KD al memoro ĉe starto. Ĝi nur subtenas CHD. Bezonas restartigon."
+#define GENESIS_PLUS_GX_SHOW_ADVANCED_AUDIO_SETTINGS_LABEL_EO "Montri altnivelajn sonvolumenajn agordojn (bezonas remalfermi menuon)"
+#define GENESIS_PLUS_GX_SHOW_ADVANCED_AUDIO_SETTINGS_INFO_0_EO "Ebligi konfiguron de malaltnivelaj sonkanalaj parametroj. NOTO: rapida menuo devas esti ŝaltita por ke ĉi tiu agordo efikiĝu."
+#define GENESIS_PLUS_GX_PSG_CHANNEL_0_VOLUME_LABEL_EO "Volumeno de tonkanalo 0 de PSG (%)"
+#define GENESIS_PLUS_GX_PSG_CHANNEL_0_VOLUME_INFO_0_EO ""
+#define GENESIS_PLUS_GX_PSG_CHANNEL_1_VOLUME_LABEL_EO "Volumeno de tonkanalo 1 de PSG (%)"
+#define GENESIS_PLUS_GX_PSG_CHANNEL_1_VOLUME_INFO_0_EO "Malpliigi la volumenon de la tonkanalo 1 de PSG."
+#define GENESIS_PLUS_GX_PSG_CHANNEL_2_VOLUME_LABEL_EO "Volumeno de tonkanalo 2 de PSG (%)"
+#define GENESIS_PLUS_GX_PSG_CHANNEL_2_VOLUME_INFO_0_EO "Malpliigi la volumenon de la tonkanalo 2 de PSG."
+#define GENESIS_PLUS_GX_PSG_CHANNEL_3_VOLUME_LABEL_EO "Volumeno de brukanalo 3 de PSG (%)"
+#define GENESIS_PLUS_GX_PSG_CHANNEL_3_VOLUME_INFO_0_EO "Malpliigi la volumenon de la brukanalo 3 de PSG."
+#define GENESIS_PLUS_GX_MD_CHANNEL_0_VOLUME_LABEL_EO "Volumeno de FM-kanalo 0 de Mega Drive/Genesis (%)"
+#define GENESIS_PLUS_GX_MD_CHANNEL_0_VOLUME_INFO_0_EO "Malpliigi la volumenon de la FM-kanalo 0 de Mega Drive/Genesis. Nur funkcias kun FM-aj imitiloj de MAME."
+#define GENESIS_PLUS_GX_MD_CHANNEL_1_VOLUME_LABEL_EO "Volumeno de FM-kanalo 1 de Mega Drive/Genesis (%)"
+#define GENESIS_PLUS_GX_MD_CHANNEL_1_VOLUME_INFO_0_EO "Malpliigi la volumenon de la FM-kanalo 1 de Mega Drive/Genesis. Nur funkcias kun FM-aj imitiloj de MAME."
+#define GENESIS_PLUS_GX_MD_CHANNEL_2_VOLUME_LABEL_EO "Volumeno de FM-kanalo 2 de Mega Drive/Genesis (%)"
+#define GENESIS_PLUS_GX_MD_CHANNEL_2_VOLUME_INFO_0_EO "Malpliigi la volumenon de la FM-kanalo 2 de Mega Drive/Genesis. Nur funkcias kun FM-aj imitiloj de MAME."
+#define GENESIS_PLUS_GX_MD_CHANNEL_3_VOLUME_LABEL_EO "Volumeno de FM-kanalo 3 de Mega Drive/Genesis (%)"
+#define GENESIS_PLUS_GX_MD_CHANNEL_3_VOLUME_INFO_0_EO "Malpliigi la volumenon de la FM-kanalo 3 de Mega Drive/Genesis. Nur funkcias kun FM-aj imitiloj de MAME."
+#define GENESIS_PLUS_GX_MD_CHANNEL_4_VOLUME_LABEL_EO "Volumeno de FM-kanalo 4 de Mega Drive/Genesis (%)"
+#define GENESIS_PLUS_GX_MD_CHANNEL_4_VOLUME_INFO_0_EO "Malpliigi la volumenon de la FM-kanalo 4 de Mega Drive/Genesis. Nur funkcias kun FM-aj imitiloj de MAME."
+#define GENESIS_PLUS_GX_MD_CHANNEL_5_VOLUME_LABEL_EO "Volumeno de FM-kanalo 5 de Mega Drive/Genesis (%)"
+#define GENESIS_PLUS_GX_MD_CHANNEL_5_VOLUME_INFO_0_EO "Malpliigi la volumenon de la FM-kanalo 5 de Mega Drive/Genesis. Nur funkcias kun FM-aj imitiloj de MAME."
+#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_0_VOLUME_LABEL_EO "Volumeno de FM-a (YM2413) kanalo 0 de Master System  (%)"
+#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_0_VOLUME_INFO_0_EO "Malpliigi la volumenon de la FM-kanalo 0 de Master System."
+#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_1_VOLUME_LABEL_EO "Volumeno de FM-a (YM2413) kanalo 1 de Master System  (%)"
+#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_1_VOLUME_INFO_0_EO "Malpliigi la volumenon de la FM-kanalo 1 de Master System."
+#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_2_VOLUME_LABEL_EO "Volumeno de FM-a (YM2413) kanalo 2 de Master System  (%)"
+#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_2_VOLUME_INFO_0_EO "Malpliigi la volumenon de la FM-kanalo 2 de Master System."
+#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_3_VOLUME_LABEL_EO "Volumeno de FM-a (YM2413) kanalo 3 de Master System  (%)"
+#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_3_VOLUME_INFO_0_EO "Malpliigi la volumenon de la FM-kanalo 3 de Master System."
+#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_4_VOLUME_LABEL_EO "Volumeno de FM-a (YM2413) kanalo 4 de Master System  (%)"
+#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_4_VOLUME_INFO_0_EO "Malpliigi la volumenon de la FM-kanalo 4 de Master System."
+#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_5_VOLUME_LABEL_EO "Volumeno de FM-a (YM2413) kanalo 5 de Master System  (%)"
+#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_5_VOLUME_INFO_0_EO "Malpliigi la volumenon de la FM-kanalo 5 de Master System."
+#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_6_VOLUME_LABEL_EO "Volumeno de FM-a (YM2413) kanalo 6 de Master System  (%)"
+#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_6_VOLUME_INFO_0_EO "Malpliigi la volumenon de la FM-kanalo 6 de Master System."
+#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_7_VOLUME_LABEL_EO "Volumeno de FM-a (YM2413) kanalo 7 de Master System  (%)"
+#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_7_VOLUME_INFO_0_EO "Malpliigi la volumenon de la FM-kanalo 7 de Master System."
+#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_8_VOLUME_LABEL_EO "Volumeno de FM-a (YM2413) kanalo 8 de Master System  (%)"
+#define GENESIS_PLUS_GX_SMS_FM_CHANNEL_8_VOLUME_INFO_0_EO "Malpliigi la volumenon de la FM-kanalo 8 de Master System."
 
 struct retro_core_option_v2_category option_cats_eo[] = {
    {
