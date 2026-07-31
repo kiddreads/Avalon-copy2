@@ -1646,7 +1646,7 @@ struct retro_core_options_v2 options_ar = {
 #define GENESIS_PLUS_GX_VDP_MODE_INFO_0_AST NULL
 #define OPTION_VAL_60HZ_AST "NTSC (60 Hz)"
 #define OPTION_VAL_50HZ_AST "PAL (50 Hz)"
-#define GENESIS_PLUS_GX_BIOS_LABEL_AST NULL
+#define GENESIS_PLUS_GX_BIOS_LABEL_AST "ROM d'arrinque del sistema"
 #define GENESIS_PLUS_GX_BIOS_INFO_0_AST NULL
 #define GENESIS_PLUS_GX_SYSTEM_BRAM_LABEL_AST NULL
 #define GENESIS_PLUS_GX_SYSTEM_BRAM_INFO_0_AST NULL
@@ -26919,7 +26919,7 @@ struct retro_core_options_v2 options_fi = {
 #define OPTION_VAL_SINGLE_FIELD_FR "Un seul champ"
 #define OPTION_VAL_DOUBLE_FIELD_FR "Double champ"
 #define GENESIS_PLUS_GX_FRAMESKIP_LABEL_FR "Saut d'images"
-#define GENESIS_PLUS_GX_FRAMESKIP_INFO_0_FR "Sauter des images pour éviter que le tampon audio ne soit sous-exécuté (crépitements). Améliore les performances au détriment de la fluidité visuelle. 'Auto' saute des images lorsque l'interface frontale le conseille. 'Manuel' utilise le paramètre 'Seuil de saut d'images (%)'."
+#define GENESIS_PLUS_GX_FRAMESKIP_INFO_0_FR "Sauter des images pour éviter que le tampon audio ne soit sous-exécuté (crépitements). Améliore les performances au détriment de la fluidité visuelle. 'Auto' saute des images lorsque l'interface graphique le conseille. 'Manuel' utilise le paramètre 'Seuil de saut d'images (%)'."
 #define OPTION_VAL_MANUAL_FR "Manuel"
 #define GENESIS_PLUS_GX_FRAMESKIP_THRESHOLD_LABEL_FR "Seuil de saut d'images (%)"
 #define GENESIS_PLUS_GX_FRAMESKIP_THRESHOLD_INFO_0_FR "Lorsque 'Saut d'images' est réglé sur 'Manuel', spécifie le seuil d'occupation du tampon audio (pourcentage) en dessous duquel des images seront sautées. Des valeurs plus élevées réduisent le risque de crépitements en faisant sauter des images plus fréquemment."
