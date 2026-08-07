@@ -47347,20 +47347,20 @@ struct retro_core_options_v2 options_or = {
 #define OPTION_VAL_PAL_PL NULL
 #define OPTION_VAL_NTSC_J_PL NULL
 #define GENESIS_PLUS_GX_VDP_MODE_LABEL_PL "Wymuś tryb VDP"
-#define GENESIS_PLUS_GX_VDP_MODE_INFO_0_PL NULL
+#define GENESIS_PLUS_GX_VDP_MODE_INFO_0_PL "Nadpisuje tryb VDP i zmusza go do działania w NTSC 60Hz lub PAL 50Hz, niezależnie od regionu systemu."
 #define OPTION_VAL_60HZ_PL NULL
 #define OPTION_VAL_50HZ_PL NULL
-#define GENESIS_PLUS_GX_BIOS_LABEL_PL NULL
-#define GENESIS_PLUS_GX_BIOS_INFO_0_PL NULL
-#define GENESIS_PLUS_GX_SYSTEM_BRAM_LABEL_PL NULL
-#define GENESIS_PLUS_GX_SYSTEM_BRAM_INFO_0_PL NULL
-#define OPTION_VAL_PER_BIOS_PL NULL
-#define OPTION_VAL_PER_GAME_PL NULL
-#define GENESIS_PLUS_GX_CART_BRAM_LABEL_PL NULL
-#define GENESIS_PLUS_GX_CART_BRAM_INFO_0_PL NULL
-#define OPTION_VAL_PER_CART_PL NULL
-#define GENESIS_PLUS_GX_CART_SIZE_LABEL_PL NULL
-#define GENESIS_PLUS_GX_CART_SIZE_INFO_0_PL NULL
+#define GENESIS_PLUS_GX_BIOS_LABEL_PL "Boot ROM systemu"
+#define GENESIS_PLUS_GX_BIOS_INFO_0_PL "Używaj oficjalnego BIOS-u/bootloadera dla emulowanego sprzętu, jeżeli jest obecny w katalogu system RetroArch'a. Wyświetla animację uruchamiania specyficzną dla konsoli, a następnie uruchamia załadowaną treść."
+#define GENESIS_PLUS_GX_SYSTEM_BRAM_LABEL_PL "CD BRAM systemu (wymagany restart)"
+#define GENESIS_PLUS_GX_SYSTEM_BRAM_INFO_0_PL "Podczas uruchamiania treści Sega CD/Mega-CD, określa, czy używać jednego pliku zapisu pomiędzy wszystkimi grami z określonego regionu (Według BIOS-u) czy tworzyć oddzielny plik zapisu dla każdej gry (Według gry). Warto zauważyć że Sega CD/Mega-CD ma ograniczoną pamięć wewnętrzną, wystarczającą tylko dla kilku gier. Aby uniknąć wyczerpania się miejsca, zaleca się używać ustawienia 'Według gry'."
+#define OPTION_VAL_PER_BIOS_PL "Według BIOS-u"
+#define OPTION_VAL_PER_GAME_PL "Według gry"
+#define GENESIS_PLUS_GX_CART_BRAM_LABEL_PL "CD Backup Cart BRAM (wymagany restart)"
+#define GENESIS_PLUS_GX_CART_BRAM_INFO_0_PL "Podczas uruchamiania treści Sega CD/Mega-CD, określa, czy używać jednego kartridża backup ram dla wszystkich gier (Według kartridża) czy tworzyć oddzielny kartridż backup ram dla każdej gry (Według gry)."
+#define OPTION_VAL_PER_CART_PL "Według kartridża"
+#define GENESIS_PLUS_GX_CART_SIZE_LABEL_PL "Rozmiar kartridża backup CD (wymagany restart)"
+#define GENESIS_PLUS_GX_CART_SIZE_INFO_0_PL "Ustawia rozmiar kartridża backup ram podczas uruchamiania treści Sega CD/Mega-CD. Przydatne do ustawiania kartridży backup ram na Według gry, aby uniknąć wielu kartridży o dużym rozmiarze."
 #define OPTION_VAL_128K_PL NULL
 #define OPTION_VAL_256K_PL NULL
 #define OPTION_VAL_512K_PL NULL
@@ -47368,44 +47368,44 @@ struct retro_core_options_v2 options_or = {
 #define OPTION_VAL_2MEG_PL NULL
 #define OPTION_VAL_4MEG_PL NULL
 #define GENESIS_PLUS_GX_ADD_ON_LABEL_PL "Dodatek CD (tryb MD) (wymaga restartu)"
-#define GENESIS_PLUS_GX_ADD_ON_INFO_0_PL NULL
+#define GENESIS_PLUS_GX_ADD_ON_INFO_0_PL "Określ który dodatek użyć do odtwarzania CD audio we wspieranych grach Mega Drive/Genesis."
 #define OPTION_VAL_SEGA_MEGA_CD_PL NULL
 #define OPTION_VAL_MEGASD_PL NULL
 #define OPTION_VAL_NONE_PL "Brak"
-#define GENESIS_PLUS_GX_LOCK_ON_LABEL_PL NULL
-#define GENESIS_PLUS_GX_LOCK_ON_INFO_0_PL NULL
+#define GENESIS_PLUS_GX_LOCK_ON_LABEL_PL "Kartridże Lock-On"
+#define GENESIS_PLUS_GX_LOCK_ON_INFO_0_PL "Technologia Lock-On jest funkcją Mega Drive/Genesis, która pozwalała podłączyć starszą grę przez port w specjalnym kartridżu, aby uzyskać zmienioną lub ulepszoną rozgrywkę. Ta opcja określa który rodzaj kartridża 'lock-on' emulować. Odpowiedni plik bios-u musi zmajdować się w katalogu system RetroArch'a."
 #define OPTION_VAL_GAME_GENIE_PL NULL
 #define OPTION_VAL_ACTION_REPLAY_PRO_PL NULL
 #define OPTION_VAL_SONIC_KNUCKLES_PL NULL
-#define GENESIS_PLUS_GX_ASPECT_RATIO_LABEL_PL NULL
+#define GENESIS_PLUS_GX_ASPECT_RATIO_LABEL_PL "Proporcje ekranu dostarczane przez rdzeń"
 #define GENESIS_PLUS_GX_ASPECT_RATIO_INFO_0_PL "Wybierz preferowane proporcje treści. Będzie to miało zastosowanie tylko wtedy, gdy współczynnik proporcji RetroArcha jest ustawiony na 'Dostarczane przez rdzeń' w ustawieniach wideo."
 #define OPTION_VAL_NTSC_PAR_PL NULL
 #define OPTION_VAL_PAL_PAR_PL NULL
 #define OPTION_VAL_4_3_PL NULL
 #define OPTION_VAL_UNCORRECTED_PL "Niepoprawione"
 #define GENESIS_PLUS_GX_OVERSCAN_LABEL_PL "Krawędzie"
-#define GENESIS_PLUS_GX_OVERSCAN_INFO_0_PL NULL
+#define GENESIS_PLUS_GX_OVERSCAN_INFO_0_PL "Włącz to, aby wyświetlić regiony overscan na górze/dole i/lub po prawej/lewej stronie ekranu. Byłyby one normalnie ukryte przez obramowanie normalnego telewizora."
 #define OPTION_VAL_TOP_BOTTOM_PL "Góra/Dół"
 #define OPTION_VAL_LEFT_RIGHT_PL "Lewo/Prawo"
 #define OPTION_VAL_FULL_PL "Pełny"
 #define GENESIS_PLUS_GX_LEFT_BORDER_LABEL_PL "Ukryj główne granice po stronie systemu"
-#define GENESIS_PLUS_GX_LEFT_BORDER_INFO_0_PL NULL
+#define GENESIS_PLUS_GX_LEFT_BORDER_INFO_0_PL "Ucina 8 pikseli z lewej strony ekranu, lub z lewej i prawej strony podczas uruchamiania gier z Master System."
 #define OPTION_VAL_LEFT_BORDER_PL "Tylko lewa ramka"
-#define OPTION_VAL_LEFT_RIGHT_BORDERS_PL NULL
-#define GENESIS_PLUS_GX_GG_EXTRA_LABEL_PL NULL
-#define GENESIS_PLUS_GX_GG_EXTRA_INFO_0_PL NULL
+#define OPTION_VAL_LEFT_RIGHT_BORDERS_PL "Lewe i Prawe obramowanie"
+#define GENESIS_PLUS_GX_GG_EXTRA_LABEL_PL "Rozszerzony ekran Game Gear"
+#define GENESIS_PLUS_GX_GG_EXTRA_INFO_0_PL "Wymusza uruchamianie gier z Game Gear w trybie SMS, ze zwiększoną rozdzielczością 256x192. Może wyświetlać dodatkową zawartość, ale zwykle wyświetla obramowanie z uszkodzonych/niechcianych danych obrazu."
 #define GENESIS_PLUS_GX_BLARGG_NTSC_FILTER_LABEL_PL "Duży filtr NTSC"
-#define GENESIS_PLUS_GX_BLARGG_NTSC_FILTER_INFO_0_PL NULL
+#define GENESIS_PLUS_GX_BLARGG_NTSC_FILTER_INFO_0_PL "Zastosuj filtr wideo, aby udawać różne sygnały telewizorów NTSC."
 #define OPTION_VAL_MONOCHROME_PL "Monochromia"
 #define OPTION_VAL_COMPOSITE_PL "Kompozytowy"
 #define OPTION_VAL_SVIDEO_PL NULL
 #define OPTION_VAL_RGB_PL NULL
-#define GENESIS_PLUS_GX_LCD_FILTER_LABEL_PL NULL
-#define GENESIS_PLUS_GX_LCD_FILTER_INFO_0_PL NULL
-#define GENESIS_PLUS_GX_RENDER_LABEL_PL NULL
-#define GENESIS_PLUS_GX_RENDER_INFO_0_PL NULL
-#define OPTION_VAL_SINGLE_FIELD_PL NULL
-#define OPTION_VAL_DOUBLE_FIELD_PL NULL
+#define GENESIS_PLUS_GX_LCD_FILTER_LABEL_PL "Filtr rozmycia LCD"
+#define GENESIS_PLUS_GX_LCD_FILTER_INFO_0_PL "Zastosuj filtr 'ghostingu', aby naśladować charakterystykę wyświetlaczy Game Gear i Genesis Nomad."
+#define GENESIS_PLUS_GX_RENDER_LABEL_PL "Wyjście trybu 2 z przeplotem"
+#define GENESIS_PLUS_GX_RENDER_INFO_0_PL "Tryb 2 z przeplotem pozwala Mega Drivewowi/Genesisowi na wyjście obrazu o podwójnej wysokości (wysoka rozdzielczość) 320x448 przez rysowanie na zmianę linii obrazu każdej klatki (jest to używane przez tryby wielosobowe w Sonic the Hedgehog 2 i Combat Cars). 'Podwójne pole' naśladuje orygnialny sprzęt, produkując ostry obraz z mrugającymi/przeplatanymi artefaktami. 'Pojedyncze pole' stosuje filtr usuwający przeplot, który stabilizuje obraz, ale powoduje lekkie rozmycie."
+#define OPTION_VAL_SINGLE_FIELD_PL "Pojedyncze pole"
+#define OPTION_VAL_DOUBLE_FIELD_PL "Podwójne pole"
 #define GENESIS_PLUS_GX_FRAMESKIP_LABEL_PL "Pomijanie klatek"
 #define GENESIS_PLUS_GX_FRAMESKIP_INFO_0_PL NULL
 #define OPTION_VAL_MANUAL_PL "Ręczny"
@@ -47441,8 +47441,8 @@ struct retro_core_options_v2 options_or = {
 #define GENESIS_PLUS_GX_FM_PREAMP_INFO_0_PL NULL
 #define GENESIS_PLUS_GX_CDDA_VOLUME_LABEL_PL "Głośność CD-DA"
 #define GENESIS_PLUS_GX_CDDA_VOLUME_INFO_0_PL NULL
-#define GENESIS_PLUS_GX_PCM_VOLUME_LABEL_PL NULL
-#define GENESIS_PLUS_GX_PCM_VOLUME_INFO_0_PL NULL
+#define GENESIS_PLUS_GX_PCM_VOLUME_LABEL_PL "Głośność PCM"
+#define GENESIS_PLUS_GX_PCM_VOLUME_INFO_0_PL "Dostosuj głośność miksowania emulowanego wyjścia generatora dźwięku PCM Sega CD/Mega-CD RF5C164."
 #define GENESIS_PLUS_GX_AUDIO_EQ_LOW_LABEL_PL "EQ Niski"
 #define GENESIS_PLUS_GX_AUDIO_EQ_LOW_INFO_0_PL "Dostosuj pasmo dolnego zasięgu wewnętrznego korektora dźwięku."
 #define GENESIS_PLUS_GX_AUDIO_EQ_MID_LABEL_PL "EQ Średni"
@@ -47450,15 +47450,15 @@ struct retro_core_options_v2 options_or = {
 #define GENESIS_PLUS_GX_AUDIO_EQ_HIGH_LABEL_PL "EQ Wysoki"
 #define GENESIS_PLUS_GX_AUDIO_EQ_HIGH_INFO_0_PL NULL
 #define GENESIS_PLUS_GX_GUN_INPUT_LABEL_PL "Wejście pistoleta świetlnego"
-#define GENESIS_PLUS_GX_GUN_INPUT_INFO_0_PL NULL
+#define GENESIS_PLUS_GX_GUN_INPUT_INFO_0_PL "Używaj sterowanego myszą 'Pistoletu świetlnego' lub wejścia 'Ekranu dotykowego'."
 #define OPTION_VAL_LIGHTGUN_PL "Pistolet Świetlny"
 #define OPTION_VAL_TOUCHSCREEN_PL "Ekran dotykowy"
-#define GENESIS_PLUS_GX_GUN_CURSOR_LABEL_PL NULL
-#define GENESIS_PLUS_GX_GUN_CURSOR_INFO_0_PL NULL
-#define GENESIS_PLUS_GX_INVERT_MOUSE_LABEL_PL NULL
-#define GENESIS_PLUS_GX_INVERT_MOUSE_INFO_0_PL NULL
-#define GENESIS_PLUS_GX_NO_SPRITE_LIMIT_LABEL_PL NULL
-#define GENESIS_PLUS_GX_NO_SPRITE_LIMIT_INFO_0_PL NULL
+#define GENESIS_PLUS_GX_GUN_CURSOR_LABEL_PL "Pokaż celownik pistoletu świetlnego"
+#define GENESIS_PLUS_GX_GUN_CURSOR_INFO_0_PL "Pokazuj celowniki pistoletów świetlnych podczas używania urządzeń wejściowych typu MD Menacer, MD Justifier i MD Light Phaser."
+#define GENESIS_PLUS_GX_INVERT_MOUSE_LABEL_PL "Odwróć oś Y myszy"
+#define GENESIS_PLUS_GX_INVERT_MOUSE_INFO_0_PL "Odwraca oś Y urządzenia wejściowego typu MD Mouse."
+#define GENESIS_PLUS_GX_NO_SPRITE_LIMIT_LABEL_PL "Usuń limit spriteów na linię"
+#define GENESIS_PLUS_GX_NO_SPRITE_LIMIT_INFO_0_PL "Usuwa oryginalny limit sprzętowy spritów na linię obrazu. To zmniejsza migotanie, ale może powodować wizualne błędy, ponieważ niektóre gry wykorzystują limit sprzętowy do generowania efektów specjalnych."
 #define GENESIS_PLUS_GX_ENHANCED_VSCROLL_LABEL_PL NULL
 #define GENESIS_PLUS_GX_ENHANCED_VSCROLL_INFO_0_PL NULL
 #define GENESIS_PLUS_GX_ENHANCED_VSCROLL_LIMIT_LABEL_PL NULL
@@ -47483,11 +47483,11 @@ struct retro_core_options_v2 options_or = {
 #define OPTION_VAL_475_PL NULL
 #define OPTION_VAL_500_PL NULL
 #define GENESIS_PLUS_GX_FORCE_DTACK_LABEL_PL "Blokada systemu"
-#define GENESIS_PLUS_GX_FORCE_DTACK_INFO_0_PL NULL
+#define GENESIS_PLUS_GX_FORCE_DTACK_INFO_0_PL "Emuluj wieszanie się systemu, które występuje na prawdziwym sprzęcie podczas wykonywania dostępów do nieprawidłowych adresów w pamięci. To powinno być wyłączone tylko podczas grania w niektóre dema lub homebrew, które wykorzystują nieprawidłowe zachowanie do poprawnego działania."
 #define GENESIS_PLUS_GX_ADDR_ERROR_LABEL_PL "Błąd adresu 68K"
-#define GENESIS_PLUS_GX_ADDR_ERROR_INFO_0_PL NULL
+#define GENESIS_PLUS_GX_ADDR_ERROR_INFO_0_PL "Procesor główny Mega Drive/Genesis (Motorola 68000) generuje wyjątek błędu adresu (crash) podczas próby niewyrównanego dostępu do pamięci. Włączenie tej opcji będzie symulować to zachowanie. To powinno być wyłączone podczas grania w ROM hacki, ponieważ były one tworzone z użyciem mniej dokładnych emulatorów i mogą polegać na nieprawidłowym dostępie do pamięci RAM do prawidłowego działania."
 #define GENESIS_PLUS_GX_CD_LATENCY_LABEL_PL "Czas dostępu CD"
-#define GENESIS_PLUS_GX_CD_LATENCY_INFO_0_PL NULL
+#define GENESIS_PLUS_GX_CD_LATENCY_INFO_0_PL "Symuluj oryginalne opóźnienie sprzętowe CD, rozpoczynając odczyt lub szukając konkretnej lokalizacji na załadowanej płycie. Jest to wymagane przez kilka gier CD, które przestaną działać, jeśli dane CD są dostępne zbyt szybko i naprawiają problemy z desynchronizacją audio CD w niektórych grach. Wyłączenie tego może być przydatne w grach MSU-MD, ponieważ sprawia, że zapętlanie utworów CD audio jest bardziej płynne."
 #define GENESIS_PLUS_GX_CD_PRECACHE_LABEL_PL "Pamięć podręczna obrazów CD"
 #define GENESIS_PLUS_GX_CD_PRECACHE_INFO_0_PL "Załaduj obraz CD do pamięci podczas uruchamiania. Obsługiwane tylko pliki CHD. Wymagane ponowne uruchomienie."
 #define GENESIS_PLUS_GX_SHOW_ADVANCED_AUDIO_SETTINGS_LABEL_PL "Pokaż zaawansowane ustawienia głośności dźwięku (Otwórz menu ponownie)"
