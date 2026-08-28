@@ -49010,7 +49010,7 @@ struct retro_core_options_v2 options_pl = {
 #define OPTION_VAL_LOW_PASS_PT_BR "Passa-baixo"
 #define OPTION_VAL_EQ_PT_BR "Equalização (EG)"
 #define GENESIS_PLUS_GX_LOWPASS_RANGE_LABEL_PT_BR "Filtro passa-baixo (%)"
-#define GENESIS_PLUS_GX_LOWPASS_RANGE_INFO_0_PT_BR "Define a frequência de corte do filtro passo-baixo. Valores maiores aumentam a \"força\" percebida do filtro, uma vez que uma faixa mais ampla do espectro de alta frequência é atenuada."
+#define GENESIS_PLUS_GX_LOWPASS_RANGE_INFO_0_PT_BR "Define a frequência de corte do filtro passa-baixo. Valores maiores aumentam a \"força\" percebida do filtro, uma vez que uma faixa mais ampla do espectro de alta frequência é atenuada."
 #define GENESIS_PLUS_GX_PSG_PREAMP_LABEL_PT_BR "Nível de pré-amplificação do PSG"
 #define GENESIS_PLUS_GX_PSG_PREAMP_INFO_0_PT_BR "Define o nível de pré-amplificação do Gerador de Som Programável (PSG) de 4 canais (SN76496), encontrado no SG-1000, Sega Mark III, Master System, Game Gear e Mega Drive/Genesis."
 #define GENESIS_PLUS_GX_FM_PREAMP_LABEL_PT_BR "Nível de pré-amplificação do som FM"
