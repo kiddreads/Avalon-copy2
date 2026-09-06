@@ -123,6 +123,7 @@ namespace Nes
 			dword prgCrc;
 			File savefile;
 			const FavoredSystem favoredSystem;
+			const bool forcedSystem;
 
 		public:
 

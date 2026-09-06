@@ -105,12 +105,13 @@ namespace Nes
 				const bool patchBypassChecksum;
 				Result* const patchResult;
 				const FavoredSystem favoredSystem;
+				const bool forcedSystem;
 				const bool askProfile;
 				const ImageDatabase* const database;
 				Result result;
 
-				Context(Type t,Cpu& c,Apu& a,Ppu& p,std::istream& s,std::istream* h,bool k,Result* r,FavoredSystem f,bool b,const ImageDatabase* d)
-				: type(t), cpu(c), apu(a), ppu(p), stream(s), patch(h), patchBypassChecksum(k), patchResult(r), favoredSystem(f), askProfile(b), database(d), result(RESULT_OK) {}
+				Context(Type t,Cpu& c,Apu& a,Ppu& p,std::istream& s,std::istream* h,bool k,Result* r,FavoredSystem f,bool e,bool b,const ImageDatabase* d)
+				: type(t), cpu(c), apu(a), ppu(p), stream(s), patch(h), patchBypassChecksum(k), patchResult(r), favoredSystem(f), forcedSystem(e), askProfile(b), database(d), result(RESULT_OK) {}
 			};
 
 			static Image* Load(Context&);

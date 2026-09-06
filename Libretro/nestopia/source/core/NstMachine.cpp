@@ -44,6 +44,7 @@ namespace Nes
 		state         (Api::Machine::NTSC),
 		frame         (0),
 		execFrames    (0),
+		systemForced  (false),
 		strobeRise    (0),
 		strobeHigh    (false),
 		strobeForwarded (false),
@@ -96,6 +97,7 @@ namespace Nes
 				patchBypassChecksum,
 				patchResult,
 				system,
+				systemForced,
 				ask,
 				imageDatabase
 			);
@@ -328,6 +330,11 @@ namespace Nes
 		void Machine::SetRamPowerState(uint state)
 		{
 			cpu.SetRamPowerState(state);
+		}
+
+		void Machine::SetSystemForced(bool forced)
+		{
+			systemForced = forced;
 		}
 
 		void Machine::SwitchMode()

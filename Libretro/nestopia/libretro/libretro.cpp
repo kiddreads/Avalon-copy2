@@ -108,6 +108,7 @@ static Api::Machine::FavoredSystem favsystem;
  * means building the image again.  Keep the bytes for that: info->data is
  * only guaranteed for the duration of retro_load_game(). */
 static Api::Machine::FavoredSystem loadedsys = Api::Machine::FAVORED_NES_NTSC;
+static bool loadedforced = false;
 static std::string rom_buf;
 static int forcesys;
 
@@ -1186,6 +1187,8 @@ static void check_variables(void)
    if (forcesys)
       favsystem = (Api::Machine::FavoredSystem)(forcesys - 1);
 
+   machine.SetSystemForced(forcesys != 0);
+
    /* A forced system dictates the region, otherwise the image does */
    if (forcesys)
       machine.SetMode((favsystem & 0x1) ? Api::Machine::PAL : Api::Machine::NTSC);
@@ -1709,7 +1712,7 @@ void retro_run(void)
       check_variables();
 
       /* The system is only read while the image is being parsed */
-      if (machine && loadedsys != favsystem)
+      if (machine && (loadedsys != favsystem || loadedforced != (forcesys != 0)))
          reload_image();
 
       delete video;
@@ -1945,6 +1948,7 @@ static void reload_image(void)
       return;
 
    loadedsys = favsystem;
+   loadedforced = (forcesys != 0);
 
    if (!sav.empty() && sram && sram_size == sav.size())
       memcpy(sram, sav.data(), sram_size);
@@ -2152,6 +2156,7 @@ bool retro_load_game(const struct retro_game_info *info)
       return false;
 
    loadedsys = favsystem;
+   loadedforced = (forcesys != 0);
 
    /* Has to be known before the second check_variables() below, which
     * is what pins the frame geometry for the player screen. */
@@ -2251,6 +2256,7 @@ void retro_unload_game(void)
    state_size = 0;
    rom_buf.clear();
    loadedsys = Api::Machine::FAVORED_NES_NTSC;
+   loadedforced = false;
 
    memset(memory_descriptors, 0, sizeof(memory_descriptors));
    memory_map.descriptors     = NULL;

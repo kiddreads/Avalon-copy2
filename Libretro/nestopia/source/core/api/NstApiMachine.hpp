@@ -253,6 +253,19 @@ namespace Nes
 			Result SetRamPowerState(uint state) throw();
 
 			/**
+			* Sets whether the system given to Load is binding.
+			*
+			* A favored system is only a tie-breaker and never overrides an image
+			* that states its own system. Set this to treat the system as an
+			* explicit choice that does override it. Must be set before loading,
+			* and stays in effect until changed.
+			*
+			* @param state true if the system is forced, default is false
+			* @return result code
+			*/
+			Result SetSystemForced(bool state) throw();
+
+			/**
 			* Returns the current mode.
 			*
 			* @return mode

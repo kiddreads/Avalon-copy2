@@ -43,7 +43,7 @@ namespace Nes
 		: nmt(NMT_DEFAULT), battery(false), wramAuto(false) {}
 
 		Cartridge::Cartridge(Context& context)
-		: Image(CARTRIDGE), board(NULL), vs(NULL), favoredSystem(context.favoredSystem)
+		: Image(CARTRIDGE), board(NULL), vs(NULL), favoredSystem(context.favoredSystem), forcedSystem(context.forcedSystem)
 		{
 			try
 			{
@@ -475,6 +475,23 @@ namespace Nes
 		{
 			if (region == Cartridge::GetDesiredRegion())
 			{
+				/* Dendy shares its region with PAL, so unlike every other system
+				 * override this one cannot be picked up by the region mismatch
+				 * below. Only an explicitly forced system overrides the profile;
+				 * a favored one is a tie-breaker and leaves a Dendy image alone.
+				 */
+				if (forcedSystem && favoredSystem == FAVORED_NES_PAL && region == REGION_PAL &&
+					profile.system.type == Profile::System::DENDY)
+				{
+					if (cpu)
+						*cpu = CPU_RP2A07;
+
+					if (ppu)
+						*ppu = PPU_RP2C07;
+
+					return SYSTEM_NES_PAL;
+				}
+
 				if (favoredSystem == FAVORED_DENDY && region == REGION_PAL)
 				{
 					switch (profile.system.type)
