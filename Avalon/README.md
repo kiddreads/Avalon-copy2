@@ -8,7 +8,7 @@ JIT service, one presenter, and one place where licensing is decided.
 
 ## Status
 
-Phases 1–2 complete (discovery, architecture); Phase 3 (foundation) underway.
+Phases 1–3 complete (discovery, architecture, foundation); Phase 4 (core integration) underway.
 `docs/INTEGRATION-STATUS.md` tracks every subsystem honestly — *discovered → analyzed → selected →
 adapted → partially integrated → integrated → tested → validated*. Nothing is called integrated
 because a file was copied or an interface compiles.
@@ -22,7 +22,7 @@ Requires Swift 5.9+. Command Line Tools are enough — no Xcode, no CMake.
 
 ```sh
 swift build
-swift test                      # 34 tests
+swift test                      # 78 tests
 swift run -c release avalon-bench     # frame-conversion benchmark
 swift run avalon-notice NOTICE.md     # regenerate attribution
 ```
@@ -35,7 +35,13 @@ swift run avalon-notice NOTICE.md     # regenerate attribution
 | `Sources/AvalonCore/Graphics/` | Shared frame presenter |
 | `Sources/AvalonCore/Platform/` | JIT arbitration service |
 | `Sources/AvalonCore/Provenance/` | Licence model, source registry, notice generation |
+| `Sources/AvalonCore/Configuration/` | Three-scope settings (game > system > global) |
+| `Sources/AvalonCore/Input/` | Normalized controls, per-core encoding maps, bindings |
+| `Sources/AvalonCore/Storage/` | Required-system-file gate and core selection |
+| `Sources/AvalonCore/Diagnostics/` | Logging |
 | `Sources/AvalonPixel/` | Pixel conversion hot path (C + NEON) |
+| `Sources/AvalonJIT/` | Executable memory: MAP_JIT, vm_remap dual mapping, W^X |
+| `Sources/AvalonAudio/` | Granular mixer, 6-point Hermite resampler |
 | `docs/ENGINEERING-MAP.md` | Repository inventory, duplication, licensing, capability matrix |
 | `docs/ARCHITECTURE.md` | The five architectural decisions and the evidence forcing each |
 | `docs/INTEGRATION-STATUS.md` | Per-subsystem and per-project integration stage |
