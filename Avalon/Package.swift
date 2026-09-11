@@ -9,9 +9,11 @@ let package = Package(
     ],
     targets: [
         .target(name: "AvalonPixel"),
+        .target(name: "AvalonJIT"),
+        .target(name: "AvalonAudio"),
         .target(
             name: "AvalonCore",
-            dependencies: ["AvalonPixel"],
+            dependencies: ["AvalonPixel", "AvalonJIT", "AvalonAudio"],
             resources: [.process("Resources")]
         ),
         .executableTarget(name: "avalon-notice", dependencies: ["AvalonCore"]),
