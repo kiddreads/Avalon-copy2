@@ -63,13 +63,22 @@ public struct SourceProject: Codable, Sendable, Identifiable, Hashable {
     public let copyrightHolders: [String]
     /// Systems emulated, for the capability matrix.
     public let systems: [String]
+    /// Free-text finding about this project, carrying the evidence for it.
+    public let notes: String?
+    /// Another project that supersedes this one entirely. Set for `iCube`.
+    public let supersededBy: String?
 
     public init(id: String, upstream: String? = nil, origin: URL? = nil, license: License,
-                licensePath: String, copyrightHolders: [String] = [], systems: [String] = []) {
+                licensePath: String, copyrightHolders: [String] = [], systems: [String] = [],
+                notes: String? = nil, supersededBy: String? = nil) {
         self.id = id; self.upstream = upstream; self.origin = origin
         self.license = license; self.licensePath = licensePath
         self.copyrightHolders = copyrightHolders; self.systems = systems
+        self.notes = notes; self.supersededBy = supersededBy
     }
+
+    /// Whether another project in the registry replaces this one entirely.
+    public var isSuperseded: Bool { supersededBy != nil }
 }
 
 /// One Avalon component and where it came from.

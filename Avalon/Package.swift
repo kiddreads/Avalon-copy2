@@ -14,6 +14,7 @@ let package = Package(
             dependencies: ["AvalonPixel"],
             resources: [.process("Resources")]
         ),
+        .executableTarget(name: "avalon-notice", dependencies: ["AvalonCore"]),
         .executableTarget(name: "avalon-bench", dependencies: ["AvalonCore"]),
         .testTarget(name: "AvalonCoreTests", dependencies: ["AvalonCore"]),
     ]
