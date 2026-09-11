@@ -13,8 +13,10 @@ Phases 1–3 complete (discovery, architecture, foundation); Phase 4 (core integ
 adapted → partially integrated → integrated → tested → validated*. Nothing is called integrated
 because a file was copied or an interface compiles.
 
-**No core implements the contract yet**, so nothing renders a game. What does exist is built, tested
-and measured.
+Avalon **runs**. A complete CHIP-8 core implements the contract and is driven end-to-end by the real
+session, pacer, presenter, input router and mixer. What is not yet done is a core for any of the
+*large* systems — each of those is a substantial port, not a binding — and the iOS app target, which
+cannot be built on this machine (Command Line Tools only).
 
 ## Build
 
@@ -22,9 +24,28 @@ Requires Swift 5.9+. Command Line Tools are enough — no Xcode, no CMake.
 
 ```sh
 swift build
-swift test                      # 78 tests
+swift test                      # 96 tests
 swift run -c release avalon-bench     # frame-conversion benchmark
 swift run avalon-notice NOTICE.md     # regenerate attribution
+swift run avalon-run                  # run a real ROM end-to-end and print the framebuffer
+```
+
+`avalon-run` loads a CHIP-8 ROM, executes it, paces it at 60 Hz, converts frames through the NEON
+presenter and pushes audio through the mixer — the whole stack, headless:
+
+```
+Avalon — CHIP-8 1.0
+JIT mode: mapJIT   SIMD presenter: true
+
+  ┌────────────────────────────────────────┐
+  │    ████  ████  ████    █   ████  ███   │
+  │    █  █  █  █  █  █   ██   █  █  █  █  │
+  │    ████  █  █  ████    █   █  █  █  █  │
+  │    █  █  █  █  █  █    █   █  █  █  █  │
+  │    █  █  ████  █  █   ███  ████  ███   │
+  └────────────────────────────────────────┘
+
+  frames run 60 · presented 60 · dropped 0 · audio 48000 frames
 ```
 
 ## What is here
@@ -42,6 +63,8 @@ swift run avalon-notice NOTICE.md     # regenerate attribution
 | `Sources/AvalonPixel/` | Pixel conversion hot path (C + NEON) |
 | `Sources/AvalonJIT/` | Executable memory: MAP_JIT, vm_remap dual mapping, W^X |
 | `Sources/AvalonAudio/` | Granular mixer, 6-point Hermite resampler |
+| `Sources/AvalonChip8/` | CHIP-8 reference core (C) |
+| `Sources/AvalonCore/Cores/` | `Chip8Core` — the contract, implemented |
 | `docs/ENGINEERING-MAP.md` | Repository inventory, duplication, licensing, capability matrix |
 | `docs/ARCHITECTURE.md` | The five architectural decisions and the evidence forcing each |
 | `docs/INTEGRATION-STATUS.md` | Per-subsystem and per-project integration stage |
