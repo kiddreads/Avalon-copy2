@@ -41,7 +41,7 @@
         "GameCube",
         "Wii"
       ],
-      "notes": "Fork of DolphiniOS with JIT removed and a SwiftUI frontend (Fin/Readme.md)."
+      "notes": "Narrow but real divergence from a near-current DolphiniOS (3,675 changed Core lines; identical generation markers to dolphin-ios). Unique in this repository: .slangp RetroArch shader chains (VideoCommon/Slang/), a cached-interpreter rewrite 480->1769 lines with inlined hot opcodes, MetalFX upscaling, and the 'Bell Audio' CoreAudio path."
     },
     {
       "id": "Folium",
@@ -138,7 +138,7 @@
         "GameCube",
         "Wii"
       ],
-      "notes": "SPDX tag confirmed at dolphin-ios/Source/Core/Core/Core.cpp:2."
+      "notes": "SPDX GPL-2.0-or-later confirmed (Source/Core/Core/Core.cpp:2). Newest Dolphin base of the three derivatives. Holds the iOS JIT acquisition ladder (ptrace, csops, AltServer, JitStreamer, Apple TXM) and Dolphin's AbstractGfx/AbstractPipeline/AsyncShaderCompiler abstraction, which returns 0 hits across all seven sibling projects."
     },
     {
       "id": "iCube",
@@ -153,7 +153,8 @@
         "GameCube",
         "Wii"
       ],
-      "notes": "Third Dolphin derivative; divergence from dolphin-ios measured in ENGINEERING-MAP.md."
+      "notes": "STALE UNBRANDED COPY of dolphin-ios, not a fork. The string 'iCube' appears 0 times in iCube/iCube/Source, which retains 500 DolphiniOS references and ships DolphiniOS.xcodeproj. Its only unique file is an app icon PNG. All 15 generation markers put it older (STATE_VERSION 170 vs 175; SDL2 vs SDL3; RenderBase.cpp vs EFBInterface.cpp). Lacks dolphin-ios's iOS JIT code entirely. RECOMMENDED FOR REMOVAL.",
+      "supersededBy": "dolphin-ios"
     },
     {
       "id": "iPSX2",

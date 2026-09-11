@@ -31,11 +31,33 @@ the C# UI toolkit vendored inside MeloNX/Ryujinx — unrelated.)
 `.github/workflows/merge-emulators.yml` is a leftover one-shot workflow from the repo assembly; it is
 not part of Avalon.
 
-### Three projects are the same emulator [verified]
-`dolphin-ios`, `iCube` and `Fin` are all Dolphin derivatives. `Fin/Readme.md` states outright that it is
-a fork of DolphiniOS. `dolphin-ios` *is* DolphiniOS. `iCube` carries an identical `Externals/` manifest
-and near-identical file count (7,427 vs 7,381) and byte size (99.9 vs 99.2 MB).
-See §"Dolphin family" for the measured divergence.
+### Three projects are the same emulator, and one of them is a straight copy [verified]
+
+`dolphin-ios`, `iCube` and `Fin` are all Dolphin derivatives.
+
+**`iCube` is not a fork. It is a stale, unbranded copy of DolphiniOS.** The evidence is unambiguous:
+
+- The string `iCube` appears **0 times** in `iCube/iCube/Source`, which still contains **500
+  `DolphiniOS` references** and ships `Source/iOS/App/DolphiniOS.xcodeproj`.
+- Its `Readme.md` is byte-identical to DolphiniOS's.
+- Its **only** file not present in `dolphin-ios` is an app icon PNG
+  (`Source/iOS/App/DolphiniOS/Assets.xcassets/AppIcon.appiconset/diosblue.png`).
+- `diff -rq` reports 1,007 differing files and 23,456 changed Core lines, but all 15 generation
+  markers put iCube uniformly **older**, not different: `STATE_VERSION` 170 (`Core/State.cpp:102`)
+  vs 175; `VideoCommon/RenderBase.cpp` + `g_renderer` instead of the current
+  `VideoCommon/EFBInterface.cpp`; SDL2 with `static_assert(!SDL_VERSION_ATLEAST(3,0,0))`
+  (`InputCommon/ControllerInterface/SDL/SDL.cpp:474`) vs SDL3.
+- 12,930 of its 14,122 changed iOS lines are two localization `Core.strings` files. Only 1,732 are code.
+- It lacks the iOS JIT acquisition code that `dolphin-ios` has (`Common/MemoryUtil_iOS*.cpp` absent).
+
+**Recommendation: remove `iCube` (7,427 files, 99.9 MB).** It contributes nothing `dolphin-ios` does
+not already have, in a newer form. Git history retains it, exactly as CEMU was removed earlier.
+
+**`Fin` is a real but narrow divergence** from a near-current DolphiniOS: only 3,675 changed Core
+lines, and identical to `dolphin-ios` on all 15 generation markers (`STATE_VERSION` 175 in both;
+`VideoCommon/ShaderCache.cpp` and `Common/Config/Config.cpp` byte-identical). Its investment is
+concentrated in four places, all of which are genuinely unique in this repository — see the
+component map below.
 
 ### Not everything that looks like a core is one [verified]
 Folium declares 11 cores but only 8 contain an emulator. `Folium/Mango`, `Folium/Lychee` and
@@ -106,9 +128,56 @@ Two further inherited hazards, both verified:
 
 ---
 
-## 4. Component map — which Avalon subsystem comes from where
+## 4. Capability matrix — strongest implementation per subsystem [analysis]
 
-*Populated in Phase 2. Nothing is claimed here until it is actually building inside Avalon.*
+Chosen on technical merit and integration cost, not project reputation. "Cost" is the honest
+barrier to getting it into Avalon.
+
+| Subsystem | Strongest | Why | Cost |
+|---|---|---|---|
+| **Core plugin contract** | Delta `EmulatorBridging` | ~20 methods, proven across 7 cores, extensible string `GameType` | Low — adapted already. Video half replaced |
+| **GPU surface handoff** | Folium `set_screens` / iPSX2 `layerClass` | Five projects converged on it independently | Low — design adopted |
+| **Native Metal renderer** | **iPSX2** | Only native Metal GS in the repo: `GS/Renderers/Metal`, 8 `.metal` shaders, 2,567 lines; adopts the UIView's own `CAMetalLayer` (`GSDeviceMTL.mm:778-782`) | Medium — GPL-3.0 |
+| **Graphics backend abstraction** | **dolphin-ios / Fin** | `AbstractGfx`, `AbstractPipeline`, `AsyncShaderCompiler`, `GraphicsModSystem` — each returns **0 hits across all seven sibling projects** | High — `VideoCommon` has 533 refs to `g_gfx`/`g_ActiveConfig` globals |
+| **Shader/pipeline cache** | PPSSPP | Integer permutation key → variant bitmask → two-level disk cache → background compile bucketed by shader pair → blocking warm-up at load | Low — copy the *design*; maps onto `MTLBinaryArchive` |
+| **Post-process shaders** | **Fin** | `.slangp` RetroArch chains (`VideoCommon/Slang/`, 8 files) → glslang → SPIRV-Cross → MSL. Unlocks the whole RetroArch shader ecosystem | Medium — hardcoded to `APIType::Metal` |
+| **Shader authoring** | Play! Nuanceur | C++ eDSL emitting SPIR-V *and* HLSL from one AST — proven multi-target | Medium — submodule absent, one-author library |
+| **Fast path without JIT** | **Fin** | Cached interpreter rewritten 480→1,769 lines with ~34 inlined opcodes and a per-callsite block inline cache | Medium — best "no-JIT" asset in the repo |
+| **ARM64 JIT (PS2)** | iPSX2 | Real ARM64 recompiler, 3,804 vixl call sites | High — 88 MMI opcodes still interpreted; only 5 allocatable GPRs |
+| **iOS JIT acquisition** | **iPSX2 + dolphin-ios** | iPSX2's 4-mode `DarwinMisc.cpp:645-860`; dolphin-ios's ptrace/AltServer/JitStreamer/TXM ladder | Medium — must be hoisted to a platform service |
+| **Dual RW/RX code memory** | MeloNX | `vm_remap` aliasing, ~20 lines, directly portable to C++ | Low |
+| **Guest memory / MMU** | MeloNX `Ryujinx.Memory` | Fault-address patching to get 4 KB tracking on 16 KB Apple pages | Design only — C# |
+| **Mirrored guest RAM** | PPSSPP `MemArenaDarwin` | `vm_allocate`/`vm_remap` + iOS base-address probing | Low — take near-verbatim |
+| **Audio mixer** | PPSSPP `GranularMixer` / Fin "Bell Audio" | 6-point Hermite, 50%-overlap granules, queue-depth rate control (not pitch bending); Fin adds NEON mixing, underrun envelope, dither | Low — both GPL-2.0-or-later |
+| **Frame pacing** | **none — written for Avalon** | Every project here lacks display phase lock; PPSSPP hardcodes 60 Hz on iOS | Done — `Core/FramePacer.swift` |
+| **Frame conversion** | **none — written for Avalon** | Folium's per-frame `CGImage` path is the thing to replace | Done — `Sources/AvalonPixel`, 7.5× on PS1 geometry |
+| **Driver bug database** | PPSSPP `thin3d.h:322-352,583-643` | `DeviceCaps` + `Bugs`: a decade of mobile-driver scar tissue as data | Low — copy near-verbatim |
+| **Input mapping** | Delta | Per-(player, gameType, controllerType) mapping; one receiver graph serving touch, MFi and keyboard | Low |
+| **Virtual pad editor** | Manic EMU | 1,735-line visual editor writing `.manicskin`; iPSX2's normalized-coords model is the cleaner data design | Medium |
+| **Game identification** | Delta | SHA1 + bundled OpenVGDB, offline and deterministic | Low — vs Manic's network scraping + LLM call |
+| **Archive/disc formats** | Manic EMU | zip/7z/rar, chd/cso/pbp/rvz/m3u | Low |
+| **Settings/feature flags** | Delta `DeltaFeatures` | `@Feature`/`@Option` wrappers auto-generating SwiftUI; 878 LOC, self-contained, zero Delta deps | Low — lift wholesale |
+| **Per-game config** | Manic EMU | Typed columns, 3-scope game/system/global | Low — vs Delta's opaque 4-key dictionary |
+| **HLE BIOS (PS2)** | **Play!** | ~35 HLE'd IRX modules + EE kernel; **no BIOS dump required**, unlike PCSX2. HLE-first with real-IRX fallback | High value, medium cost — **BSD-2** |
+| **VU recompilation** | Play! | Per-field stall modelling, dead-flag elimination, cross-block integer-branch-delay compensation, deferred XGKICK | High — port algorithms, not code |
+| **Per-game fixes** | Play! `GameConfig.xml` | Declarative, keyed by **block content hash** rather than address | Low — generalizes to every core |
+| **Portable support lib** | PPSSPP `Common/` | 354 files with only 13 `Core/` includes across 4 files — genuinely decoupled | Low, except `CPUDetect` (GPL-2.0-only) |
+| **Thread pool** | PPSSPP `Common/Thread` | Task pool with 3 task classes, `Promise`, `ParallelLoop` — 1,336 LOC | Low |
+| **Switch emulation** | MeloNX | Only Switch core available | **Plugin only** — NativeAOT .NET dylib, cannot merge |
+
+### The two PS2 projects are complementary, not competing
+
+This is the clearest case of the brief's "combine two excellent implementations solving different
+aspects of the same problem":
+
+- **iPSX2** has the native Metal renderer and a working ARM64 JIT, but **requires a BIOS dump** and is GPL-3.0.
+- **Play!** has a complete **HLE BIOS** (no dump, `Source/ee/PS2OS.cpp` + `Source/iop/IopBios.cpp`),
+  the best VU analysis passes anywhere here, and is **BSD-2** — but renders through MoltenVK/GL and
+  its iOS story depends on JIT it cannot obtain.
+
+Avalon's PS2 path takes Play!'s HLE BIOS and VU analysis with iPSX2's Metal GS approach and Avalon's
+JIT service. That removes the BIOS-dump wall, which is a legal and UX barrier for any mainstream
+distribution.
 
 ## 5. Integration status
 

@@ -14,6 +14,7 @@ Legend: **discovered → analyzed → selected → adapted → partially integra
 | Core contract (`EmulatorCore`) | **adapted** | Derived from Delta's `EmulatorBridging`; compiles; no core implements it yet |
 | Surface negotiation | **adapted** | `RenderSurface.swift`; the design is settled and cited, no Metal backend yet |
 | JIT arbitration | **tested** | `Platform/JITService.swift`; 5 tests covering the real MeloNX/PPSSPP conflicts |
+| Frame pacing | **tested** | `Core/FramePacer.swift`; 7 tests across 59.94/59.727/50 Hz guests, ProMotion, stalls. Written, not harvested — no project here phase-locks to the display |
 | Frame conversion / presenter | **tested** | `Sources/AvalonPixel` (C + NEON) + `Graphics/FramePresenter.swift`; 7 tests incl. exhaustive SIMD-vs-scalar; benchmarked (7.5x on the PS1 VRAM case) |
 | Metal texture upload | *selected* | Presenter is deliberately Metal-free so it tests off-device; upload belongs in AvalonPlatform |
 | Audio (granular mixer) | *selected* | PPSSPP `Core/HW/GranularMixer.*`, GPL-2.0-or-later; not yet adapted |
@@ -30,8 +31,15 @@ Legend: **discovered → analyzed → selected → adapted → partially integra
 | PPSSPP | **analyzed** | `DeviceCaps`/`Bugs` DB, shader-cache architecture, `Common/Thread` selected. |
 | Play! | **analyzed** | HLE BIOS + VU analysis passes selected. BSD-2 makes it uniquely reusable. |
 | iPSX2 | **analyzed** | Native Metal GS and the Darwin JIT strategy selected. |
-| dolphin-ios / iCube / Fin | *discovery in progress* | Three Dolphin derivatives; divergence being measured. |
+| dolphin-ios | **analyzed** | Newest Dolphin base. AbstractGfx abstraction + iOS JIT ladder selected. |
+| Fin | **analyzed** | `.slangp` shader chains, cached-interpreter rewrite, Bell Audio selected. |
+| iCube | **analyzed — recommended for removal** | Stale unbranded copy of dolphin-ios; 0 occurrences of its own name in its source. Contributes nothing. |
 | MeloNX | **analyzed** | Cannot be merged. Plugin-only via its existing C ABI. License unresolved. |
+
+## Pending decision
+
+**Removing `iCube`** would delete 7,427 files / 99.9 MB of verified pure duplication. Evidence is in
+ENGINEERING-MAP.md §1. Git history retains it either way. Awaiting the repository owner's call.
 
 ## Known gaps
 
