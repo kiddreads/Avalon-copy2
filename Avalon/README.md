@@ -28,6 +28,7 @@ swift test                      # 96 tests
 swift run -c release avalon-bench     # frame-conversion benchmark
 swift run avalon-notice NOTICE.md     # regenerate attribution
 swift run avalon-run                  # run a real ROM end-to-end and print the framebuffer
+swift run avalon-verify               # check every file:line citation in the docs resolves
 ```
 
 `avalon-run` loads a CHIP-8 ROM, executes it, paces it at 60 Hz, converts frames through the NEON
@@ -68,6 +69,17 @@ JIT mode: mapJIT   SIMD presenter: true
 | `docs/ENGINEERING-MAP.md` | Repository inventory, duplication, licensing, capability matrix |
 | `docs/ARCHITECTURE.md` | The five architectural decisions and the evidence forcing each |
 | `docs/INTEGRATION-STATUS.md` | Per-subsystem and per-project integration stage |
+
+## Keeping the documentation honest
+
+`docs/` makes ~82 claims of the form `SomeProject/path/File.cpp:123`. Each is an assertion about the
+repository, and assertions rot. `swift run avalon-verify` resolves every one and fails if a file is
+gone or a line is out of range, so a reorganisation upstream breaks the check rather than quietly
+making the engineering map wrong.
+
+It found two bugs in itself on first run — a regex alternation that truncated `.cs` paths to `.c`,
+and line counting that reported every CRLF file as one line, because Swift treats `\r\n` as a single
+`Character` and `split(separator: "\n")` therefore matches nothing.
 
 ## The three findings that shaped it
 

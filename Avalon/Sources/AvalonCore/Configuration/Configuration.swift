@@ -2,12 +2,12 @@
 //
 // Three scopes, resolved narrowest-first: per-game beats per-system beats global. That shape comes
 // from Manic EMU, which is the only project here that gets it right
-// (`Manic EMU/.../Common/Models/Prefference.swift:17-149`). Delta by contrast stores per-game
-// settings as an opaque `NSDictionary` with four keys (`Delta/.../Misc/GameSetting.h:11-15`), which
+// (`Manic EMU/Manic EMU/ManicEmu/ManicEmu/Sources/Business/Common/Models/Prefference.swift:17-149`). Delta by contrast stores per-game
+// settings as an opaque `NSDictionary` with four keys (`Delta/Delta/Database/Model/Misc/GameSetting.h:11-15`), which
 // is why nothing in Delta can be overridden per game without a schema change.
 //
 // Values are typed. Folium's settings are the cautionary tale: it defines ~40 3DS settings, maps 14
-// of them to the core, and silently discards every non-Bool (`Folium/.../Cytrus.swift:145-152`), so
+// of them to the core, and silently discards every non-Bool (`Folium/Cytrus/Cytrus.swift:145-152`), so
 // upscale factor, texture filter and volume are shown in the UI and never applied.
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later

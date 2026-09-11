@@ -4,7 +4,7 @@
 // independent projects in this repository all ended up handing their core an opaque `CAMetalLayer`
 // pointer, and the one project that did *not* provide a surface channel (Delta) proved unable to
 // host a GPU-native core — its own derivative, Manic EMU, had to bypass the protocol to run Citra
-// (`Manic EMU/.../Cores/ThreeDS.swift:303-362`).
+// (`Manic EMU/Manic EMU/ManicEmu/ManicEmu/Sources/Tools/Cores/ThreeDS.swift:303-362`).
 //
 // So Avalon inverts Delta's video layer: a core is *given* a surface, it does not hand back a buffer.
 // The CPU-framebuffer case is one implementation of this contract rather than the contract itself.
@@ -43,7 +43,7 @@ public struct PixelSize: Hashable, Codable, Sendable {
 public enum RenderingModel: Sendable, Equatable {
     /// The core writes pixels into memory; Avalon uploads and presents them.
     /// Replaces the per-frame `CGImage` → `UIImageView` path every software core in Folium uses
-    /// (`Folium/.../KiwiController.swift:381-408`), which allocates and converts on the main actor.
+    /// (`Folium/Folium/Controllers/Emulation/KiwiController.swift:381-408`), which allocates and converts on the main actor.
     case softwareFramebuffer(format: PixelFormat, nativeSize: PixelSize)
 
     /// The core renders directly into a surface Avalon provides — via Metal, or via Vulkan on

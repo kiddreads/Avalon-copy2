@@ -2,7 +2,7 @@
 //
 // The lifecycle / input / state / cheat half of this is Delta's `EmulatorBridging`, which is small,
 // complete, and proven across seven shipping cores. It was recovered verbatim from Manic EMU's
-// conformances (`Manic EMU/.../Cores/EmulatorBridgingBase.swift:9-79`) because DeltaCore itself is an
+// conformances (`Manic EMU/Manic EMU/ManicEmu/ManicEmu/Sources/Tools/Cores/EmulatorBridgingBase.swift:9-79`) because DeltaCore itself is an
 // unchecked-out submodule.
 //
 // Three things are deliberately different:
@@ -57,7 +57,7 @@ public struct CoreCapabilities: OptionSet, Sendable, Hashable {
     public static let saveStates     = Self(rawValue: 1 << 0)
     public static let cheats         = Self(rawValue: 1 << 1)
     /// Exposes guest memory — this is how Delta drives RetroAchievements core-agnostically
-    /// (`Delta/.../RetroAchievements/AchievementsTracker.swift:181`).
+    /// (`Delta/Delta/RetroAchievements/AchievementsTracker.swift:181`).
     public static let memoryAccess   = Self(rawValue: 1 << 2)
     public static let rewind         = Self(rawValue: 1 << 3)
     /// Needs executable memory. Avalon must provision it before `start` — see JITService.

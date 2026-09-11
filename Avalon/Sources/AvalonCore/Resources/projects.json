@@ -198,10 +198,10 @@
     },
     {
       "host": "Manic EMU",
-      "path": "Manic EMU/.../EmulationCore.swift:146-148",
+      "path": "Manic EMU/Manic EMU/ManicEmu/ManicEmu/Sources/Tools/Others/EmulationCore.swift",
       "name": "nonCommercialCores (PicoDrive, FBNeo, Snes9x)",
       "license": "NonCommercial",
-      "evidence": "Manic EMU/Manic EMU/ManicEmu/Sources/Tools/Others/EmulationCore.swift:146-148",
+      "evidence": "Manic EMU/Manic EMU/ManicEmu/ManicEmu/Sources/Tools/Others/EmulationCore.swift:146-148",
       "hazard": "A no-commercial-use term is an additional restriction; GPL section 7 forbids it. These cores cannot be combined into a GPL/AGPL work."
     },
     {

@@ -171,7 +171,7 @@ public final class Chip8Core: EmulatorCore {
 
     /// The whole machine is POD, so a save state is a byte copy plus a versioned header.
     /// The header is the part that matters: Delta stamps its states with the core identifier and
-    /// version and filters on it (`Delta/.../GameViewController.swift:1240-1241`), which is how a
+    /// version and filters on it (`Delta/Delta/Emulation/GameViewController.swift:1240-1241`), which is how a
     /// core update stops silently loading an incompatible state.
     private static let stateMagic: UInt32 = 0x41_43_38_53   // "AC8S"
     private static let stateVersion: UInt32 = 1

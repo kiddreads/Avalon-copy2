@@ -2,7 +2,7 @@
 //
 // Most emulated systems need files Avalon cannot ship: a BIOS dump, keys, firmware. Folium is the
 // only project here that models this declaratively, with a per-system required/optional table and a
-// gate before launch (`Folium/.../Actors/DirectoryManager.swift:20-170`, gate in
+// gate before launch (`Folium/Folium/Actors/DirectoryManager.swift:20-170`, gate in
 // `GamesController.swift:564+`). Everything else discovers the problem by failing to boot.
 //
 // It also records something that matters for choosing between cores: Play! needs **no** PS2 BIOS

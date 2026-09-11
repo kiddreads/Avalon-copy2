@@ -23,7 +23,7 @@ public enum License: String, Codable, Sendable, CaseIterable {
     /// Weak copyleft; compatible with GPLv3 but imposes a relinking obligation.
     case lgpl3OrLater = "LGPL-3.0-or-later"
     /// Not an open-source license. Manic EMU gates several libretro cores this way
-    /// (`Manic EMU/.../EmulationCore.swift:146-148` `nonCommercialCores`). A "no commercial use"
+    /// (`Manic EMU/Manic EMU/ManicEmu/ManicEmu/Sources/Tools/Others/EmulationCore.swift:146-148` `nonCommercialCores`). A "no commercial use"
     /// term is an additional restriction, which GPL §7 forbids — such a core cannot be combined
     /// into a GPL/AGPL work at all.
     case nonCommercial = "NonCommercial"

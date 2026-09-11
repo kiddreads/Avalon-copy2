@@ -22,11 +22,11 @@ public enum GraphicsQuirk: String, Sendable, CaseIterable, Codable {
     case tileBasedBarrierScope
 
     /// Framebuffer fetch is unavailable on the Simulator, though present on device.
-    /// `iPSX2/.../GS/Renderers/Metal/GSMTLDeviceInfo.mm:208-212`.
+    /// `iPSX2/iPSX2/cpp/pcsx2/GS/Renderers/Metal/GSMTLDeviceInfo.mm:208-212`.
     case noFramebufferFetchOnSimulator
 
     /// `shm_open` is blocked by the iOS sandbox; shared memory must come from `mkstemp` in TMPDIR.
-    /// `iPSX2/.../GS/GS.cpp:1113-1128`.
+    /// `iPSX2/iPSX2/cpp/pcsx2/GS/GS.cpp:1113-1128`.
     case noPosixSharedMemory
 
     /// MoltenVK requires vertex attribute descriptions duplicated per binding.

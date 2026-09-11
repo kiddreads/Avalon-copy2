@@ -3,7 +3,7 @@
  *
  * Every software core in this repository hands the frontend a raw pixel buffer, and every frontend
  * here converts it badly. Folium builds a CGImage and a UIImage per frame and assigns it to a
- * UIImageView on the main actor (Folium/.../KiwiController.swift:381-408). Mandarine converts the
+ * UIImageView on the main actor (Folium/Folium/Controllers/Emulation/KiwiController.swift:381-408). Mandarine converts the
  * entire 1024x512 PS1 VRAM to a 24-bit CGImage every frame and only then crops to the visible
  * region (MandarineController.swift:340-352, Extensions/CGImage.swift:85-126).
  *

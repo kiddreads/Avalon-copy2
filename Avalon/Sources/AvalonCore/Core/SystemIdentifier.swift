@@ -1,7 +1,7 @@
 // Avalon — system identity.
 //
 // Deliberately an open string, not an enum. Delta's `GameType` works the same way
-// (`GameType("public.aoshuang.game.fds")`, `Manic EMU/.../Cores/FDS.swift:14`) and it is the reason
+// (`GameType("public.aoshuang.game.fds")`, `Manic EMU/Manic EMU/ManicEmu/ManicEmu/Sources/Tools/Cores/FDS.swift:14`) and it is the reason
 // adding a system to Delta needs no change to DeltaCore itself. Avalon keeps that property: a closed
 // enum here would make every new core a breaking change to the package that defines the contract.
 //

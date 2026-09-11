@@ -17,6 +17,7 @@ let package = Package(
             dependencies: ["AvalonPixel", "AvalonJIT", "AvalonAudio", "AvalonChip8"],
             resources: [.process("Resources")]
         ),
+        .executableTarget(name: "avalon-verify", dependencies: ["AvalonCore"]),
         .executableTarget(name: "avalon-run", dependencies: ["AvalonCore", "AvalonAudio"]),
         .executableTarget(name: "avalon-notice", dependencies: ["AvalonCore"]),
         .executableTarget(name: "avalon-bench", dependencies: ["AvalonCore"]),

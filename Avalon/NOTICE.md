@@ -106,8 +106,8 @@ These are present in source projects but must not enter an Avalon build.
 
 ### nonCommercialCores (PicoDrive, FBNeo, Snes9x) — NonCommercial
 
-- Location: `Manic EMU/.../EmulationCore.swift:146-148` (in Manic EMU)
-- Evidence: `Manic EMU/Manic EMU/ManicEmu/Sources/Tools/Others/EmulationCore.swift:146-148`
+- Location: `Manic EMU/Manic EMU/ManicEmu/ManicEmu/Sources/Tools/Others/EmulationCore.swift` (in Manic EMU)
+- Evidence: `Manic EMU/Manic EMU/ManicEmu/ManicEmu/Sources/Tools/Others/EmulationCore.swift:146-148`
 - Reason: A no-commercial-use term is an additional restriction; GPL section 7 forbids it. These cores cannot be combined into a GPL/AGPL work.
 
 ## Data excluded from redistribution

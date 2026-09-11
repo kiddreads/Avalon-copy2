@@ -13,9 +13,9 @@ then gets out of the way.
 | Project | Mechanism | Evidence |
 |---|---|---|
 | Folium | `cytrus::set_screens(void* layer, h, w, secondary)`, stored as `CA::MetalLayer*` via metal-cpp, given to Vulkan as `render_surface` | `Folium/Cytrus/System/bridge.cpp:276-286`, `emu_window_vk.cpp:43-48` |
-| MeloNX | Swift `Unmanaged.passUnretained(metalLayer).toOpaque()` → `set_native_window` → `vkCreateMetalSurfaceEXT` | `MeloNX/.../Metal/MetalView.swift:178-193`, `Ryujinx.Library/Window/MoltenVKWindow.cs:83-109` |
-| iPSX2 | `UIView.layerClass = CAMetalLayer`; the Metal backend **adopts the view's existing layer** rather than making one | `iPSX2/.../cpp/ios_main.mm:73-89`, `GS/Renderers/Metal/GSDeviceMTL.mm:778-782` |
-| Manic EMU | Bypasses its own core protocol with a non-protocol `start(…metalView:…)` handing over the raw layer | `Manic EMU/.../Cores/ThreeDS.swift:303-362` |
+| MeloNX | Swift `Unmanaged.passUnretained(metalLayer).toOpaque()` → `set_native_window` → `vkCreateMetalSurfaceEXT` | `MeloNX/src/MeloNX/MeloNX/UI/Emulation/Metal/MetalView.swift:178-193`, `Ryujinx.Library/Window/MoltenVKWindow.cs:83-109` |
+| iPSX2 | `UIView.layerClass = CAMetalLayer`; the Metal backend **adopts the view's existing layer** rather than making one | `iPSX2/iPSX2/cpp/ios_main.mm:73-89`, `GS/Renderers/Metal/GSDeviceMTL.mm:778-782` |
+| Manic EMU | Bypasses its own core protocol with a non-protocol `start(…metalView:…)` handing over the raw layer | `Manic EMU/Manic EMU/ManicEmu/ManicEmu/Sources/Tools/Cores/ThreeDS.swift:303-362` |
 | PPSSPP | `+layerClass → CAMetalLayer`, layer passed to `InitSurface(WINDOWSYSTEM_METAL_EXT, …)` | `PPSSPP/ios/ViewControllerMetal.mm:71,278` |
 
 Delta is the control case that proves the point. Its `DeltaCore` contract has **no** surface channel —
@@ -34,7 +34,7 @@ Citra** (`ThreeDS.swift:303-362`, which declares a fake `videoFormat` at `:158`)
 ### Why the shared presenter matters
 
 Folium's software cores each convert `uint32_t*` → `CGImage` → `UIImage` → `UIImageView.image` every
-frame on the main actor (`Folium/.../KiwiController.swift:381-408`). Mandarine converts the **entire
+frame on the main actor (`Folium/Folium/Controllers/Emulation/KiwiController.swift:381-408`). Mandarine converts the **entire
 1024×512 PS1 VRAM** to a 24-bit `CGImage` per frame and only then crops
 (`MandarineController.swift:340-352`). One shared presenter replaces all of it and gives
 every software core free scaling, filtering and vsync.
@@ -60,12 +60,12 @@ allocation and the main-actor hop that Folium additionally pays on every frame.
 
 The lifecycle/input/state/cheat half of `EmulatorBridging` is small, complete and proven across seven
 shipping cores. Recovered verbatim from Manic EMU's conformances (DeltaCore itself is an uncheckout
-submodule) at `Manic EMU/.../Cores/EmulatorBridgingBase.swift:9-79`:
+submodule) at `Manic EMU/Manic EMU/ManicEmu/ManicEmu/Sources/Tools/Cores/EmulatorBridgingBase.swift:9-79`:
 
 `start/stop/pause/resume`, `runFrame(processVideo:)`, `activateInput/deactivateInput/resetInputs`,
 `saveSaveState/loadSaveState`, `saveGameSave/loadGameSave`, `addCheatCode/resetCheats/updateCheats`,
 optional `readMemory` (which is how Delta drives RetroAchievements core-agnostically —
-`Delta/.../RetroAchievements/AchievementsTracker.swift:181`).
+`Delta/Delta/RetroAchievements/AchievementsTracker.swift:181`).
 
 Avalon adopts this shape, with two corrections:
 - **No singletons.** `FDSEmulatorBridge.shared`, `ThreeDSEmulatorBridge.shared`,
@@ -103,7 +103,7 @@ Four cores, four incompatible JIT strategies, one process-global resource.
 The design to implement is iPSX2's four-mode strategy plus MeloNX's `vm_remap` dual-mapping
 (`DualMappedJitAllocator.cs:85-105`) and its graceful no-debugger fallback — a SIGTRAP handler that
 does `pc += 4; x0 = 0` so a missing debugger returns NULL instead of crashing
-(`MeloNX/.../Common/JIT26Breakpoint.swift:10-15`). Note: taking iPSX2's *code* makes the consumer
+(`MeloNX/src/MeloNX/MeloNX/Common/JIT26Breakpoint.swift:10-15`). Note: taking iPSX2's *code* makes the consumer
 GPL-3.0; the technique should be re-implemented from public Apple APIs if App Store viability matters.
 
 ---
@@ -114,7 +114,7 @@ The brief allows for this explicitly, and the code demands it:
 
 - **MeloNX cannot be merged at any price.** It is .NET 10 **NativeAOT** cross-compiled to `ios-arm64`,
   shipping as `Ryujinx.Library.dylib` with a flat 30-function C ABI
-  (`Ryujinx.Library.csproj:5,12-13`, `MeloNX/.../Core/Ryujinx.swift:391-479`). The dylib statically
+  (`Ryujinx.Library.csproj:5,12-13`, `MeloNX/src/MeloNX/MeloNX/Core/Ryujinx.swift:391-479`). The dylib statically
   contains an entire .NET runtime — one GC, one thread pool, one BCL per image. 4,007 `.cs` files.
   There is no path from that to C++. It is *already* a plugin; Avalon should treat it as one.
 - The C++ cores (Dolphin family, PPSSPP, PCSX2, Play!) share no CPU architecture, no memory model and

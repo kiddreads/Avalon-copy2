@@ -5,11 +5,11 @@
 // KEYINPUT mask (`Folium/Grape/Grape.swift:11-26`), Gambatte's mask (`Kiwi.swift:15-27`), and
 // arbitrary integers 700–782 for the 3DS (`Cytrus.swift:12-40`) — so its "controls controller" is
 // ten overloads of `press(button:using:)`, one per concrete enum
-// (`Folium/.../ControlsController.swift:20-118`).
+// (`Folium/Folium/Controllers/Emulation/ControlsController.swift:20-118`).
 //
 // Delta gets this right and is the model here: one receiver graph where the same mapping serves
 // touch skins, MFi controllers and keyboards uniformly, keyed per (player, system, controller type)
-// (`Delta/.../GameViewController.swift:874-916`, `Delta/.../GameControllerInputMapping.swift:39-62`).
+// (`Delta/Delta/Emulation/GameViewController.swift:874-916`, `Delta/Delta/Database/Model/Human/GameControllerInputMapping.swift:39-62`).
 // Manic EMU regressed it by dropping the player index (`.../ControllerMapping.swift:16-28`), which
 // is why it cannot map two players independently.
 //
