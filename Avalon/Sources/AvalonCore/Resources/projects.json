@@ -1,0 +1,221 @@
+{
+  "schemaVersion": 1,
+  "snapshot": {
+    "repo": "kiddreads/Avalon-copy2",
+    "commit": "6fa7b92",
+    "date": "2026-09-10"
+  },
+  "projects": [
+    {
+      "id": "Delta",
+      "upstream": null,
+      "origin": "https://github.com/rileytestut/Delta",
+      "license": "AGPL-3.0-or-later",
+      "licensePath": "Delta/COPYING",
+      "copyrightHolders": [
+        "Riley Testut",
+        "AltStore LLC"
+      ],
+      "systems": [
+        "NES",
+        "SNES",
+        "N64",
+        "GB",
+        "GBC",
+        "GBA",
+        "NDS",
+        "Genesis"
+      ],
+      "notes": "App shell only in this repo; all cores are external git submodules (Delta/.gitmodules)."
+    },
+    {
+      "id": "Fin",
+      "upstream": "DolphiniOS -> Dolphin",
+      "origin": "https://github.com/OatmealDome/dolphiniOS",
+      "license": "GPL-2.0-or-later",
+      "licensePath": "Fin/COPYING",
+      "copyrightHolders": [
+        "Dolphin Emulator Project"
+      ],
+      "systems": [
+        "GameCube",
+        "Wii"
+      ],
+      "notes": "Fork of DolphiniOS with JIT removed and a SwiftUI frontend (Fin/Readme.md)."
+    },
+    {
+      "id": "Folium",
+      "upstream": null,
+      "origin": "https://github.com/jarrodnorwell/Folium",
+      "license": "GPL-3.0-or-later",
+      "licensePath": "Folium/LICENSE",
+      "copyrightHolders": [
+        "Jarrod Norwell"
+      ],
+      "systems": [
+        "3DS",
+        "PS1",
+        "NDS",
+        "GB",
+        "GBC",
+        "GBA",
+        "ColecoVision",
+        "Genesis",
+        "NES",
+        "SNES",
+        "WonderSwan"
+      ],
+      "notes": "8 real cores + 3 bridge-only stubs (Mango, Lychee, Durian have no System/ dir)."
+    },
+    {
+      "id": "Manic EMU",
+      "upstream": null,
+      "origin": null,
+      "license": "AGPL-3.0-or-later",
+      "licensePath": "Manic EMU/Manic EMU/LICENSE",
+      "copyrightHolders": [
+        "Manic EMU authors"
+      ],
+      "systems": [
+        "40+ via libretro"
+      ],
+      "notes": "41 prebuilt *.libretro.framework binaries + Citra.framework; no core source in repo."
+    },
+    {
+      "id": "MeloNX",
+      "upstream": "Ryujinx",
+      "origin": "https://github.com/MeloNX-Emu/MeloNX",
+      "license": "MIT",
+      "licensePath": "MeloNX/LICENSE.txt",
+      "copyrightHolders": [
+        "Ryujinx contributors",
+        "MeloNX contributors"
+      ],
+      "systems": [
+        "Nintendo Switch"
+      ],
+      "notes": "CONTRADICTION: MeloNX/LICENSE.txt is verbatim MIT (Ryujinx Team and Contributors); README.md:13,218 claims GPLv3 but no GPL text ships. Must be resolved with the author before Avalon derives from it. Bundled ffmpeg is LGPL-3.0."
+    },
+    {
+      "id": "PPSSPP",
+      "upstream": null,
+      "origin": "https://github.com/hrydgard/ppsspp",
+      "license": "GPL-2.0-or-later",
+      "licensePath": "PPSSPP/LICENSE.TXT",
+      "copyrightHolders": [
+        "Henrik Rydgard",
+        "PPSSPP Project"
+      ],
+      "systems": [
+        "PSP"
+      ],
+      "notes": "or-later confirmed at PPSSPP/Core/Core.cpp:5. Common/GPU/thin3d.h:5 is MIT. 10 files inherited from 2003-era Dolphin are GPL-2.0-ONLY (see vendoredCores)."
+    },
+    {
+      "id": "Play!",
+      "upstream": null,
+      "origin": "https://github.com/jpd002/Play-",
+      "license": "BSD-2-Clause",
+      "licensePath": "Play!/License.txt",
+      "copyrightHolders": [
+        "Jean-Philip Desjardins"
+      ],
+      "systems": [
+        "PS2"
+      ],
+      "notes": "Play!/License.txt has two Redistributions clauses, not three. Only permissively licensed emulator in the repository."
+    },
+    {
+      "id": "dolphin-ios",
+      "upstream": "Dolphin",
+      "origin": "https://github.com/OatmealDome/dolphiniOS",
+      "license": "GPL-2.0-or-later",
+      "licensePath": "dolphin-ios/COPYING",
+      "copyrightHolders": [
+        "Dolphin Emulator Project"
+      ],
+      "systems": [
+        "GameCube",
+        "Wii"
+      ],
+      "notes": "SPDX tag confirmed at dolphin-ios/Source/Core/Core/Core.cpp:2."
+    },
+    {
+      "id": "iCube",
+      "upstream": "Dolphin",
+      "origin": null,
+      "license": "GPL-2.0-or-later",
+      "licensePath": "iCube/iCube/COPYING",
+      "copyrightHolders": [
+        "Dolphin Emulator Project"
+      ],
+      "systems": [
+        "GameCube",
+        "Wii"
+      ],
+      "notes": "Third Dolphin derivative; divergence from dolphin-ios measured in ENGINEERING-MAP.md."
+    },
+    {
+      "id": "iPSX2",
+      "upstream": "PCSX2",
+      "origin": null,
+      "license": "GPL-3.0-or-later",
+      "licensePath": "iPSX2/iPSX2/COPYING.GPLv3",
+      "copyrightHolders": [
+        "PCSX2 Dev Team"
+      ],
+      "systems": [
+        "PS2"
+      ],
+      "notes": "Real ARM64 PCSX2 port (ARMSX2 lineage, 3804 vixl call sites). 838 SPDX headers, no GPL-2.0-only files. The repository's only NATIVE Metal renderer (GS/Renderers/Metal, 8 .metal shaders)."
+    }
+  ],
+  "vendoredCores": [
+    {
+      "host": "Folium",
+      "path": "Folium/Kiwi/System",
+      "name": "Gambatte",
+      "license": "GPL-2.0-only",
+      "evidence": "Folium/Kiwi/System/gambatte.cpp:4-6",
+      "hazard": "INCOMPATIBLE with the GPL-3.0 umbrella Folium ships under. Must not enter Avalon."
+    },
+    {
+      "host": "Folium",
+      "path": "Folium/Plum/System/core/clown68000",
+      "name": "clown68000",
+      "license": "AGPL-3.0-or-later",
+      "evidence": "Folium/Plum/System/core/clown68000/interpreter/clown68000.c:2-8",
+      "hazard": "Stronger copyleft than its host; forces AGPL on any combined work."
+    },
+    {
+      "host": "PPSSPP",
+      "path": "PPSSPP/Common/CPUDetect.h (+9 more)",
+      "name": "Dolphin-derived CPU detection / ARM emitter",
+      "license": "GPL-2.0-only",
+      "evidence": "PPSSPP/Common/CPUDetect.h:3-5 ('version 2.0.', no or-later); also ArmEmitter.{h,cpp}, ArmCPUDetect.cpp, RiscV/LoongArch/FakeCPUDetect.cpp, FakeEmitter.h, Core/ELF/PrxDecrypter.h",
+      "hazard": "CPUDetect.h is included by 62 files including Common/Arm64Emitter.cpp \u2014 the exact code Avalon most wants to harvest. Rewrite CPU detection rather than inherit a v2-only obligation."
+    },
+    {
+      "host": "Manic EMU",
+      "path": "Manic EMU/.../EmulationCore.swift:146-148",
+      "name": "nonCommercialCores (PicoDrive, FBNeo, Snes9x)",
+      "license": "NonCommercial",
+      "evidence": "Manic EMU/Manic EMU/ManicEmu/Sources/Tools/Others/EmulationCore.swift:146-148",
+      "hazard": "A no-commercial-use term is an additional restriction; GPL section 7 forbids it. These cores cannot be combined into a GPL/AGPL work."
+    },
+    {
+      "host": "MeloNX",
+      "path": "MeloNX ffmpeg xcframeworks",
+      "name": "ffmpeg",
+      "license": "LGPL-3.0-or-later",
+      "evidence": "MeloNX/README.md:220; distribution/legal/THIRDPARTY.md",
+      "hazard": ""
+    }
+  ],
+  "excludedData": [
+    {
+      "path": "Folium/SharedDependencies/Sources/osa",
+      "reason": "Embeds Nintendo 3DS system files (shared_font, mii, country_list) as C arrays. Copyrighted Nintendo data, not redistributable."
+    }
+  ]
+}

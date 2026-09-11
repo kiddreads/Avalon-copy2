@@ -1,0 +1,39 @@
+# Avalon — Integration Status
+
+Stages mean exactly what the project brief §12 says. Nothing is described as integrated because a
+file was copied, an interface exists, or a stub compiles.
+
+Legend: **discovered → analyzed → selected → adapted → partially integrated → integrated → tested → validated**
+
+## Avalon subsystems
+
+| Subsystem | Stage | Evidence |
+|---|---|---|
+| Licensing & compatibility model | **tested** | `Sources/AvalonCore/Provenance/License.swift`; 7 tests in `LicenseTests.swift` |
+| Source-project registry | **integrated** | `Resources/projects.json` (10 projects, 5 hazard entries), `ProjectRegistry.swift` |
+| Core contract (`EmulatorCore`) | **adapted** | Derived from Delta's `EmulatorBridging`; compiles; no core implements it yet |
+| Surface negotiation | **adapted** | `RenderSurface.swift`; the design is settled and cited, no Metal backend yet |
+| JIT arbitration | **tested** | `Platform/JITService.swift`; 5 tests covering the real MeloNX/PPSSPP conflicts |
+| Shared Metal presenter | *selected* | Design chosen; not yet written |
+| Audio (granular mixer) | *selected* | PPSSPP `Core/HW/GranularMixer.*`, GPL-2.0-or-later; not yet adapted |
+| Input mapping | *selected* | Delta's `GameController`/`Input` receiver graph; not yet adapted |
+| Game library / identification | *analyzed* | Delta's SHA1 + offline OpenVGDB chosen over Manic's network scraping |
+
+## Source projects
+
+| Project | Stage | Note |
+|---|---|---|
+| Delta | **analyzed** | Core contract recovered and adapted. App shell not used. |
+| Manic EMU | **analyzed** | Flex skin editor and per-game typed config selected for later. |
+| Folium | **analyzed** | Surface-handoff seam selected; app layer rejected (7,500-line copy-paste tree). |
+| PPSSPP | **analyzed** | `DeviceCaps`/`Bugs` DB, shader-cache architecture, `Common/Thread` selected. |
+| Play! | **analyzed** | HLE BIOS + VU analysis passes selected. BSD-2 makes it uniquely reusable. |
+| iPSX2 | **analyzed** | Native Metal GS and the Darwin JIT strategy selected. |
+| dolphin-ios / iCube / Fin | *discovery in progress* | Three Dolphin derivatives; divergence being measured. |
+| MeloNX | **analyzed** | Cannot be merged. Plugin-only via its existing C ABI. License unresolved. |
+
+## Known gaps
+
+- No core implements `EmulatorCore` yet, so nothing renders, plays audio or accepts input.
+- No iOS app target exists; the build machine has Command Line Tools only (no Xcode, no iOS SDK).
+- MeloNX's license contradiction (MIT file vs GPLv3 README) is unresolved and blocks derivation.
