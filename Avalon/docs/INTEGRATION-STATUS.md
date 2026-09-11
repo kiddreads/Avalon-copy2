@@ -14,7 +14,8 @@ Legend: **discovered → analyzed → selected → adapted → partially integra
 | Core contract (`EmulatorCore`) | **adapted** | Derived from Delta's `EmulatorBridging`; compiles; no core implements it yet |
 | Surface negotiation | **adapted** | `RenderSurface.swift`; the design is settled and cited, no Metal backend yet |
 | JIT arbitration | **tested** | `Platform/JITService.swift`; 5 tests covering the real MeloNX/PPSSPP conflicts |
-| Shared Metal presenter | *selected* | Design chosen; not yet written |
+| Frame conversion / presenter | **tested** | `Sources/AvalonPixel` (C + NEON) + `Graphics/FramePresenter.swift`; 7 tests incl. exhaustive SIMD-vs-scalar; benchmarked (7.5x on the PS1 VRAM case) |
+| Metal texture upload | *selected* | Presenter is deliberately Metal-free so it tests off-device; upload belongs in AvalonPlatform |
 | Audio (granular mixer) | *selected* | PPSSPP `Core/HW/GranularMixer.*`, GPL-2.0-or-later; not yet adapted |
 | Input mapping | *selected* | Delta's `GameController`/`Input` receiver graph; not yet adapted |
 | Game library / identification | *analyzed* | Delta's SHA1 + offline OpenVGDB chosen over Manic's network scraping |

@@ -8,10 +8,13 @@ let package = Package(
         .library(name: "AvalonCore", targets: ["AvalonCore"]),
     ],
     targets: [
+        .target(name: "AvalonPixel"),
         .target(
             name: "AvalonCore",
+            dependencies: ["AvalonPixel"],
             resources: [.process("Resources")]
         ),
+        .executableTarget(name: "avalon-bench", dependencies: ["AvalonCore"]),
         .testTarget(name: "AvalonCoreTests", dependencies: ["AvalonCore"]),
     ]
 )

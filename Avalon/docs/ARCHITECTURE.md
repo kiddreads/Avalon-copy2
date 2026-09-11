@@ -36,9 +36,23 @@ Citra** (`ThreeDS.swift:303-362`, which declares a fake `videoFormat` at `:158`)
 Folium's software cores each convert `uint32_t*` → `CGImage` → `UIImage` → `UIImageView.image` every
 frame on the main actor (`Folium/.../KiwiController.swift:381-408`). Mandarine converts the **entire
 1024×512 PS1 VRAM** to a 24-bit `CGImage` per frame and only then crops
-(`MandarineController.swift:340-352`). One shared `MTLTexture` presenter replaces all of it and gives
-every software core free scaling, filtering and vsync. This is the single largest performance win
-available to Avalon over any existing frontend here.
+(`MandarineController.swift:340-352`). One shared presenter replaces all of it and gives
+every software core free scaling, filtering and vsync.
+
+This is built and measured. `Sources/AvalonPixel` converts straight into a texture staging buffer
+with a NEON path (verified against the scalar path across the entire 16-bit input space for both
+16-bit formats — `FramePresenterTests.swift`). Measured on this machine, `swift run -c release
+avalon-bench`:
+
+| case | per frame |
+|---|---|
+| NES 256x240 RGB565, full frame | 17.2 us |
+| GBA 240x160 RGB565, full frame | 6.7 us |
+| **PS1 VRAM 1024x512 — convert whole surface then crop (Folium's approach)** | **109.8 us** |
+| **PS1 VRAM 1024x512 — region blit of the 320x240 visible window (Avalon)** | **14.6 us** |
+
+A **7.5x** reduction for the Mandarine geometry, before counting the `CGImage`/`UIImage`
+allocation and the main-actor hop that Folium additionally pays on every frame.
 
 ---
 
