@@ -56828,7 +56828,7 @@ struct retro_core_options_v2 options_sr = {
 #define OPTION_VAL_SEGA_MEGA_CD_SV NULL
 #define OPTION_VAL_MEGASD_SV NULL
 #define OPTION_VAL_NONE_SV "Ingen"
-#define GENESIS_PLUS_GX_LOCK_ON_LABEL_SV NULL
+#define GENESIS_PLUS_GX_LOCK_ON_LABEL_SV "Kassettlåsning"
 #define GENESIS_PLUS_GX_LOCK_ON_INFO_0_SV "Lock-On Technology är en Mega Drive/Genesis-funktion som gjorde det möjligt för ett äldre spel att ansluta till pass-through-porten på en speciell kassett för utökad eller förändrad speltid. Detta alternativ anger vilken typ av speciell ”lock-on”-kassett som ska emuleras. En motsvarande bios-fil måste finnas i RetroArchs systemkatalog."
 #define OPTION_VAL_GAME_GENIE_SV NULL
 #define OPTION_VAL_ACTION_REPLAY_PRO_SV NULL
