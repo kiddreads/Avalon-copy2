@@ -31,6 +31,13 @@ public enum License: String, Codable, Sendable, CaseIterable {
     case gpl2Only = "GPL-2.0-only"
     /// GPL v2 *with* the "or any later version" grant — relicensable upward to v3.
     case gpl2OrLater = "GPL-2.0-or-later"
+    /// File-level copyleft. Cemu, and so muffin, ship under it
+    /// (`cemu-ios-muffin/LICENSE.txt`). MPL §3.3 lets a covered file be distributed under a
+    /// Secondary License — GPL 2.0+, LGPL 2.1+ or AGPL 3.0+ — *unless* the file carries the
+    /// Exhibit B "Incompatible With Secondary Licenses" notice. No file under
+    /// `cemu-ios-muffin/src/ios/App/` carries it, so muffin's skin work can enter an AGPL build
+    /// with its own files staying MPL and their notices preserved.
+    case mpl2 = "MPL-2.0"
     case gpl3OrLater = "GPL-3.0-or-later"
     case agpl3OrLater = "AGPL-3.0-or-later"
 
@@ -41,6 +48,7 @@ public enum License: String, Codable, Sendable, CaseIterable {
         case .mit, .bsd2Clause, .bsd3Clause: return nil   // compatible with anything
         case .gpl2Only: return [2]                        // v2 and only v2
         case .gpl2OrLater: return [2, 3]                  // may be exercised as either
+        case .mpl2: return [2, 3]                         // §3.3 Secondary Licenses
         case .gpl3OrLater, .agpl3OrLater, .lgpl3OrLater: return [3]
         case .nonCommercial: return []                    // combines with nothing copyleft
         }
@@ -50,6 +58,7 @@ public enum License: String, Codable, Sendable, CaseIterable {
     var copyleftRank: Int {
         switch self {
         case .mit, .bsd2Clause, .bsd3Clause: return 0
+        case .mpl2: return 1            // copyleft, but per file rather than per work
         case .gpl2Only, .gpl2OrLater: return 1
         case .lgpl3OrLater, .gpl3OrLater: return 2
         case .agpl3OrLater: return 3

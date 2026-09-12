@@ -21,6 +21,7 @@ let package = Package(
         .executableTarget(name: "avalon-run", dependencies: ["AvalonCore", "AvalonAudio"]),
         .executableTarget(name: "avalon-notice", dependencies: ["AvalonCore"]),
         .executableTarget(name: "avalon-bench", dependencies: ["AvalonCore"]),
+        .executableTarget(name: "avalon-controls", dependencies: ["AvalonCore"]),
         .testTarget(name: "AvalonCoreTests", dependencies: ["AvalonCore"]),
     ]
 )

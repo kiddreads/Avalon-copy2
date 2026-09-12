@@ -26,6 +26,11 @@ Legend: **discovered → analyzed → selected → adapted → partially integra
 | Input abstraction | **tested** | `Input/Input.swift`; 7 tests using Folium's real per-core encodings |
 | Graphics quirks / capabilities | **tested** | `Graphics/GraphicsQuirks.swift`; 6 tests; content sourced from 5 projects |
 | Logging | **tested** | `Diagnostics/Log.swift`; 5 tests |
+| Touch control layouts | **tested** | `Controls/TouchLayout.swift` + `Resources/controls.json`; 11 platforms, 120 controls |
+| Layout solver | **tested** | `Controls/LayoutSolver.swift`; resolves onto any aspect ratio; 6 device profiles |
+| Layout verifier | **tested** | `Controls/LayoutVerifier.swift`; 132 platform×device×mode checks, 0 fatal |
+| Touch routing | **tested** | `Controls/TouchRouter.swift`; 13 tests incl. an end-to-end press into a core encoding |
+| Control skins | **tested** | `Controls/ControlSkin.swift` + `Resources/controlskins.json`; 22 skins from muffin |
 | Metal texture upload | *selected* | Presenter is Metal-free by design so it tests off-device; upload is platform code |
 | Shader/pipeline cache | *selected* | PPSSPP's architecture chosen; not yet written |
 | Game library / identification | *analyzed* | Delta's SHA1 + offline OpenVGDB over Manic's network scraping |
@@ -45,6 +50,15 @@ Legend: **discovered → analyzed → selected → adapted → partially integra
 | iCube | **analyzed — recommended for removal** | Stale unbranded copy of dolphin-ios; 0 occurrences of its own name in its source. Contributes nothing. |
 | MeloNX | **analyzed** | Cannot be merged. Plugin-only via its existing C ABI. License unresolved. |
 
+## Sources outside this repository
+
+| Project | Licence | Stage | What Avalon took |
+|---|---|---|---|
+| cemu-ios-muffin | MPL-2.0 | **adapted (skin model only)** | The named-colour-token skin model and its 22 colour presets, re-expressed as `Resources/controlskins.json`. No muffin code is in Avalon. Sibling repo, not part of this tree. MPL §3.3 permits it in an AGPL build because no file under `cemu-ios-muffin/src/ios/App/` carries the Exhibit B notice. |
+
+Integrating anything further from muffin is **on hold at the repository owner's request** — they are
+still working in that repo and will say when it is ready.
+
 ## Pending decision
 
 **Removing `iCube`** would delete 7,427 files / 99.9 MB of verified pure duplication. Evidence is in
@@ -58,6 +72,10 @@ ENGINEERING-MAP.md §1. Git history retains it either way. Awaiting the reposito
   and each is a substantial port rather than a binding.
 - No iOS app target exists; this machine has Command Line Tools only (no Xcode, no iOS SDK), so
   `.xcodeproj` targets and on-device runs cannot be built or verified here.
+- **The control layouts are geometry and routing, not pixels.** Every layout resolves, verifies and
+  routes touches, and `swift run avalon-controls` prints the numbers for all 11 platforms on 6
+  device profiles. Nothing *draws* them: rendering is the platform layer's job and needs the iOS
+  app target that cannot be built on this machine.
 - No Metal backend yet. The presenter deliberately holds no Metal types so it tests off-device;
   texture upload is the platform layer's job and is not written.
 - No iOS app target exists; the build machine has Command Line Tools only (no Xcode, no iOS SDK).

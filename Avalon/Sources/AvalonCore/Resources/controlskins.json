@@ -1,0 +1,753 @@
+{
+ "version": 1,
+ "skins": [
+  {
+   "id": "standard",
+   "name": "Standard",
+   "shadow": 0.4,
+   "radius": 24.0,
+   "dpad": {
+    "hex": "#B2B2B2",
+    "alpha": 1.0
+   },
+   "a": {
+    "hex": "#33CC4C",
+    "alpha": 1.0
+   },
+   "b": {
+    "hex": "#FF4C33",
+    "alpha": 1.0
+   },
+   "x": {
+    "hex": "#1A80FF",
+    "alpha": 1.0
+   },
+   "y": {
+    "hex": "#FFCC1A",
+    "alpha": 1.0
+   },
+   "bg": {
+    "hex": "#26262B",
+    "alpha": 1.0
+   },
+   "border": {
+    "hex": "#FFFFFF",
+    "alpha": 0.1
+   }
+  },
+  {
+   "id": "wiiUOriginal",
+   "name": "Wii U Original",
+   "shadow": 0.45,
+   "radius": 22.0,
+   "dpad": {
+    "hex": "#333333",
+    "alpha": 1.0
+   },
+   "a": {
+    "hex": "#1AB233",
+    "alpha": 1.0
+   },
+   "b": {
+    "hex": "#F2331A",
+    "alpha": 1.0
+   },
+   "x": {
+    "hex": "#004CF2",
+    "alpha": 1.0
+   },
+   "y": {
+    "hex": "#FCBF00",
+    "alpha": 1.0
+   },
+   "bg": {
+    "hex": "#2E2E30",
+    "alpha": 1.0
+   },
+   "border": {
+    "hex": "#FFFFFF",
+    "alpha": 0.12
+   }
+  },
+  {
+   "id": "gameCube",
+   "name": "GameCube",
+   "shadow": 0.5,
+   "radius": 20.0,
+   "dpad": {
+    "hex": "#262626",
+    "alpha": 1.0
+   },
+   "a": {
+    "hex": "#26BF40",
+    "alpha": 1.0
+   },
+   "b": {
+    "hex": "#FF1A1A",
+    "alpha": 1.0
+   },
+   "x": {
+    "hex": "#004CF2",
+    "alpha": 1.0
+   },
+   "y": {
+    "hex": "#F2A600",
+    "alpha": 1.0
+   },
+   "bg": {
+    "hex": "#1A1A26",
+    "alpha": 1.0
+   },
+   "border": {
+    "hex": "#FFFFFF",
+    "alpha": 0.1
+   }
+  },
+  {
+   "id": "nintendo64",
+   "name": "Nintendo 64",
+   "shadow": 0.4,
+   "radius": 18.0,
+   "dpad": {
+    "hex": "#CC1A1A",
+    "alpha": 1.0
+   },
+   "a": {
+    "hex": "#33CC4C",
+    "alpha": 1.0
+   },
+   "b": {
+    "hex": "#FFCC00",
+    "alpha": 1.0
+   },
+   "x": {
+    "hex": "#33CC4C",
+    "alpha": 1.0
+   },
+   "y": {
+    "hex": "#FFCC00",
+    "alpha": 1.0
+   },
+   "bg": {
+    "hex": "#1F1F33",
+    "alpha": 1.0
+   },
+   "border": {
+    "hex": "#FFFFFF",
+    "alpha": 0.15
+   }
+  },
+  {
+   "id": "superNintendo",
+   "name": "Super Nintendo",
+   "shadow": 0.35,
+   "radius": 16.0,
+   "dpad": {
+    "hex": "#B2B2B2",
+    "alpha": 1.0
+   },
+   "a": {
+    "hex": "#26BF33",
+    "alpha": 1.0
+   },
+   "b": {
+    "hex": "#F22626",
+    "alpha": 1.0
+   },
+   "x": {
+    "hex": "#2666F2",
+    "alpha": 1.0
+   },
+   "y": {
+    "hex": "#F2B20D",
+    "alpha": 1.0
+   },
+   "bg": {
+    "hex": "#332640",
+    "alpha": 1.0
+   },
+   "border": {
+    "hex": "#FFFFFF",
+    "alpha": 0.1
+   }
+  },
+  {
+   "id": "nes",
+   "name": "NES",
+   "shadow": 0.3,
+   "radius": 12.0,
+   "dpad": {
+    "hex": "#333333",
+    "alpha": 1.0
+   },
+   "a": {
+    "hex": "#F23333",
+    "alpha": 1.0
+   },
+   "b": {
+    "hex": "#F23333",
+    "alpha": 1.0
+   },
+   "x": {
+    "hex": "#F23333",
+    "alpha": 1.0
+   },
+   "y": {
+    "hex": "#F23333",
+    "alpha": 1.0
+   },
+   "bg": {
+    "hex": "#1A1A1A",
+    "alpha": 1.0
+   },
+   "border": {
+    "hex": "#FFFFFF",
+    "alpha": 0.08
+   }
+  },
+  {
+   "id": "switchPro",
+   "name": "Switch Pro",
+   "shadow": 0.5,
+   "radius": 20.0,
+   "dpad": {
+    "hex": "#4C4C4C",
+    "alpha": 1.0
+   },
+   "a": {
+    "hex": "#33CC4C",
+    "alpha": 1.0
+   },
+   "b": {
+    "hex": "#FF4C33",
+    "alpha": 1.0
+   },
+   "x": {
+    "hex": "#1A80FF",
+    "alpha": 1.0
+   },
+   "y": {
+    "hex": "#FFCC1A",
+    "alpha": 1.0
+   },
+   "bg": {
+    "hex": "#14141A",
+    "alpha": 1.0
+   },
+   "border": {
+    "hex": "#FFFFFF",
+    "alpha": 0.12
+   }
+  },
+  {
+   "id": "playStation",
+   "name": "PlayStation",
+   "shadow": 0.55,
+   "radius": 22.0,
+   "dpad": {
+    "hex": "#333333",
+    "alpha": 1.0
+   },
+   "a": {
+    "hex": "#3399FF",
+    "alpha": 1.0
+   },
+   "b": {
+    "hex": "#FF334C",
+    "alpha": 1.0
+   },
+   "x": {
+    "hex": "#FF6633",
+    "alpha": 1.0
+   },
+   "y": {
+    "hex": "#33CC4C",
+    "alpha": 1.0
+   },
+   "bg": {
+    "hex": "#0D0D12",
+    "alpha": 1.0
+   },
+   "border": {
+    "hex": "#FFFFFF",
+    "alpha": 0.1
+   }
+  },
+  {
+   "id": "xbox",
+   "name": "Xbox",
+   "shadow": 0.5,
+   "radius": 18.0,
+   "dpad": {
+    "hex": "#333333",
+    "alpha": 1.0
+   },
+   "a": {
+    "hex": "#1AB233",
+    "alpha": 1.0
+   },
+   "b": {
+    "hex": "#FF331A",
+    "alpha": 1.0
+   },
+   "x": {
+    "hex": "#2666FF",
+    "alpha": 1.0
+   },
+   "y": {
+    "hex": "#FFBF00",
+    "alpha": 1.0
+   },
+   "bg": {
+    "hex": "#141414",
+    "alpha": 1.0
+   },
+   "border": {
+    "hex": "#00CC00",
+    "alpha": 0.3
+   }
+  },
+  {
+   "id": "steamDeck",
+   "name": "Steam Deck",
+   "shadow": 0.45,
+   "radius": 20.0,
+   "dpad": {
+    "hex": "#262626",
+    "alpha": 1.0
+   },
+   "a": {
+    "hex": "#33CC4C",
+    "alpha": 1.0
+   },
+   "b": {
+    "hex": "#FF4C33",
+    "alpha": 1.0
+   },
+   "x": {
+    "hex": "#1A80FF",
+    "alpha": 1.0
+   },
+   "y": {
+    "hex": "#FFCC1A",
+    "alpha": 1.0
+   },
+   "bg": {
+    "hex": "#1A1A1C",
+    "alpha": 1.0
+   },
+   "border": {
+    "hex": "#FFFFFF",
+    "alpha": 0.15
+   }
+  },
+  {
+   "id": "arcadeCabinet",
+   "name": "Arcade Cabinet",
+   "shadow": 0.6,
+   "radius": 12.0,
+   "dpad": {
+    "hex": "#F26600",
+    "alpha": 1.0
+   },
+   "a": {
+    "hex": "#F21A1A",
+    "alpha": 1.0
+   },
+   "b": {
+    "hex": "#1ACCF2",
+    "alpha": 1.0
+   },
+   "x": {
+    "hex": "#F2F21A",
+    "alpha": 1.0
+   },
+   "y": {
+    "hex": "#1AF266",
+    "alpha": 1.0
+   },
+   "bg": {
+    "hex": "#050505",
+    "alpha": 1.0
+   },
+   "border": {
+    "hex": "#F26600",
+    "alpha": 0.5
+   }
+  },
+  {
+   "id": "segaGenesis",
+   "name": "Sega Genesis",
+   "shadow": 0.4,
+   "radius": 14.0,
+   "dpad": {
+    "hex": "#333333",
+    "alpha": 1.0
+   },
+   "a": {
+    "hex": "#F22626",
+    "alpha": 1.0
+   },
+   "b": {
+    "hex": "#26F226",
+    "alpha": 1.0
+   },
+   "x": {
+    "hex": "#2626F2",
+    "alpha": 1.0
+   },
+   "y": {
+    "hex": "#F2F226",
+    "alpha": 1.0
+   },
+   "bg": {
+    "hex": "#0D0D0D",
+    "alpha": 1.0
+   },
+   "border": {
+    "hex": "#FFFFFF",
+    "alpha": 0.1
+   }
+  },
+  {
+   "id": "minimal",
+   "name": "Minimal",
+   "shadow": 0.2,
+   "radius": 12.0,
+   "dpad": {
+    "hex": "#FFFFFF",
+    "alpha": 0.8
+   },
+   "a": {
+    "hex": "#FFFFFF",
+    "alpha": 0.7
+   },
+   "b": {
+    "hex": "#FFFFFF",
+    "alpha": 0.7
+   },
+   "x": {
+    "hex": "#FFFFFF",
+    "alpha": 0.7
+   },
+   "y": {
+    "hex": "#FFFFFF",
+    "alpha": 0.7
+   },
+   "bg": {
+    "hex": "#000000",
+    "alpha": 0.6
+   },
+   "border": {
+    "hex": "#FFFFFF",
+    "alpha": 0.2
+   }
+  },
+  {
+   "id": "glass",
+   "name": "Glass",
+   "shadow": 0.15,
+   "radius": 16.0,
+   "dpad": {
+    "hex": "#FFFFFF",
+    "alpha": 0.6
+   },
+   "a": {
+    "hex": "#33CC4C",
+    "alpha": 0.7
+   },
+   "b": {
+    "hex": "#FF4C33",
+    "alpha": 0.7
+   },
+   "x": {
+    "hex": "#1A80FF",
+    "alpha": 0.7
+   },
+   "y": {
+    "hex": "#FFCC1A",
+    "alpha": 0.7
+   },
+   "bg": {
+    "hex": "#000000",
+    "alpha": 0.3
+   },
+   "border": {
+    "hex": "#FFFFFF",
+    "alpha": 0.3
+   }
+  },
+  {
+   "id": "neon",
+   "name": "Neon",
+   "shadow": 0.6,
+   "radius": 20.0,
+   "dpad": {
+    "hex": "#00FFCC",
+    "alpha": 1.0
+   },
+   "a": {
+    "hex": "#00FF4C",
+    "alpha": 1.0
+   },
+   "b": {
+    "hex": "#FF0080",
+    "alpha": 1.0
+   },
+   "x": {
+    "hex": "#0080FF",
+    "alpha": 1.0
+   },
+   "y": {
+    "hex": "#FFD900",
+    "alpha": 1.0
+   },
+   "bg": {
+    "hex": "#05050D",
+    "alpha": 1.0
+   },
+   "border": {
+    "hex": "#00FFCC",
+    "alpha": 0.4
+   }
+  },
+  {
+   "id": "darkMode",
+   "name": "Dark Mode",
+   "shadow": 0.6,
+   "radius": 18.0,
+   "dpad": {
+    "hex": "#666666",
+    "alpha": 1.0
+   },
+   "a": {
+    "hex": "#1A9933",
+    "alpha": 1.0
+   },
+   "b": {
+    "hex": "#CC261A",
+    "alpha": 1.0
+   },
+   "x": {
+    "hex": "#0059E6",
+    "alpha": 1.0
+   },
+   "y": {
+    "hex": "#E6A600",
+    "alpha": 1.0
+   },
+   "bg": {
+    "hex": "#14141A",
+    "alpha": 1.0
+   },
+   "border": {
+    "hex": "#FFFFFF",
+    "alpha": 0.08
+   }
+  },
+  {
+   "id": "lightMode",
+   "name": "Light Mode",
+   "shadow": 0.15,
+   "radius": 20.0,
+   "dpad": {
+    "hex": "#808080",
+    "alpha": 1.0
+   },
+   "a": {
+    "hex": "#1ACC33",
+    "alpha": 1.0
+   },
+   "b": {
+    "hex": "#FF331A",
+    "alpha": 1.0
+   },
+   "x": {
+    "hex": "#004CFF",
+    "alpha": 1.0
+   },
+   "y": {
+    "hex": "#FFCC00",
+    "alpha": 1.0
+   },
+   "bg": {
+    "hex": "#E6E6EB",
+    "alpha": 1.0
+   },
+   "border": {
+    "hex": "#000000",
+    "alpha": 0.1
+   }
+  },
+  {
+   "id": "custom",
+   "name": "Custom",
+   "shadow": 0.4,
+   "radius": 20.0,
+   "dpad": {
+    "hex": "#6699CC",
+    "alpha": 1.0
+   },
+   "a": {
+    "hex": "#994CCC",
+    "alpha": 1.0
+   },
+   "b": {
+    "hex": "#CC4C99",
+    "alpha": 1.0
+   },
+   "x": {
+    "hex": "#4CCC99",
+    "alpha": 1.0
+   },
+   "y": {
+    "hex": "#CC994C",
+    "alpha": 1.0
+   },
+   "bg": {
+    "hex": "#1A1F26",
+    "alpha": 1.0
+   },
+   "border": {
+    "hex": "#6699CC",
+    "alpha": 0.3
+   }
+  },
+  {
+   "id": "marioTheme",
+   "name": "Mario Theme",
+   "shadow": 0.4,
+   "radius": 20.0,
+   "dpad": {
+    "hex": "#F24C00",
+    "alpha": 1.0
+   },
+   "a": {
+    "hex": "#33CC4C",
+    "alpha": 1.0
+   },
+   "b": {
+    "hex": "#F2331A",
+    "alpha": 1.0
+   },
+   "x": {
+    "hex": "#F2CC00",
+    "alpha": 1.0
+   },
+   "y": {
+    "hex": "#3366F2",
+    "alpha": 1.0
+   },
+   "bg": {
+    "hex": "#F26600",
+    "alpha": 0.1
+   },
+   "border": {
+    "hex": "#F24C00",
+    "alpha": 0.3
+   }
+  },
+  {
+   "id": "zeldaTheme",
+   "name": "Zelda Theme",
+   "shadow": 0.45,
+   "radius": 20.0,
+   "dpad": {
+    "hex": "#CCB233",
+    "alpha": 1.0
+   },
+   "a": {
+    "hex": "#CCB233",
+    "alpha": 1.0
+   },
+   "b": {
+    "hex": "#4C9933",
+    "alpha": 1.0
+   },
+   "x": {
+    "hex": "#3380CC",
+    "alpha": 1.0
+   },
+   "y": {
+    "hex": "#CC3333",
+    "alpha": 1.0
+   },
+   "bg": {
+    "hex": "#1A141F",
+    "alpha": 1.0
+   },
+   "border": {
+    "hex": "#CCB233",
+    "alpha": 0.25
+   }
+  },
+  {
+   "id": "pro",
+   "name": "Pro",
+   "shadow": 0.5,
+   "radius": 20.0,
+   "dpad": {
+    "hex": "#333333",
+    "alpha": 1.0
+   },
+   "a": {
+    "hex": "#26B240",
+    "alpha": 1.0
+   },
+   "b": {
+    "hex": "#E63326",
+    "alpha": 1.0
+   },
+   "x": {
+    "hex": "#0066F2",
+    "alpha": 1.0
+   },
+   "y": {
+    "hex": "#F2B200",
+    "alpha": 1.0
+   },
+   "bg": {
+    "hex": "#1A1A1F",
+    "alpha": 1.0
+   },
+   "border": {
+    "hex": "#FFFFFF",
+    "alpha": 0.15
+   }
+  },
+  {
+   "id": "dark",
+   "name": "Dark",
+   "shadow": 0.6,
+   "radius": 18.0,
+   "dpad": {
+    "hex": "#666666",
+    "alpha": 1.0
+   },
+   "a": {
+    "hex": "#1A9933",
+    "alpha": 1.0
+   },
+   "b": {
+    "hex": "#CC261A",
+    "alpha": 1.0
+   },
+   "x": {
+    "hex": "#0059E6",
+    "alpha": 1.0
+   },
+   "y": {
+    "hex": "#E6A600",
+    "alpha": 1.0
+   },
+   "bg": {
+    "hex": "#14141A",
+    "alpha": 1.0
+   },
+   "border": {
+    "hex": "#FFFFFF",
+    "alpha": 0.08
+   }
+  }
+ ]
+}

@@ -179,12 +179,49 @@ Avalon's PS2 path takes Play!'s HLE BIOS and VU analysis with iPSX2's Metal GS a
 JIT service. That removes the BIOS-dump wall, which is a legal and UX barrier for any mainstream
 distribution.
 
-## 5. Integration status
+## 5. Touch controls [verified]
+
+Avalon has one control layout per platform, resolved onto the actual screen at runtime rather than
+drawn per device. The shape of the skin system is muffin's
+(`cemu-ios-muffin/src/ios/App/ControllerSkinPalette.swift` — a skin is named colour tokens, not
+artwork), the per-system geometry is the point Delta and Manic EMU are right about, and the
+solver, verifier and router are Avalon's.
+
+### What checking the geometry by machine found
+
+Everything below was believed correct until the numbers were run. That is the finding.
+
+| Fault | Where it came from |
+|---|---|
+| Both Steam Deck trackpads had the same id and both bound to the pointer | The side test read an *anchor offset*, which is measured from whichever edge the control anchors to, as an absolute x |
+| The arcade six-button grid tore in half on a different aspect ratio | Rows 1–3 and 4–6 straddled the canvas midpoint, so each row anchored to a different edge. Clusters now carry one shared anchor |
+| The N64's Z trigger was missing entirely | Never drawn. It is not an optional button |
+| The Wii U GamePad had no ZL or ZR | Same |
+| The Steam Deck had one thumbstick | Same |
+| The N64's single stick bound to the *right* stick, and the arcade lever to an analog axis | Sticks were numbered by screen position. Position does not decide identity: the N64's stick sits in the right column and is the primary stick; an arcade lever is four microswitches |
+| Shoulder targets landed at 12–18pt on a phone | Two stacked 22-unit bars spend 51 units of canvas to produce a 22-unit target. One row of 40-unit bars side by side uses *fewer* vertical units and nearly doubles the target |
+| Switch and Xbox face buttons landed at 35pt on a phone | 130 design units — 28% of the canvas — held nothing at all. Canvas height is the divisor in the solver's scale, so the dead band was shrinking every control on the layout |
+
+Current state, from `swift run avalon-controls`: **11 platforms × 6 device profiles × 2 view modes,
+0 fatal violations.** Smallest primary touch target 37.6pt (Steam Deck on an iPhone SE), smallest
+secondary 24.5pt. On any iPad every primary control clears Apple's 44pt.
+
+### Licensing consequence
+
+muffin is MPL-2.0. `Sources/AvalonCore/Provenance/License.swift` gained the case, and the
+compatibility claim is checkable: MPL §3.3 permits distribution under a Secondary License —
+GPL 2.0+, LGPL 2.1+, AGPL 3.0+ — unless a file carries the Exhibit B "Incompatible With Secondary
+Licenses" notice. No file under `cemu-ios-muffin/src/ios/App/` carries it. muffin is registered in
+`Sources/AvalonCore/Resources/projects.json` under `externalSources`, kept apart from the ten
+projects in this tree because its paths resolve against the parent directory, and `avalon-verify`
+now checks those paths too.
+
+## 6. Integration status
 
 See `INTEGRATION-STATUS.md`. Terms used there mean exactly what §12 of the project brief says they mean:
 discovered → analyzed → selected → adapted → partially integrated → integrated → tested → validated.
 
-## 6. Known limitations
+## 7. Known limitations
 
 - No full Xcode on the build machine (Command Line Tools only): no iOS SDK, no `.xcodeproj` builds,
   no CMake. Avalon's foundation is therefore a Swift Package, buildable and testable with

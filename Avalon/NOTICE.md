@@ -78,6 +78,18 @@ Avalon component over a network must be offered the corresponding source.
 - Licence text: `iPSX2/iPSX2/COPYING.GPLv3`
 - Systems: PS2
 
+## Drawn from outside this repository
+
+These are separate projects. Avalon uses work from them and the obligation to attribute it is the same as for anything in the tree.
+
+### cemu-ios-muffin — MPL-2.0
+
+- Source: https://github.com/kiddreads/cemu-ios-muffin
+- Copyright: Cemu contributors, cemu-ios-muffin contributors
+- Licence text: `cemu-ios-muffin/LICENSE.txt` (beside this repository)
+- Used for: Touch control skins: the named-colour-token model and the twenty-two colour presets, re-expressed as Resources/controlskins.json. No muffin source code is present in Avalon.
+- A sibling repository, not part of this one, so it resolves against the parent directory. Plain MPL-2.0: no file under src/ios/App carries the Exhibit B 'Incompatible With Secondary Licenses' notice, so MPL section 3.3 permits distribution under AGPL-3.0 as a Secondary License with the MPL files' own notices preserved. Further integration is on hold at the repository owner's request while work continues in that repo.
+
 ## Present in the repository but not in the build
 
 - **iCube** — superseded by `dolphin-ios`.
@@ -113,4 +125,5 @@ These are present in source projects but must not enter an Avalon build.
 ## Data excluded from redistribution
 
 - `Folium/SharedDependencies/Sources/osa` — Embeds Nintendo 3DS system files (shared_font, mii, country_list) as C arrays. Copyrighted Nintendo data, not redistributable.
+
 

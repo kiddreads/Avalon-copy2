@@ -35,12 +35,18 @@ func citations(in text: String, source: String) -> [Citation] {
         // Only check paths that name a real top-level project or Avalon itself.
         let roots = ["Delta/", "Fin/", "Folium/", "Manic EMU/", "MeloNX/", "PPSSPP/",
                      "Play!/", "dolphin-ios/", "iCube/", "iPSX2/", "Sources/", "Tests/", "docs/"]
+            + externalRoots
         guard roots.contains(where: { path.hasPrefix($0) }) else { return nil }
         let line = m.range(at: 2).location != NSNotFound
             ? Int(ns.substring(with: m.range(at: 2))) : nil
         return Citation(path: path, line: line, source: source)
     }
 }
+
+/// Projects Avalon cites that are NOT inside this repository. muffin is the user's own separate
+/// repo and sits beside this one, so its citations resolve against the parent directory. If it is
+/// not checked out there, its citations count as skipped rather than as broken documentation.
+let externalRoots = ["cemu-ios-muffin/"]
 
 func scan(_ dir: URL, extensions: Set<String>) -> [URL] {
     guard let e = FileManager.default.enumerator(at: dir, includingPropertiesForKeys: nil) else { return [] }
@@ -65,7 +71,8 @@ for c in Set(all) {
     if isElided(c.path) { elided += 1; elidedPaths.insert(c.path); continue }
     // Avalon's own paths are relative to Avalon/; source-project paths to the repo root.
     let isAvalonPath = c.path.hasPrefix("Sources/") || c.path.hasPrefix("Tests/") || c.path.hasPrefix("docs/")
-    let base = isAvalonPath ? avalonDir : repoRoot
+    let isExternal = externalRoots.contains { c.path.hasPrefix($0) }
+    let base = isAvalonPath ? avalonDir : (isExternal ? repoRoot.deletingLastPathComponent() : repoRoot)
     let url = base.appendingPathComponent(c.path)
 
     guard FileManager.default.fileExists(atPath: url.path) else {
@@ -102,6 +109,17 @@ if let registry = try? ProjectRegistry.bundled() {
             atPath: repoRoot.appendingPathComponent(p.id).path)
         if projectPresent && !FileManager.default.fileExists(atPath: url.path) {
             licenceFailures.append("  \(p.id): licence not at \(p.licensePath)")
+        }
+    }
+    // External sources resolve against the parent directory, and their licence text is the
+    // evidence for the compatibility claim Avalon makes about them.
+    for e in registry.externalSources ?? [] {
+        let root = repoRoot.deletingLastPathComponent()
+        let url = root.appendingPathComponent(e.licensePath)
+        let present = FileManager.default.fileExists(
+            atPath: root.appendingPathComponent(e.id).path)
+        if present && !FileManager.default.fileExists(atPath: url.path) {
+            licenceFailures.append("  \(e.id): licence not at \(e.licensePath) (external)")
         }
     }
 }

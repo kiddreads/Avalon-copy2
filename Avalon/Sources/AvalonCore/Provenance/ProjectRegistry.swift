@@ -30,6 +30,23 @@ public struct ExcludedData: Codable, Sendable, Hashable {
     public let reason: String
 }
 
+/// A project Avalon draws from that lives OUTSIDE this repository.
+///
+/// muffin is the only one: it is the user's own separate repo and sits beside this one. Keeping it
+/// in a distinct list rather than alongside the ten projects here stops `licensePath` from being
+/// silently wrong — an external path resolves against the parent directory, not the repo root.
+public struct ExternalSource: Codable, Sendable, Hashable, Identifiable {
+    public let id: String
+    public let origin: URL
+    public let license: License
+    /// Repo-relative to the PARENT of this repository, e.g. `cemu-ios-muffin/LICENSE.txt`.
+    public let licensePath: String
+    public let copyrightHolders: [String]
+    /// What Avalon took from it.
+    public let usedFor: String
+    public let notes: String
+}
+
 public struct ProjectRegistry: Codable, Sendable {
     public struct Snapshot: Codable, Sendable {
         public let repo: String, commit: String, date: String
@@ -40,6 +57,9 @@ public struct ProjectRegistry: Codable, Sendable {
     public let projects: [SourceProject]
     public let vendoredCores: [VendoredCore]
     public let excludedData: [ExcludedData]
+    /// Projects outside this repository that Avalon draws from. Optional so an older registry
+    /// still decodes.
+    public let externalSources: [ExternalSource]?
 
     /// The registry shipped with Avalon.
     public static func bundled() throws -> ProjectRegistry {
@@ -61,7 +81,9 @@ public struct ProjectRegistry: Codable, Sendable {
     /// Using only `projects.map(\.license)` here would be the exact mistake this type exists to
     /// prevent: it would miss Gambatte and report that everything combines cleanly.
     public var allLicensesInPlay: Set<License> {
-        Set(projects.map(\.license)).union(vendoredCores.map(\.license))
+        Set(projects.map(\.license))
+            .union(vendoredCores.map(\.license))
+            .union((externalSources ?? []).map(\.license))
     }
 
     /// The license a build containing *everything* would have to carry, or `nil` if no such build
@@ -74,7 +96,8 @@ public struct ProjectRegistry: Codable, Sendable {
     public func combinedLicense(excluding excludedProjects: Set<String>) -> License? {
         let projectLicenses = projects.filter { !excludedProjects.contains($0.id) }.map(\.license)
         let coreLicenses = vendoredCores.filter { !$0.isHazard }.map(\.license)
-        return License.combinedLicense(of: projectLicenses + coreLicenses)
+        let externalLicenses = (externalSources ?? []).map(\.license)
+        return License.combinedLicense(of: projectLicenses + coreLicenses + externalLicenses)
     }
 
     public var hazards: [VendoredCore] { vendoredCores.filter(\.isHazard) }

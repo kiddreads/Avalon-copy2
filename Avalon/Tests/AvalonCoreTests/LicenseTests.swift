@@ -46,3 +46,38 @@ func permissiveAbsorbs() {
     #expect(License.combinedLicense(of: [.bsd3Clause]) == .bsd3Clause)
     #expect(License.combinedLicense(of: []) == nil)
 }
+
+@Suite("MPL-2.0 and external sources")
+struct MPLLicenseTests {
+
+    @Test("MPL-2.0 may be combined into an AGPL work")
+    func mplCombinesWithAGPL() {
+        // MPL §3.3: a covered file with no Exhibit B notice may be distributed under a Secondary
+        // License, and AGPL-3.0 is one. The combined work is AGPL; the MPL files stay MPL.
+        #expect(License.combinedLicense(of: [.mpl2, .agpl3OrLater]) == .agpl3OrLater)
+        #expect(License.combinedLicense(of: [.mpl2, .gpl3OrLater]) == .gpl3OrLater)
+        #expect(License.canCombine([.mpl2, .mit, .agpl3OrLater]))
+    }
+
+    @Test("MPL-2.0 is copyleft and still refuses a non-commercial term")
+    func mplIsCopyleft() {
+        #expect(License.mpl2.requiresSourceDisclosure)
+        #expect(License.mpl2.permitsCommercialUse)
+        #expect(!License.mpl2.hasNetworkClause)
+        #expect(License.combinedLicense(of: [.mpl2, .nonCommercial]) == nil)
+        #expect(License.combinedLicense(of: [.mpl2]) == .mpl2)
+    }
+
+    @Test("muffin is registered as an external source with its licence recorded")
+    func muffinIsRegistered() throws {
+        let registry = try ProjectRegistry.bundled()
+        let muffin = try #require(registry.externalSources?.first { $0.id == "cemu-ios-muffin" })
+        #expect(muffin.license == .mpl2)
+        #expect(muffin.licensePath == "cemu-ios-muffin/LICENSE.txt")
+        // It is NOT one of the ten projects in this repository, and must not be listed as one.
+        #expect(registry.project("cemu-ios-muffin") == nil)
+        // Its licence is counted when Avalon works out what a build may carry.
+        #expect(registry.allLicensesInPlay.contains(.mpl2))
+        #expect(registry.combinedLicense(excluding: ["Folium"]) != nil)
+    }
+}

@@ -46,6 +46,22 @@ public extension ProjectRegistry {
             out += "\n"
         }
 
+        if let external = externalSources, !external.isEmpty {
+            out += "## Drawn from outside this repository\n\n"
+            out += "These are separate projects. Avalon uses work from them and the obligation to "
+            out += "attribute it is the same as for anything in the tree.\n\n"
+            for e in external.sorted(by: { $0.id < $1.id }) {
+                out += "### \(e.id) — \(e.license.rawValue)\n\n"
+                out += "- Source: \(e.origin.absoluteString)\n"
+                if !e.copyrightHolders.isEmpty {
+                    out += "- Copyright: \(e.copyrightHolders.joined(separator: ", "))\n"
+                }
+                out += "- Licence text: `\(e.licensePath)` (beside this repository)\n"
+                out += "- Used for: \(e.usedFor)\n"
+                out += "- \(e.notes)\n\n"
+            }
+        }
+
         let superseded = projects.filter(\.isSuperseded)
         if !superseded.isEmpty {
             out += "## Present in the repository but not in the build\n\n"
