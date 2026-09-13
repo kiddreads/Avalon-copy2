@@ -176,10 +176,13 @@ struct EmulationView: View {
                             // One `Text`, two styles: the platform name reads first and heaviest,
                             // the hardware name follows as a caption — legible at a glance instead
                             // of one long undifferentiated run of "Name — Hardware".
+                            // `.foregroundStyle` on a concatenated Text run needs iOS 17;
+                            // `.foregroundColor` does the same job back to iOS 13, which is what
+                            // this app's deployment target (16.0) actually requires.
                             (Text(l.name)
                                 + Text("  ·  \(l.hardware)")
                                     .font(.caption)
-                                    .foregroundStyle(.secondary))
+                                    .foregroundColor(.secondary))
                                 .tag(l.id)
                         }
                     }
