@@ -79,6 +79,22 @@ static int probe_mapjit(void) {
     return 1;
 }
 
+/* The Simulator runs as an ordinary macOS process, where a single combined RWX mapping usually
+   just works with no MAP_JIT and no entitlement at all -- until it doesn't. A test-hosted
+   process (`xcodebuild test` against the iOS Simulator) failed exactly this mmap in CI with
+   `.unavailable(reason: "could not map ... bytes as simulator")`, while the very same run's
+   MAP_JIT/dual-map tests, exercised as a plain macOS process on the same machine, passed. That
+   points at the test host's own sandboxing, not the CPU or the OS release, so it has to be
+   probed rather than assumed: nothing here can distinguish "Simulator app I ran manually" from
+   "Simulator process xctest is driving" except by trying the mapping. */
+static int probe_simulator_combined(void) {
+    size_t sz = page_round(1);
+    void *p = mmap(NULL, sz, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_PRIVATE | MAP_ANON, -1, 0);
+    if (p == MAP_FAILED) return 0;
+    munmap(p, sz);
+    return 1;
+}
+
 static int probe_dualmap(void) {
     size_t sz = page_round(1);
     void *rx = mmap(NULL, sz, PROT_READ | PROT_EXEC, MAP_PRIVATE | MAP_ANON, -1, 0);
@@ -98,7 +114,13 @@ static int probe_dualmap(void) {
 avalon_jit_mode avalon_jit_detect(void) {
 #if defined(__APPLE__)
 #if TARGET_OS_SIMULATOR
-    return AVALON_JIT_SIMULATOR;
+    /* Probed, not assumed -- see probe_simulator_combined(). Dual mapping is the fallback because
+       it is already proven to work on this same kind of process (real iOS devices have no other
+       option), and it asks for nothing a combined RWX page needs that a sandboxed host might
+       refuse. */
+    if (probe_simulator_combined()) return AVALON_JIT_SIMULATOR;
+    if (probe_dualmap()) return AVALON_JIT_DUALMAP;
+    return AVALON_JIT_UNAVAILABLE;
 #elif AVALON_JIT_HAS_WX_TOGGLE
     /* macOS. Preference order is by cost, not by novelty. MAP_JIT is the cheapest correct option
        on modern Apple silicon; dual mapping costs an extra VA mapping but never reprotects, which
