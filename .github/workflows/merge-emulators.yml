@@ -38,6 +38,14 @@ jobs:
             folder: Folium
           - url: https://github.com/hrydgard/ppsspp.git
             folder: PPSSPP
+          # libretro cores, licence-audited (see docs/ENGINEERING-MAP.md §5b) before being added
+          # here -- each is independent of RetroArch (GPL-3.0) and of every other core.
+          - url: https://github.com/libretro/mgba.git
+            folder: Libretro/mgba
+          - url: https://github.com/libretro/nestopia.git
+            folder: Libretro/nestopia
+          - url: https://github.com/libretro/Genesis-Plus-GX.git
+            folder: Libretro/genesis-plus-gx
           - url: https://github.com/Thiago-Heleno/iPSX2-src.git
             folder: iPSX2
           - url: https://github.com/jpd002/Play-.git
