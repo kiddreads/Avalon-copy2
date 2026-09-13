@@ -118,7 +118,7 @@ struct SystemCatalogTests {
     @Test("exactly one system is playable, and the app must not imply otherwise")
     func honestAboutCores() {
         #expect(SystemCatalog.playable.count == 1)
-        #expect(SystemCatalog.playable.first?.id == SystemCatalog.chip8)
+        #expect(SystemCatalog.playable.first?.id == .chip8)
         // Every system without a core has to say what it is waiting for.
         for profile in SystemCatalog.all where !profile.coreStatus.isAvailable {
             guard case .notYet(let note) = profile.coreStatus else { continue }

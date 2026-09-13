@@ -252,6 +252,49 @@ Licenses" notice. No file under `cemu-ios-muffin/src/ios/App/` carries it. muffi
 projects in this tree because its paths resolve against the parent directory, and `avalon-verify`
 now checks those paths too.
 
+## 5b. libretro: hosting cores through a standard ABI instead of porting each one [verified]
+
+RetroArch itself is GPL-3.0, but its API is not: `libretro.h` carries its own MIT licence, scoped
+explicitly to the header — *"The following license statement only applies to this libretro API
+header (libretro.h)."* Avalon implements a frontend against that header
+(`Sources/AvalonLibretro/AvalonLibretro.c`), which takes on no obligation from RetroArch itself.
+
+`AvalonLibretroTestCore` is a genuine libretro core — not a mock of the frontend — used to prove the
+ABI is right: it negotiates a pixel format through the environment callback, renders input-dependent
+frames, produces audio, and serializes. `LibretroCore<Spec>` (`Sources/AvalonCore/Cores/LibretroCore.swift`)
+then implements `EmulatorCore` generically for any core with a `LibretroCoreSpec`. 7 tests, all
+against the real ABI, including one genuine bug the tests caught before anything shipped:
+
+> `avalon_libretro_open` stores the vtable pointer it is given for the session's entire lifetime.
+> The first version passed `withUnsafePointer(to: Spec.vtable().pointee)` — the address of a
+> **stack copy** that only lived for that one call. Every later `avalon_libretro_run` dereferenced a
+> dangling frame: SIGBUS on the very first frame, caught immediately by the test suite rather than on
+> a device. Fixed by passing the real, process-lifetime static pointer.
+
+### Core-by-core licence audit [verified 2026-09-12]
+
+Every core is independent of RetroArch and independent of every other core; each is checked on its
+own terms against Avalon's `License.combinedLicense`. GitHub's `license.spdx_id` detection does not
+distinguish GPL-2.0-**only** from GPL-2.0-**or-later** reliably — Nestopia's API tag was plain
+`GPL-2.0` and its actual `COPYING` grants "any later version" — so every entry below is checked
+against the licence file's own text, not the API tag alone.
+
+| Core | Systems | Licence, from the file itself | Ships in Avalon? |
+|---|---|---|---|
+| **mGBA** | GB, GBC, GBA | MPL-2.0 | ✅ — and removes the Gambatte (GPL-2.0-only) blocker entirely |
+| **Nestopia** | NES/Famicom | GPL-2.0-**or-later** (`COPYING`: "either of that version or of any later version") | ✅ upgrades to v3 |
+| **Genesis Plus GX** | Genesis, Master System, Game Gear, SG-1000 | LGPL-2.1-**or-later** (`LICENSE.txt`: "version 2.1 ... or any later version") | ✅ — `License` gained `.lgpl21OrLater` for this |
+| melonDS | Nintendo DS/DSi | GPL-3.0 | ✅ upgradeable, but heavy; not attempted in the two-day window |
+| Snes9x | SNES | *"Under no circumstances will commercial rights be given"* | ❌ non-commercial — GPL §7 forbids it, same trap as Manic EMU |
+| Gambatte | GB/GBC | GPL-2.0-**only** | ❌ already excluded — see §3 |
+| mupen64plus-libretro-nx, DeSmuME, VBA-Next, ProSystem, Beetle PCE/NGP/WSwan/VB, Citra | N64, NDS, GBA, Atari 7800, PC Engine, Neo Geo Pocket, WonderSwan, Virtual Boy, 3DS | GitHub reports plain `GPL-2.0` | **Unresolved** — could be either generation; needs the same file-level check as the four above before any of them ships |
+
+Only the first three are integrated into the audit as confirmed-safe; the "unresolved" row is
+listed so the gap is visible rather than silently assumed favourable. None of the confirmed-safe
+cores' SOURCE has been vendored yet — this is a licence and ABI audit, not a port. Each core still
+needs its symbols namespaced for static linking (`AvalonLibretro.h`'s whole reason for existing) and
+an iOS cross-compile, neither of which fits what has been verified so far.
+
 ## 6. Integration status
 
 See `INTEGRATION-STATUS.md`. Terms used there mean exactly what §12 of the project brief says they mean:

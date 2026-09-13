@@ -145,7 +145,7 @@
    "upstream": "Dolphin",
    "origin": null,
    "license": "GPL-2.0-or-later",
-   "licensePath": "iCube/iCube/COPYING",
+   "licensePath": "iCube/COPYING",
    "copyrightHolders": [
     "Dolphin Emulator Project"
    ],

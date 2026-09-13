@@ -45,26 +45,26 @@ public struct SystemProfile: Hashable, Sendable, Identifiable {
 
 public enum SystemCatalog {
 
-    public static let chip8: SystemIdentifier = "com.avalon.system.chip8"
+    // `.chip8` is declared in Chip8Core.swift, next to the core that implements it.
     public static let wiiU: SystemIdentifier = "com.avalon.system.wiiu"
 
     /// Ordered roughly by how likely a player is to have one, which is also the library's order.
     public static let all: [SystemProfile] = [
         SystemProfile(id: .nes, displayName: "Nintendo Entertainment System", shortName: "NES",
                       fileExtensions: ["nes", "unf", "unif", "fds"], layoutID: "nes",
-                      coreStatus: .notYet(note: "Delta's NES core is selected; not yet ported.")),
+                      coreStatus: .notYet(note: "libretro's Nestopia core is GPL-2.0-or-later, verified against its actual COPYING text. Needs symbol namespacing and an iOS build.")),
         SystemProfile(id: .snes, displayName: "Super Nintendo", shortName: "SNES",
                       fileExtensions: ["sfc", "smc", "swc", "fig"], layoutID: "snes",
                       coreStatus: .notYet(note: "Delta's SNES core is selected; not yet ported.")),
         SystemProfile(id: .gameBoy, displayName: "Game Boy", shortName: "GB",
                       fileExtensions: ["gb", "gbc"], layoutID: "nes",
-                      coreStatus: .notYet(note: "Blocked: the available core is Gambatte, which is GPL-2.0-only and cannot ship in an AGPL build. Needs a different core.")),
+                      coreStatus: .notYet(note: "No longer blocked: libretro's mGBA core is MPL-2.0, verified clear of Gambatte's GPL-2.0-only trap. Needs symbol namespacing and an iOS build.")),
         SystemProfile(id: .gameBoyAdvance, displayName: "Game Boy Advance", shortName: "GBA",
                       fileExtensions: ["gba"], layoutID: "snes",
-                      coreStatus: .notYet(note: "Delta's mGBA core is selected; not yet ported.")),
+                      coreStatus: .notYet(note: "libretro's mGBA core (MPL-2.0, verified) covers this too. Needs symbol namespacing and an iOS build.")),
         SystemProfile(id: .genesis, displayName: "Sega Genesis", shortName: "Genesis",
                       fileExtensions: ["md", "gen", "smd", "32x"], layoutID: "genesis",
-                      coreStatus: .notYet(note: "Folium's Lychee core is selected; not yet ported.")),
+                      coreStatus: .notYet(note: "libretro's Genesis Plus GX is LGPL-2.1-or-later, verified. Needs symbol namespacing and an iOS build.")),
         SystemProfile(id: .nintendo64, displayName: "Nintendo 64", shortName: "N64",
                       fileExtensions: ["n64", "z64", "v64"], layoutID: "n64",
                       coreStatus: .notYet(note: "Delta's core is selected; needs the JIT service.")),
@@ -98,7 +98,7 @@ public enum SystemCatalog {
         SystemProfile(id: .wonderSwan, displayName: "WonderSwan", shortName: "WonderSwan",
                       fileExtensions: ["ws", "wsc"], layoutID: "nes",
                       coreStatus: .notYet(note: "Folium's Durian core is selected; unique to this collection.")),
-        SystemProfile(id: chip8, displayName: "CHIP-8", shortName: "CHIP-8",
+        SystemProfile(id: .chip8, displayName: "CHIP-8", shortName: "CHIP-8",
                       fileExtensions: ["ch8", "c8"], layoutID: "nes",
                       coreStatus: .available(coreID: "avalon.chip8")),
     ]

@@ -22,6 +22,10 @@ public enum License: String, Codable, Sendable, CaseIterable {
     case bsd3Clause = "BSD-3-Clause"
     /// Weak copyleft; compatible with GPLv3 but imposes a relinking obligation.
     case lgpl3OrLater = "LGPL-3.0-or-later"
+    /// Same relinking obligation as LGPL-3.0, one GPL generation back. Genesis Plus GX's
+    /// LICENSE.txt reads "version 2.1 of the License, or (at your option) any later version" —
+    /// the "-or-later" grant is what lets it reach v3, exactly like GPL-2.0-or-later.
+    case lgpl21OrLater = "LGPL-2.1-or-later"
     /// Not an open-source license. Manic EMU gates several libretro cores this way
     /// (`Manic EMU/Manic EMU/ManicEmu/ManicEmu/Sources/Tools/Others/EmulationCore.swift:146-148` `nonCommercialCores`). A "no commercial use"
     /// term is an additional restriction, which GPL §7 forbids — such a core cannot be combined
@@ -50,6 +54,7 @@ public enum License: String, Codable, Sendable, CaseIterable {
         case .gpl2OrLater: return [2, 3]                  // may be exercised as either
         case .mpl2: return [2, 3]                         // §3.3 Secondary Licenses
         case .gpl3OrLater, .agpl3OrLater, .lgpl3OrLater: return [3]
+        case .lgpl21OrLater: return [2, 3]     // "or later" reaches v3 the same way GPL-2.0-or-later does
         case .nonCommercial: return []                    // combines with nothing copyleft
         }
     }
@@ -59,7 +64,7 @@ public enum License: String, Codable, Sendable, CaseIterable {
         switch self {
         case .mit, .bsd2Clause, .bsd3Clause: return 0
         case .mpl2: return 1            // copyleft, but per file rather than per work
-        case .gpl2Only, .gpl2OrLater: return 1
+        case .gpl2Only, .gpl2OrLater, .lgpl21OrLater: return 1
         case .lgpl3OrLater, .gpl3OrLater: return 2
         case .agpl3OrLater: return 3
         case .nonCommercial: return 4   // never actually returned; combination fails first

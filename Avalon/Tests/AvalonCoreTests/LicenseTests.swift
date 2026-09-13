@@ -81,3 +81,23 @@ struct MPLLicenseTests {
         #expect(registry.combinedLicense(excluding: ["Folium"]) != nil)
     }
 }
+
+@Suite("LGPL-2.1-or-later")
+struct LGPL21LicenseTests {
+    @Test("reaches v3 the same way GPL-2.0-or-later does")
+    func reachesV3() {
+        #expect(License.combinedLicense(of: [.lgpl21OrLater, .agpl3OrLater]) == .agpl3OrLater)
+        // Mirrors the existing GPL-2.0-only + GPL-2.0-or-later precedent (line 26 above): two
+        // components each capable of v2 combine fine, capped at v2 — this is legitimately
+        // different from mixing a v2-only component with something that can ONLY be v3.
+        #expect(License.combinedLicense(of: [.lgpl21OrLater, .gpl2Only]) != nil)
+    }
+
+    @Test("still cannot join a build that requires v3, same as any v2-only component")
+    func blocksAV3OnlyBuild() {
+        // The scenario that actually matters: Avalon's own code is agpl3OrLater. A GPL-2.0-only
+        // dependency caps the whole set at v2, and v2 cannot describe a work that also contains
+        // agpl3OrLater code, regardless of what else is mixed in alongside it.
+        #expect(License.combinedLicense(of: [.lgpl21OrLater, .gpl2Only, .agpl3OrLater]) == nil)
+    }
+}
