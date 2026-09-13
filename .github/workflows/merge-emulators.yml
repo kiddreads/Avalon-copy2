@@ -48,6 +48,8 @@ jobs:
             folder: Libretro/genesis-plus-gx
           - url: https://github.com/libretro/bsnes.git
             folder: Libretro/bsnes
+          - url: https://github.com/libretro/pcsx_rearmed.git
+            folder: Libretro/pcsx_rearmed
           - url: https://github.com/Thiago-Heleno/iPSX2-src.git
             folder: iPSX2
           - url: https://github.com/jpd002/Play-.git
