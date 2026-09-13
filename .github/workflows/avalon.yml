@@ -80,6 +80,12 @@ jobs:
 
       # The whole point of this job. AvalonCore has C targets (NEON pixel conversion, the JIT
       # code cache, the audio mixer) whose iOS build has never been exercised anywhere.
+      # EXCLUDED_ARCHS=x86_64: pcsx_rearmed's GTE core (libpcsxcore/gte_arm64.S,
+      # gte_nf_arm64.S) is hand-written AArch64 assembly with no x86_64 equivalent.
+      # 'generic/platform=iOS Simulator' otherwise builds a universal x86_64+arm64 slice --
+      # harmless for every other target here, but a hard assembler error for these two.
+      # Every macOS Actions runner is Apple Silicon, so an arm64-only simulator slice is not a
+      # regression in what's actually exercised.
       - name: Build AvalonCore for the iOS Simulator
         run: |
           xcodebuild build \
@@ -87,6 +93,7 @@ jobs:
             -destination 'generic/platform=iOS Simulator' \
             -derivedDataPath .build/xcode \
             -skipPackagePluginValidation \
+            EXCLUDED_ARCHS=x86_64 \
             CODE_SIGNING_ALLOWED=NO
 
       - name: Build AvalonCore for a real device
