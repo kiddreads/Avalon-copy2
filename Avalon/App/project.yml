@@ -1,0 +1,48 @@
+# Avalon iOS app.
+#
+# XcodeGen rather than a checked-in .xcodeproj: this repository's development machine has no
+# Xcode, so a binary project file could never be edited or reviewed here. project.yml is text,
+# and CI generates the real project from it.
+
+name: Avalon
+options:
+  bundleIdPrefix: com.avalon
+  deploymentTarget:
+    iOS: "16.0"
+  createIntermediateGroups: true
+
+packages:
+  Avalon:
+    path: ../
+
+targets:
+  Avalon:
+    type: application
+    platform: iOS
+    sources:
+      - path: Sources
+    dependencies:
+      - package: Avalon
+        product: AvalonCore
+    info:
+      path: Info.plist
+      properties:
+        CFBundleDisplayName: Avalon
+        CFBundleShortVersionString: "0.1"
+        CFBundleVersion: "1"
+        UILaunchScreen: {}
+        UIRequiresFullScreen: true
+        UIStatusBarHidden: true
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.avalon.emulator
+        TARGETED_DEVICE_FAMILY: "1,2"
+        SWIFT_VERSION: "5.9"
+        GENERATE_INFOPLIST_FILE: NO
+        ENABLE_USER_SCRIPT_SANDBOXING: NO

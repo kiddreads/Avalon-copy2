@@ -136,3 +136,55 @@ jobs:
             -derivedDataPath .build/xcode-test \
             -skipPackagePluginValidation \
             CODE_SIGNING_ALLOWED=NO
+
+  ipa:
+    name: Sideloadable .ipa
+    runs-on: macos-latest
+    needs: ios
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: Avalon
+          fetch-depth: 1
+
+      # The development machine has no Xcode, so a binary .xcodeproj could never be edited or
+      # reviewed there. project.yml is text and the real project is generated here.
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate the Xcode project
+        working-directory: Avalon/App
+        run: xcodegen generate
+
+      # Unsigned on purpose. A signed build would need the owner's certificates in CI; AltStore
+      # and Sideloadly re-sign with the user's own account at install time, which is how a
+      # sideloaded emulator gets onto a device anyway.
+      - name: Build unsigned for a device
+        working-directory: Avalon/App
+        run: |
+          xcodebuild build \
+            -project Avalon.xcodeproj \
+            -scheme Avalon \
+            -configuration Release \
+            -sdk iphoneos \
+            -derivedDataPath build \
+            -skipPackagePluginValidation \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=""
+
+      - name: Package the .ipa
+        working-directory: Avalon/App
+        run: |
+          app="build/Build/Products/Release-iphoneos/Avalon.app"
+          test -d "$app" || { echo "::error::no .app was produced"; ls -R build/Build/Products; exit 1; }
+          rm -rf Payload && mkdir Payload
+          cp -R "$app" Payload/
+          zip -qry Avalon-unsigned.ipa Payload
+          echo "Built $(du -h Avalon-unsigned.ipa | cut -f1) unsigned .ipa"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Avalon-unsigned-ipa
+          path: Avalon/App/Avalon-unsigned.ipa
+          if-no-files-found: error
+          retention-days: 30

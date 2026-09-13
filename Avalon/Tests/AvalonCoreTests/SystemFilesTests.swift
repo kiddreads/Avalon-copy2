@@ -88,3 +88,56 @@ func jitAvailabilityAffectsSelection() {
     // With JIT available the tie breaks deterministically by id rather than arbitrarily.
     #expect(CoreCandidate.preferred(from: candidates, jitAvailable: true)?.descriptor.id == "interpreted")
 }
+
+@Suite("System catalog")
+struct SystemCatalogTests {
+
+    @Test("every system maps to a control layout that exists")
+    func layoutsResolve() throws {
+        let layouts = try TouchLayoutLibrary.builtIn()
+        for profile in SystemCatalog.all {
+            #expect(layouts.layout(id: profile.layoutID) != nil,
+                    "\(profile.shortName) wants layout '\(profile.layoutID)', which does not exist")
+        }
+    }
+
+    @Test("extensions resolve, and ambiguous ones return every candidate")
+    func extensions() {
+        #expect(SystemCatalog.profiles(forExtension: "nes").first?.id == .nes)
+        #expect(SystemCatalog.profiles(forExtension: ".Z64").first?.id == .nintendo64)
+        #expect(SystemCatalog.profiles(forExtension: "ch8").first?.coreStatus.isAvailable == true)
+        #expect(SystemCatalog.profiles(forExtension: "xyz").isEmpty)
+        #expect(SystemCatalog.profiles(forExtension: "").isEmpty)
+
+        // An .iso is three different consoles and the player has to be the one to say which.
+        let iso = SystemCatalog.profiles(forExtension: "iso").map(\.id)
+        #expect(iso.count == 3)
+        #expect(iso.contains(.gameCube) && iso.contains(.playStation2) && iso.contains(.psp))
+    }
+
+    @Test("exactly one system is playable, and the app must not imply otherwise")
+    func honestAboutCores() {
+        #expect(SystemCatalog.playable.count == 1)
+        #expect(SystemCatalog.playable.first?.id == SystemCatalog.chip8)
+        // Every system without a core has to say what it is waiting for.
+        for profile in SystemCatalog.all where !profile.coreStatus.isAvailable {
+            guard case .notYet(let note) = profile.coreStatus else { continue }
+            #expect(note.count > 20, "\(profile.shortName): the reason is not specific enough")
+        }
+    }
+
+    @Test("no two systems claim the same unambiguous extension")
+    func noSilentCollisions() {
+        var owner: [String: String] = [:]
+        for profile in SystemCatalog.all {
+            for ext in profile.fileExtensions {
+                if let existing = owner[ext] {
+                    // Collisions are allowed only where the catalog declares them ambiguous.
+                    #expect(SystemCatalog.profiles(forExtension: ext).count > 1,
+                            "\(ext) is claimed by both \(existing) and \(profile.shortName) with no ordering")
+                }
+                owner[ext] = profile.shortName
+            }
+        }
+    }
+}
