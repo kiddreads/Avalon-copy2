@@ -63,6 +63,14 @@ Avalon component over a network must be offered the corresponding source.
 - Licence text: `Play!/License.txt`
 - Systems: PS2
 
+### bsnes — GPL-3.0-only
+
+- Upstream: https://github.com/libretro/bsnes
+- Source: https://github.com/libretro/bsnes
+- Copyright: byuu
+- Licence text: `Libretro/bsnes/LICENSE.txt`
+- Systems: Super Nintendo
+
 ### dolphin-ios — GPL-2.0-or-later
 
 - Upstream: Dolphin

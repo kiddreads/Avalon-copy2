@@ -55,7 +55,7 @@ public enum SystemCatalog {
                       coreStatus: .available(coreID: NestopiaSpec.coreID)),
         SystemProfile(id: .snes, displayName: "Super Nintendo", shortName: "SNES",
                       fileExtensions: ["sfc", "smc", "swc", "fig"], layoutID: "snes",
-                      coreStatus: .notYet(note: "Delta's SNES core is selected; not yet ported.")),
+                      coreStatus: .available(coreID: BsnesSpec.coreID)),
         SystemProfile(id: .gameBoy, displayName: "Game Boy", shortName: "GB",
                       fileExtensions: ["gb", "gbc"], layoutID: "nes",
                       coreStatus: .available(coreID: MGBASpec.coreID)),

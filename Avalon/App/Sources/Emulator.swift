@@ -123,6 +123,13 @@ final class Emulator: ObservableObject {
                                displayInterval: 1.0 / 60.0,
                                frameProvider: { core.currentFrame() })
 
+        case .snes:
+            let core = LibretroCore<BsnesSpec>()
+            guard (try? core.load(game: game.url)) != nil else { return nil }
+            return CoreSession(core: core, audio: sink, inputMap: BsnesSpec.inputMap,
+                               displayInterval: 1.0 / 60.0,
+                               frameProvider: { core.currentFrame() })
+
         default:
             return nil
         }

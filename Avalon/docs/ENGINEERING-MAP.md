@@ -445,6 +445,78 @@ rather than the libretro-hosting pattern used for the smaller consoles.
 architecture is verified to permit a software-only, interpreter-only build in principle; what
 remains is a genuinely large amount of dependency work, not an unknown.
 
+## 5g. bsnes (SNES): the fourth core, and the first without libretro-common [verified 2026-09-13]
+
+Requested directly ("can you add 3ds?" was answered honestly as out of reach for now in §5f;
+SNES was the natural next candidate under the standing "keep going" instruction). `libretro/bsnes`
+is GPL-3.0-**only** -- verified against its own `LICENSE.txt` ("specifically version 3 of the
+License and no other version"), not GitHub's `spdx_id` tag, the same discipline applied to every
+licence claim in this document. Unlike GPL-2.0-only, this is not a compatibility trap: it is
+already at generation 3, the generation Avalon's own AGPL-3.0-or-later occupies, and GPLv3 was
+written with AGPLv3 combination in mind. See `License.swift`'s `.gpl3Only` case.
+
+**What made it tractable at all.** Its own `target-libretro/GNUmakefile` already carries explicit
+upstream `ios-arm64` platform support -- a better starting position than any of the other three
+cores had (none of them had upstream iOS support to begin with). The repository is self-contained
+for the libretro target: `bsnes/`, `nall/` and `libco/` are all it needs (`hiro/`, `ruby/`,
+`sourcery/`, `shaders/` are the standalone-UI toolkit, unused here) -- no external submodule or
+separate-repo dependency the way 3DS needed cryptopp and libressl. Total size for what's actually
+compiled is ~123K lines, in the same range as Genesis Plus GX (191K) and Nestopia (168K), not the
+3DS's different league.
+
+**Unlike every core so far, no libretro-common dependency.** Genesis Plus GX, Nestopia and mGBA
+each vendor their own snapshot of libretro-common, which is why every one of them needed internal
+utility symbols namespaced (not just the RETRO_API surface) the moment two of them shared a
+binary. bsnes's own `target-libretro/libretro.cpp` includes only `<cassert>` and `"libretro.h"` --
+its utility layer is entirely `nall`, already namespaced under C++ namespaces (`SuperFamicom::`,
+`Emulator::`, `nall::`). `bsnes_namespace.h` only has to rename the 24 RETRO_API entry points.
+
+**The unity-build trap, again, plus one new twist.** Like the other three cores, most of bsnes's
+own `.cpp` files exist to be `#include`d by exactly one top-level file, never compiled as their
+own translation unit -- `sources:` names only the real ~20 entry points its own GNUmakefiles
+compile (traced by reading `bsnes/GNUmakefile`, `sfc/GNUmakefile`, `processor/GNUmakefile` and
+`target-libretro/GNUmakefile` directly, the same way as before). The twist: `target-libretro/
+program.cpp` looked like its own translation unit (it has real code, not just declarations) but
+`libretro.cpp` itself does `#include "program.cpp"` partway through -- listing both compiled
+`program.cpp` twice, once orphaned from the `input_state`/`video_cb`/`environ_cb` file-scope
+statics that only exist in `libretro.cpp`, producing "use of undeclared identifier" errors that
+looked like a missing declaration rather than a duplicate compilation.
+
+**A second, independent GB/GBC core, needed unconditionally.** bsnes vendors its own SameBoy
+fork (`gb/Core`, MIT) as 15 real per-file translation units (`debugger.c`/`sm83_disassembler.c`
+excluded, matching upstream's own `DISABLE_DEBUGGER`). Super Game Boy support
+(`sfc/coprocessor/icd/icd.cpp`) routes a SNES-hosted SGB cartridge's inserted GB ROM through it,
+and `coprocessor.cpp`'s unity build references those symbols unconditionally -- so it has to be
+linked for every bsnes build, not only ones that load an SGB cart. Avalon's own GB/GBC play still
+goes entirely through mGBA; this is bsnes's own internal plumbing, confirmed via `icd.cpp` calling
+`platform->load(ID::GameBoy, ...)` and `cartridge.slotGameBoy`, unrelated to anything outside SGB.
+
+**The one real build-system change: C++17, package-wide.** `nall` uses structured bindings and
+`if constexpr`, requiring C++17; Nestopia's target needs C++14. A per-target `-std=c++17`
+override in `cxxSettings` reproduced the exact bug already documented for Nestopia -- a mixed
+C/C++ target shares one flag set, so the override leaked into this target's own `.c` files
+(`libco.c`, `lzma.c`, every `gb/Core/*.c`) and clang rejected `-std=c++17` outright on a C compile.
+Raising the package's `cxxLanguageStandard` to `.cxx17` instead avoids that (the setting SwiftPM
+recognizes specially, unlike a raw flag, only ever applies to C++ sources) -- and Nestopia's own
+build and all its tests pass unchanged under C++17, confirming a newer standard being a superset
+of what an older codebase was written against is the normal case here, not a risk that paid off.
+
+**The ROM fixture.** `need_fullpath = true` -- bsnes reads the ROM file itself via `nall::file`
+rather than accepting an in-memory buffer, already satisfied by `avalon_libretro_load` populating
+both `info.path` and `info.data`/`info.size` regardless of which a given core reads.
+`Heuristics::SuperFamicom::scoreHeader` (`heuristics/super-famicom.cpp`), read directly rather
+than guessed, needs: a 32KB-minimum image, map mode `0x20` at header+0x25 (LoROM, at address
+`0x7fb0`), a checksum/complement pair summing to `0xffff`, a reset vector `>= 0x8000`, and a
+"most likely" 65816 opcode (`0x78`, SEI) at the byte the reset vector points to. HiROM/ExLoROM/
+ExHiROM all score zero outright against an image this small (each requires size >= its own header
+address + 0x50, far past 32KB), so a bare 32KB image scoring anything above zero as LoROM wins
+the comparison by construction -- no need to also suppress the alternatives.
+
+**Result:** zero symbol collisions with the other three cores once linked into one binary (the
+lack of a shared libretro-common ruled out the option-array collision class that hit Genesis Plus
+GX/Nestopia/mGBA three separate times), all 157 pre-existing tests pass unchanged under C++17, and
+`BsnesCoreTests` proves load → run → save-state round-trip against the real, compiled core.
+
 ## 6. Integration status
 
 See `INTEGRATION-STATUS.md`. Terms used there mean exactly what §12 of the project brief says they mean:

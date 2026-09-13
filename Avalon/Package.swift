@@ -177,10 +177,103 @@ let package = Package(
             name: "AvalonMGBAGlue",
             dependencies: ["AvalonLibretro", "AvalonLibretroMGBA"]
         ),
+        // bsnes's own source (C++17), vendored unmodified at Libretro/bsnes. GPL-3.0-only --
+        // see License.swift's .gpl3Only case for why that's not a compatibility trap the way
+        // GPL-2.0-only would be. Unlike the other three cores, bsnes's own target-libretro build
+        // has no libretro-common dependency at all (its utility layer is nall, its own,
+        // namespaced under C++ namespaces already) -- so bsnes_namespace.h only has to rename the
+        // 24 RETRO_API entry points, not internal helper symbols too. Same reason as the other
+        // three for avoiding a dependency on AvalonLibretro here (Clang modules would freeze
+        // libretro.h's declarations before bsnes_namespace.h's #defines run).
+        //
+        // Real, upstream-authored SNES source in this target: `sfc/`, `processor/`,
+        // `emulator/`, `filter/`, `heuristics/`. bsnes also builds a *second*, independent
+        // GB/GBC core (`gb/Core`, a vendored SameBoy fork, MIT) unconditionally -- Super Game Boy
+        // support routes a SNES-hosted SGB cartridge's inserted GB ROM through it
+        // (`sfc/coprocessor/icd/icd.cpp` calls `platform->load(ID::GameBoy, ...)` and
+        // `cartridge.slotGameBoy`), and `sfc/coprocessor/coprocessor.cpp`'s unity build
+        // unconditionally references those symbols -- so it has to be linked in for any bsnes
+        // build, not only ones that want to play GB ROMs directly. Avalon's own GB/GBC play still
+        // goes through mGBA; this is bsnes's own SGB plumbing, unused by anything outside SGB
+        // carts.
+        //
+        // Only listing the real translation units here, not whole directories: like Genesis Plus
+        // GX/Nestopia/mGBA before it, bsnes's own build is a unity build where most .cpp files
+        // (e.g. every sfc/coprocessor/*/*.cpp, filter/*.cpp, lzma/*.c) are meant to be #included
+        // by exactly one top-level file, never compiled as their own translation unit --
+        // SwiftPM's directory-based discovery doesn't know that distinction, so `sources:` names
+        // only the ~20 real entry points bsnes's own GNUmakefiles compile, plus gb/Core's 15 real
+        // per-file objects (debugger.c and sm83_disassembler.c excluded, matching upstream's own
+        // Makefile -- DISABLE_DEBUGGER, below).
+        .target(
+            name: "AvalonLibretroBsnes",
+            path: "Sources/AvalonLibretroBsnesSource",
+            sources: [
+                "libco/libco.c",
+                "emulator/emulator.cpp",
+                "filter/filter.cpp",
+                "lzma/lzma.cpp",
+                "sfc/interface/interface.cpp",
+                "sfc/system/system.cpp",
+                "sfc/controller/controller.cpp",
+                "sfc/cartridge/cartridge.cpp",
+                "sfc/memory/memory.cpp",
+                "sfc/cpu/cpu.cpp",
+                "sfc/smp/smp.cpp",
+                "sfc/dsp/dsp.cpp",
+                "sfc/ppu/ppu.cpp",
+                "sfc/ppu-fast/ppu.cpp",
+                "sfc/expansion/expansion.cpp",
+                "sfc/coprocessor/coprocessor.cpp",
+                "sfc/slot/slot.cpp",
+                "processor/wdc65816/wdc65816.cpp",
+                "processor/spc700/spc700.cpp",
+                "processor/arm7tdmi/arm7tdmi.cpp",
+                // program.cpp is NOT its own translation unit -- target-libretro/libretro.cpp
+                // itself does `#include "program.cpp"` partway through (that's where the
+                // input_state/video_cb/environ_cb statics program.cpp calls actually live).
+                // Listing both here compiled program.cpp twice, once orphaned from those statics.
+                "target-libretro/libretro.cpp",
+                "gb/Core/apu.c",
+                "gb/Core/camera.c",
+                "gb/Core/display.c",
+                "gb/Core/gb.c",
+                "gb/Core/joypad.c",
+                "gb/Core/mbc.c",
+                "gb/Core/memory.c",
+                "gb/Core/printer.c",
+                "gb/Core/random.c",
+                "gb/Core/rewind.c",
+                "gb/Core/save_state.c",
+                "gb/Core/sgb.c",
+                "gb/Core/sm83_cpu.c",
+                "gb/Core/symbol_hash.c",
+                "gb/Core/timing.c",
+            ],
+            cSettings: [
+                .headerSearchPath("."),
+                .define("__LIBRETRO__"),
+                .define("GB_INTERNAL"),
+                .define("DISABLE_DEBUGGER"),
+                .define("HAVE_POSIX_MEMALIGN"),
+                .unsafeFlags(["-include", "bsnes_namespace.h"]),
+            ],
+            cxxSettings: [
+                .headerSearchPath("."),
+                .define("__LIBRETRO__"),
+                .unsafeFlags(["-include", "bsnes_namespace.h"]),
+            ]
+        ),
+        // Bridges the namespaced bsnes_retro_* symbols to a vtable, mirroring
+        // AvalonGenesisPlusGXGlue / AvalonNestopiaGlue / AvalonMGBAGlue.
+        .target(
+            name: "AvalonBsnesGlue",
+            dependencies: ["AvalonLibretro", "AvalonLibretroBsnes"]
+        ),
         .target(
             name: "AvalonCore",
             dependencies: ["AvalonPixel", "AvalonJIT", "AvalonAudio", "AvalonChip8", "AvalonLibretro",
-                           "AvalonGenesisPlusGXGlue", "AvalonNestopiaGlue", "AvalonMGBAGlue"],
+                           "AvalonGenesisPlusGXGlue", "AvalonNestopiaGlue", "AvalonMGBAGlue", "AvalonBsnesGlue"],
             resources: [.process("Resources")]
         ),
         .executableTarget(name: "avalon-verify", dependencies: ["AvalonCore"]),
@@ -201,6 +294,11 @@ let package = Package(
     // Nestopia's core is C++; this sets the standard package-wide rather than per-target, since a
     // per-target unsafeFlag in cxxSettings leaked "-std=c++14" into the SAME target's .c files
     // too (a mixed C/C++ target shares one flag set across both file kinds) and clang rejects a
-    // C++ standard flag on a C compile outright.
-    cxxLanguageStandard: .cxx14
+    // C++ standard flag on a C compile outright. bsnes's nall library requires C++17 (structured
+    // bindings, if-constexpr, inline variables) -- the same mixed-target flag-sharing bug means a
+    // per-target override isn't an option for it either, so this raises the package-wide floor to
+    // C++17 rather than C++14. Nestopia's C++ builds and tests unchanged under C++17 (verified);
+    // a newer standard being a superset of the one a codebase was written against is the normal
+    // case, not the exception.
+    cxxLanguageStandard: .cxx17
 )

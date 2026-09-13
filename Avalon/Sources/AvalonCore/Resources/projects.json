@@ -223,6 +223,20 @@
     "Game Boy Advance"
    ],
    "notes": "Vendored via the merge workflow at Libretro/mgba. The only core here whose real build is full CMake, not a standalone libretro Makefile -- two generated files (flags.h, version.c) are hand-resolved instead of generated; see include/mgba/flags.h and src/core/version.c for exactly what was chosen and why. Vendors one genuine third-party dependency, inih (BSD-licensed, a few hundred lines), needed by config.c's Configuration API even though the actual INI-file-reading half of it is never exercised. Removes the Gambatte (GPL-2.0-only) blocker entirely: this is what Avalon actually ships for GB/GBC/GBA. Hosted through AvalonLibretro (Sources/AvalonLibretroMGBA, namespaced mgba_retro_* and, once a third core revealed the same per-language option-array collision already seen between Genesis Plus GX and Nestopia, mgba_lrc_* too) and MGBASpec (Sources/AvalonCore/Cores/MGBACore.swift). Integrated and tested: MGBACoreTests loads a ROM, runs frames, and round-trips a save state through the real, compiled core. See docs/ENGINEERING-MAP.md §5e."
+  },
+  {
+   "id": "bsnes",
+   "upstream": "https://github.com/libretro/bsnes",
+   "origin": "https://github.com/libretro/bsnes",
+   "license": "GPL-3.0-only",
+   "licensePath": "Libretro/bsnes/LICENSE.txt",
+   "copyrightHolders": [
+    "byuu"
+   ],
+   "systems": [
+    "Super Nintendo"
+   ],
+   "notes": "Vendored via the merge workflow at Libretro/bsnes. GPL-3.0-only, not -or-later (LICENSE.txt: 'specifically version 3 of the License and no other version') -- not a compatibility trap the way GPL-2.0-only would be, since it is already at generation 3; see License.swift's .gpl3Only case. Unlike the other three cores, its own target-libretro build has no libretro-common dependency at all -- its utility layer is nall, its own, already namespaced under C++ namespaces -- so the namespace header only renames the 24 RETRO_API entry points. Requires C++17 (nall uses structured bindings and if-constexpr), raising the package-wide C++ standard from C++14; Nestopia's own C++ build and tests are unaffected (verified). Only the real translation units are compiled, not whole directories: bsnes's own build is a unity build where most .cpp files exist to be #included exactly once, never compiled separately -- 37 real files total (22 in sfc/processor/emulator/filter/lzma/target-libretro, 15 in the vendored SameBoy-derived gb/Core, needed unconditionally because Super Game Boy support routes through it even for plain SNES carts). Hosted through AvalonLibretro (Sources/AvalonLibretroBsnes, namespaced bsnes_retro_*) and BsnesSpec (Sources/AvalonCore/Cores/BsnesCore.swift). Integrated and tested: BsnesCoreTests loads a minimal LoROM image that satisfies bsnes's own header-scoring heuristic, runs frames, and round-trips a save state through the real, compiled core."
   }
  ],
  "vendoredCores": [
