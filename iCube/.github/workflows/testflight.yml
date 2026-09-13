@@ -1,0 +1,245 @@
+name: TestFlight
+
+# Signed App Store Connect uploads for iCube. Separate from build.yml, which
+# produces the UNSIGNED sideload IPAs that feed the AltStore/SideStore source —
+# TestFlight needs real signing, so the two cannot share a job.
+#
+# NOT on every develop push: each run consumes an App Store Connect build number
+# and a processing slot. Nightly, plus explicit dispatch.
+
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: 'Platform(s) to archive and upload'
+        required: true
+        default: all
+        type: choice
+        options: [all, ios, tvos]
+  schedule:
+    - cron: '0 10 * * *'   # 10:00 UTC, an hour after Provenance's
+
+concurrency:
+  group: testflight-${{ github.ref }}
+  cancel-in-progress: false   # never cancel a half-finished upload
+
+jobs:
+  plan:
+    name: Select platforms
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.pick.outputs.matrix }}
+    steps:
+      - id: pick
+        run: |
+          case "${{ inputs.platform || 'all' }}" in
+            ios)  M='["ios"]' ;;
+            tvos) M='["tvos"]' ;;
+            *)    M='["ios","tvos"]' ;;
+          esac
+          echo "matrix=$M" >> "$GITHUB_OUTPUT"
+
+  testflight:
+    name: Archive and upload (${{ matrix.platform }})
+    needs: plan
+    # macos-26 + Xcode 26.3, matching build.yml. On macos-15 the runner default is
+    # the iOS 18.5 SDK, and the app uses iOS 26 APIs (glassEffect,
+    # searchToolbarBehavior, navigationSubtitle) behind `if #available(iOS 26.0,
+    # tvOS 26.0, *)`. An availability guard cannot conjure a symbol the SDK does
+    # not ship, so both legs failed to compile until this was pinned.
+    runs-on: macos-26
+    # One platform per job. Two cold archives in a single job is what made
+    # Provenance's tvOS leg fail intermittently with no diagnostic.
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    timeout-minutes: 300
+    env:
+      DEST: ${{ matrix.platform == 'tvos' && 'generic/platform=tvOS' || 'generic/platform=iOS' }}
+      DEVELOPER_DIR: /Applications/Xcode_26.3.app/Contents/Developer
+      XCODE_VERSION: '26.3'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1.6.0
+        with:
+          xcode-version: ${{ env.XCODE_VERSION }}
+
+      # tuist generate resolves the binary target eagerly, so the xcframework
+      # must exist BEFORE the project is generated, not after.
+      - name: Build PVlibDolphin xcframework
+        run: |
+          set -euo pipefail
+          python3 BuildiOSXCFramework.py --platforms OS64 SIMULATORARM64 TVOS SIMULATOR_TVOS
+          ls -d build/xcframework/* >/dev/null || { echo "::error::no xcframework produced"; exit 1; }
+
+      # Installed via mise, matching build.yml. `curl -Ls https://install.tuist.io | bash`
+      # is not usable from CI: the host sits behind a Cloudflare challenge, so curl
+      # returns an HTML interstitial and bash tries to execute it —
+      #   bash: line 1: syntax error near unexpected token `<'
+      # Pinned for the same reason build.yml pins it: nothing in the repo fixes a
+      # Tuist version, so an unpinned install tracks latest and can break generation
+      # on any release.
+      - name: Install Tuist
+        env:
+          TUIST_VERSION: '4.200.0'
+        run: |
+          set -euo pipefail
+          curl -fsSL https://mise.run | sh
+          MISE="$HOME/.local/bin/mise"
+          "$MISE" use -g "tuist@${TUIST_VERSION}"
+          echo "$HOME/.local/share/mise/shims" >> "$GITHUB_PATH"
+          "$HOME/.local/share/mise/shims/tuist" version
+
+      - name: Generate Xcode project
+        working-directory: Source/iOS/App
+        run: tuist generate --no-open
+
+      # Automatic signing needs TWO identities in the keychain. The profiles come
+      # from -allowProvisioningUpdates using the ASC API key, so only certs are
+      # imported here.
+      #
+      # Why two: `xcodebuild archive` signs the ARCHIVE with an Apple Development
+      # identity; only -exportArchive re-signs with Distribution. With just the
+      # distribution cert present, -allowProvisioningUpdates minted a fresh
+      # Development certificate on EVERY run, whose private key died with the
+      # runner. 19 of those corpses accumulated Sept 2–5 2026 across this repo and
+      # Provenance until Apple's per-account cap hit — run 33964414142:
+      #   error: Choose a certificate to revoke. Your account has reached the
+      #          maximum number of certificates.
+      # DEV_CERT_P12 is a Development identity whose key we keep (minted with
+      # Provenance's Scripts/asc_certs.py create), so xcodebuild reuses it.
+      # Certificates are team-wide: the same .p12 is set on Provenance.
+      - name: Import signing certificates
+        env:
+          CERT_P12: ${{ secrets.CERT_P12 }}
+          P12_PASS: ${{ secrets.P12_PASS }}
+          DEV_CERT_P12: ${{ secrets.DEV_CERT_P12 }}
+          DEV_P12_PASS: ${{ secrets.DEV_P12_PASS }}
+        run: |
+          set -euo pipefail
+          for v in CERT_P12 DEV_CERT_P12; do
+            [ -n "${!v}" ] || { echo "::error::$v is not set — cannot sign."; exit 1; }
+          done
+          KEYCHAIN_PASSWORD="$(openssl rand -base64 24)"
+          echo "::add-mask::$KEYCHAIN_PASSWORD"
+          KEYCHAIN="$RUNNER_TEMP/signing.keychain-db"
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          import_p12() {  # $1 = base64 p12, $2 = password
+            local path="$RUNNER_TEMP/import.p12"
+            echo -n "$1" | base64 --decode -o "$path"
+            security import "$path" -P "$2" -A -t cert -f pkcs12 -k "$KEYCHAIN"
+            rm -f "$path"
+          }
+          import_p12 "$CERT_P12" "$P12_PASS"
+          import_p12 "$DEV_CERT_P12" "$DEV_P12_PASS"
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN" >/dev/null
+          security list-keychains -d user -s "$KEYCHAIN" $(security list-keychains -d user | tr -d '"')
+          security find-identity -v -p codesigning "$KEYCHAIN"
+          # Both must be present, or the archive step silently mints a new
+          # Development cert and refills the account cap.
+          for want in "Apple Distribution" "Apple Development"; do
+            security find-identity -v -p codesigning "$KEYCHAIN" | grep -q "$want" \
+              || { echo "::error::no '$want' identity after import"; exit 1; }
+          done
+
+      - name: Archive and upload
+        env:
+          ASC_API_KEY_ID: ${{ secrets.ASC_API_KEY_ID }}
+          ASC_API_ISSUER_ID: ${{ secrets.ASC_API_ISSUER_ID }}
+          ASC_API_KEY_CONTENT: ${{ secrets.ASC_API_KEY_CONTENT }}
+        run: |
+          set -euo pipefail
+          for v in ASC_API_KEY_ID ASC_API_ISSUER_ID ASC_API_KEY_CONTENT; do
+            [ -n "${!v}" ] || { echo "::error::$v is not set"; exit 1; }
+          done
+          # ASC_API_KEY_CONTENT may hold either a raw .p8 or a base64 blob, so
+          # sniff before writing. Decoding first is a trap: macOS base64 --decode
+          # skips characters it cannot parse and still exits 0, so feeding it a raw
+          # PEM yields a garbage file and no error, and xcodebuild then fails with
+          #   Invalid authentication key credential specified
+          #   (DVTFoundation.JWT.Error.keyPathInvalid)
+          # after the archive has already run. Same order release.sh uses.
+          KEY="$RUNNER_TEMP/AuthKey_${ASC_API_KEY_ID}.p8"
+          if printf '%s' "$ASC_API_KEY_CONTENT" | grep -q "BEGIN PRIVATE KEY"; then
+            ( umask 077; printf '%s' "$ASC_API_KEY_CONTENT" > "$KEY" )
+          else
+            ( umask 077; printf '%s' "$ASC_API_KEY_CONTENT" | base64 --decode > "$KEY" ) 2>/dev/null \
+              || { echo "::error::ASC_API_KEY_CONTENT is neither a valid .p8 nor base64"; exit 1; }
+          fi
+          # Fail here rather than 90 minutes later at export.
+          grep -q "BEGIN PRIVATE KEY" "$KEY" \
+            || { echo "::error::materialised key is not a PEM private key"; exit 1; }
+          # Epoch seconds: unique and strictly increasing, so App Store Connect
+          # never rejects the upload as a redundant binary.
+          BUILD=$(date +%s)
+          ARCHIVE="$RUNNER_TEMP/iCube-${{ matrix.platform }}.xcarchive"
+          AUTH=(-authenticationKeyPath "$KEY" -authenticationKeyID "$ASC_API_KEY_ID" -authenticationKeyIssuerID "$ASC_API_ISSUER_ID")
+
+          set -o pipefail
+          xcodebuild archive \
+            -workspace Source/iOS/App/iCube.xcworkspace \
+            -scheme "iCube (AppStore)" \
+            -configuration "Release (AppStore)" \
+            -destination "$DEST" \
+            -archivePath "$ARCHIVE" \
+            CODE_SIGN_STYLE=Automatic CURRENT_PROJECT_VERSION="$BUILD" \
+            -allowProvisioningUpdates "${AUTH[@]}" 2>&1 | tee /tmp/testflight.log
+
+          # -allowProvisioningUpdates is required on export too, not just archive:
+          # the API key authenticates but does not authorise xcodebuild to create
+          # or download profiles, and a fresh runner has none installed.
+          xcodebuild -exportArchive \
+            -archivePath "$ARCHIVE" \
+            -exportPath "$RUNNER_TEMP/export" \
+            -exportOptionsPlist ExportOptions/ExportOptions-AppStore.plist \
+            -allowProvisioningUpdates "${AUTH[@]}" \
+            CURRENT_PROJECT_VERSION="$BUILD" 2>&1 | tee -a /tmp/testflight.log
+
+      # Sentry symbolication. Project.swift carries an "Upload Debug Symbols to
+      # Sentry" build phase, but it is guarded on `which sentry-cli`, which no
+      # GitHub runner has — so every crash from a CI build arrived unsymbolicated
+      # (the 🤯 frames on ICUBE-1). Upload the archive's dSYMs explicitly here,
+      # after export so the build phase cannot run twice. Needs SENTRY_AUTH_TOKEN
+      # (an org auth token from https://provenance-emu.sentry.io/settings/auth-tokens/);
+      # warns and continues without it so symbol upload can never block a release.
+      - name: Upload dSYMs to Sentry
+        if: success()
+        continue-on-error: true
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: provenance-emu
+          SENTRY_PROJECT: icube
+          SENTRY_CLI_VERSION: '2.46.0'
+        run: |
+          set -euo pipefail
+          if [ -z "${SENTRY_AUTH_TOKEN}" ]; then
+            echo "::warning::SENTRY_AUTH_TOKEN not set — crashes from this build will be unsymbolicated in Sentry."
+            exit 0
+          fi
+          curl -fsSL -o "$RUNNER_TEMP/sentry-cli" \
+            "https://github.com/getsentry/sentry-cli/releases/download/${SENTRY_CLI_VERSION}/sentry-cli-Darwin-universal"
+          chmod +x "$RUNNER_TEMP/sentry-cli"
+          "$RUNNER_TEMP/sentry-cli" debug-files upload --include-sources \
+            "$RUNNER_TEMP/iCube-${{ matrix.platform }}.xcarchive/dSYMs"
+
+      # xcbeautify-style filtering hides Run Script output, so the raw log is the
+      # only place some failures appear.
+      - name: Upload raw log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: testflight-log-${{ matrix.platform }}
+          path: /tmp/testflight.log
+          retention-days: 3
+
+      - name: Clean up keychain
+        if: always()
+        run: security delete-keychain "$RUNNER_TEMP/signing.keychain-db" 2>/dev/null || true

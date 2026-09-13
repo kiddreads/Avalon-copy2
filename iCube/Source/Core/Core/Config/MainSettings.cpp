@@ -1,0 +1,1248 @@
+// Copyright 2017 Dolphin Emulator Project
+// SPDX-License-Identifier: GPL-2.0-or-later
+
+#include "Core/Config/MainSettings.h"
+
+#include <sstream>
+
+#include <fmt/format.h>
+
+#include "AudioCommon/AudioCommon.h"
+#include "Common/Assert.h"
+#include "Common/CommonPaths.h"
+#include "Common/CommonTypes.h"
+#include "Common/Config/Config.h"
+#include "Common/EnumMap.h"
+#include "Common/FileUtil.h"
+#include "Common/Logging/Log.h"
+#include "Common/MathUtil.h"
+#include "Common/StringUtil.h"
+#include "Common/Version.h"
+#include "Core/AchievementManager.h"
+#include "Core/Config/DefaultLocale.h"
+#include "Core/HW/EXI/EXI.h"
+#include "Core/HW/EXI/EXI_Device.h"
+#include "Core/HW/GCMemcard/GCMemcard.h"
+#include "Core/HW/HSP/HSP_Device.h"
+#include "Core/HW/Memmap.h"
+#include "Core/HW/SI/SI_Device.h"
+#include "Core/PowerPC/PowerPC.h"
+#include "Core/USBUtils.h"
+#include "DiscIO/Enums.h"
+#include "VideoCommon/VideoBackendBase.h"
+
+namespace Config
+{
+// Main.Core
+
+const Info<bool> MAIN_SKIP_IPL{{System::Main, "Core", "SkipIPL"}, true};
+const Info<PowerPC::CPUCore> MAIN_CPU_CORE{{System::Main, "Core", "CPUCore"},
+                                           PowerPC::DefaultCPUCore()};
+const Info<bool> MAIN_JIT_FOLLOW_BRANCH{{System::Main, "Core", "JITFollowBranch"}, true};
+const Info<bool> MAIN_FASTMEM{{System::Main, "Core", "Fastmem"}, true};
+const Info<bool> MAIN_FASTMEM_ARENA{{System::Main, "Core", "FastmemArena"}, true};
+const Info<bool> MAIN_LARGE_ENTRY_POINTS_MAP{{System::Main, "Core", "LargeEntryPointsMap"}, true};
+const Info<bool> MAIN_ACCURATE_CPU_CACHE{{System::Main, "Core", "AccurateCPUCache"}, false};
+const Info<bool> MAIN_DSP_HLE{{System::Main, "Core", "DSPHLE"}, true};
+const Info<int> MAIN_MAX_FALLBACK{{System::Main, "Core", "MaxFallback"}, 100};
+const Info<int> MAIN_TIMING_VARIANCE{{System::Main, "Core", "TimingVariance"}, 40};
+const Info<bool> MAIN_CORRECT_TIME_DRIFT{{System::Main, "Core", "CorrectTimeDrift"}, false};
+#if defined(ANDROID)
+// Currently enabled by default on Android because the performance boost is really needed.
+constexpr bool DEFAULT_CPU_THREAD = true;
+#else
+constexpr bool DEFAULT_CPU_THREAD = false;
+#endif
+const Info<bool> MAIN_CPU_THREAD{{System::Main, "Core", "CPUThread"}, DEFAULT_CPU_THREAD};
+const Info<bool> MAIN_SYNC_ON_SKIP_IDLE{{System::Main, "Core", "SyncOnSkipIdle"}, true};
+const Info<std::string> MAIN_DEFAULT_ISO{{System::Main, "Core", "DefaultISO"}, ""};
+const Info<bool> MAIN_ENABLE_CHEATS{{System::Main, "Core", "EnableCheats"}, false};
+const Info<int> MAIN_GC_LANGUAGE{{System::Main, "Core", "SelectedLanguage"}, 0};
+const Info<bool> MAIN_OVERRIDE_REGION_SETTINGS{{System::Main, "Core", "OverrideRegionSettings"},
+                                               false};
+const Info<bool> MAIN_DPL2_DECODER{{System::Main, "Core", "DPL2Decoder"}, false};
+const Info<AudioCommon::DPL2Quality> MAIN_DPL2_QUALITY{{System::Main, "Core", "DPL2Quality"},
+                                                       AudioCommon::GetDefaultDPL2Quality()};
+const Info<int> MAIN_AUDIO_LATENCY{{System::Main, "Core", "AudioLatency"}, 20};
+const Info<int> MAIN_AUDIO_BUFFER_SIZE{{System::Main, "Core", "AudioBufferSize"}, 80};
+const Info<bool> MAIN_AUDIO_FILL_GAPS{{System::Main, "Core", "AudioFillGaps"}, true};
+#if defined(__APPLE__)
+const Info<bool> MAIN_AUDIO_STRETCH{{System::Main, "Core", "AudioStretch"}, true};
+#else
+const Info<bool> MAIN_AUDIO_STRETCH{{System::Main, "Core", "AudioStretch"}, false};
+#endif
+const Info<int> MAIN_AUDIO_STRETCH_LATENCY{{System::Main, "Core", "AudioStretchMaxLatency"}, 80};
+const Info<std::string> MAIN_MEMCARD_A_PATH{{System::Main, "Core", "MemcardAPath"}, ""};
+const Info<std::string> MAIN_MEMCARD_B_PATH{{System::Main, "Core", "MemcardBPath"}, ""};
+const Info<std::string>& GetInfoForMemcardPath(ExpansionInterface::Slot slot)
+{
+  ASSERT(ExpansionInterface::IsMemcardSlot(slot));
+  static constexpr Common::EnumMap<const Info<std::string>*, ExpansionInterface::MAX_MEMCARD_SLOT>
+      infos{
+          &MAIN_MEMCARD_A_PATH,
+          &MAIN_MEMCARD_B_PATH,
+      };
+  return *infos[slot];
+}
+const Info<std::string> MAIN_AGP_CART_A_PATH{{System::Main, "Core", "AgpCartAPath"}, ""};
+const Info<std::string> MAIN_AGP_CART_B_PATH{{System::Main, "Core", "AgpCartBPath"}, ""};
+const Info<std::string>& GetInfoForAGPCartPath(ExpansionInterface::Slot slot)
+{
+  ASSERT(ExpansionInterface::IsMemcardSlot(slot));
+  static constexpr Common::EnumMap<const Info<std::string>*, ExpansionInterface::MAX_MEMCARD_SLOT>
+      infos{
+          &MAIN_AGP_CART_A_PATH,
+          &MAIN_AGP_CART_B_PATH,
+      };
+  return *infos[slot];
+}
+const Info<std::string> MAIN_GCI_FOLDER_A_PATH{{System::Main, "Core", "GCIFolderAPath"}, ""};
+const Info<std::string> MAIN_GCI_FOLDER_B_PATH{{System::Main, "Core", "GCIFolderBPath"}, ""};
+const Info<std::string>& GetInfoForGCIPath(ExpansionInterface::Slot slot)
+{
+  ASSERT(ExpansionInterface::IsMemcardSlot(slot));
+  static constexpr Common::EnumMap<const Info<std::string>*, ExpansionInterface::MAX_MEMCARD_SLOT>
+      infos{
+          &MAIN_GCI_FOLDER_A_PATH,
+          &MAIN_GCI_FOLDER_B_PATH,
+      };
+  return *infos[slot];
+}
+const Info<std::string> MAIN_GCI_FOLDER_A_PATH_OVERRIDE{
+    {System::Main, "Core", "GCIFolderAPathOverride"}, ""};
+const Info<std::string> MAIN_GCI_FOLDER_B_PATH_OVERRIDE{
+    {System::Main, "Core", "GCIFolderBPathOverride"}, ""};
+const Info<std::string>& GetInfoForGCIPathOverride(ExpansionInterface::Slot slot)
+{
+  ASSERT(ExpansionInterface::IsMemcardSlot(slot));
+  static constexpr Common::EnumMap<const Info<std::string>*, ExpansionInterface::MAX_MEMCARD_SLOT>
+      infos{
+          &MAIN_GCI_FOLDER_A_PATH_OVERRIDE,
+          &MAIN_GCI_FOLDER_B_PATH_OVERRIDE,
+      };
+  return *infos[slot];
+}
+
+const Info<int> MAIN_MEMORY_CARD_SIZE{{System::Main, "Core", "MemoryCardSize"}, -1};
+
+const Info<ExpansionInterface::EXIDeviceType> MAIN_SLOT_A{
+    {System::Main, "Core", "SlotA"}, ExpansionInterface::EXIDeviceType::MemoryCardFolder};
+const Info<ExpansionInterface::EXIDeviceType> MAIN_SLOT_B{{System::Main, "Core", "SlotB"},
+                                                          ExpansionInterface::EXIDeviceType::None};
+const Info<ExpansionInterface::EXIDeviceType> MAIN_SERIAL_PORT_1{
+    {System::Main, "Core", "SerialPort1"}, ExpansionInterface::EXIDeviceType::None};
+const Info<ExpansionInterface::EXIDeviceType> MAIN_SERIAL_PORT_2{
+    {System::Main, "Core", "SerialPort2"}, ExpansionInterface::EXIDeviceType::None};
+
+const Info<ExpansionInterface::EXIDeviceType>& GetInfoForEXIDevice(ExpansionInterface::Slot slot)
+{
+  static constexpr Common::EnumMap<const Info<ExpansionInterface::EXIDeviceType>*,
+                                   ExpansionInterface::MAX_SLOT>
+      infos{
+          &MAIN_SLOT_A,
+          &MAIN_SLOT_B,
+          &MAIN_SERIAL_PORT_1,
+          &MAIN_SERIAL_PORT_2,
+      };
+  return *infos[slot];
+}
+
+const Info<std::string> MAIN_BBA_MAC{{System::Main, "Core", "BBA_MAC"}, ""};
+const Info<std::string> MAIN_BBA_XLINK_IP{{System::Main, "Core", "BBA_XLINK_IP"}, "127.0.0.1"};
+const Info<bool> MAIN_BBA_XLINK_CHAT_OSD{{System::Main, "Core", "BBA_XLINK_CHAT_OSD"}, true};
+
+// Schthack PSO Server - https://schtserv.com/
+const Info<std::string> MAIN_BBA_BUILTIN_DNS{{System::Main, "Core", "BBA_BUILTIN_DNS"},
+                                             "3.18.217.27"};
+const Info<std::string> MAIN_BBA_TAPSERVER_DESTINATION{
+    {System::Main, "Core", "BBA_TAPSERVER_DESTINATION"}, "/tmp/dolphin-tap"};
+const Info<std::string> MAIN_MODEM_TAPSERVER_DESTINATION{
+    {System::Main, "Core", "MODEM_TAPSERVER_DESTINATION"}, "/tmp/dolphin-modem-tap"};
+const Info<std::string> MAIN_BBA_BUILTIN_IP{{System::Main, "Core", "BBA_BUILTIN_IP"}, ""};
+
+const Info<SerialInterface::SIDevices>& GetInfoForSIDevice(int channel)
+{
+  static const std::array<const Info<SerialInterface::SIDevices>, 4> infos{
+      Info<SerialInterface::SIDevices>{{System::Main, "Core", "SIDevice0"},
+                                       SerialInterface::SIDEVICE_GC_CONTROLLER},
+      Info<SerialInterface::SIDevices>{{System::Main, "Core", "SIDevice1"},
+                                       SerialInterface::SIDEVICE_NONE},
+      Info<SerialInterface::SIDevices>{{System::Main, "Core", "SIDevice2"},
+                                       SerialInterface::SIDEVICE_NONE},
+      Info<SerialInterface::SIDevices>{{System::Main, "Core", "SIDevice3"},
+                                       SerialInterface::SIDEVICE_NONE},
+  };
+  return infos[channel];
+}
+
+const Info<bool>& GetInfoForAdapterRumble(int channel)
+{
+  static const std::array<const Info<bool>, 4> infos{
+      Info<bool>{{System::Main, "Core", "AdapterRumble0"}, true},
+      Info<bool>{{System::Main, "Core", "AdapterRumble1"}, true},
+      Info<bool>{{System::Main, "Core", "AdapterRumble2"}, true},
+      Info<bool>{{System::Main, "Core", "AdapterRumble3"}, true},
+  };
+  return infos[channel];
+}
+
+const Info<bool>& GetInfoForSimulateKonga(int channel)
+{
+  static const std::array<const Info<bool>, 4> infos{
+      Info<bool>{{System::Main, "Core", "SimulateKonga0"}, false},
+      Info<bool>{{System::Main, "Core", "SimulateKonga1"}, false},
+      Info<bool>{{System::Main, "Core", "SimulateKonga2"}, false},
+      Info<bool>{{System::Main, "Core", "SimulateKonga3"}, false},
+  };
+  return infos[channel];
+}
+
+const Info<bool> MAIN_WII_SD_CARD{{System::Main, "Core", "WiiSDCard"}, true};
+const Info<bool> MAIN_WII_SD_CARD_ENABLE_FOLDER_SYNC{
+    {System::Main, "Core", "WiiSDCardEnableFolderSync"}, false};
+const Info<u64> MAIN_WII_SD_CARD_FILESIZE{{System::Main, "Core", "WiiSDCardFilesize"}, 0};
+const Info<bool> MAIN_WII_KEYBOARD{{System::Main, "Core", "WiiKeyboard"}, false};
+const Info<bool> MAIN_WIIMOTE_CONTINUOUS_SCANNING{
+    {System::Main, "Core", "WiimoteContinuousScanning"}, false};
+const Info<std::string> MAIN_WIIMOTE_AUTO_CONNECT_ADDRESSES{
+    {System::Main, "Core", "WiimoteAutoConnectAddresses"}, ""};
+const Info<bool> MAIN_WIIMOTE_ENABLE_SPEAKER{{System::Main, "Core", "WiimoteEnableSpeaker"}, false};
+const Info<bool> MAIN_CONNECT_WIIMOTES_FOR_CONTROLLER_INTERFACE{
+    {System::Main, "Core", "WiimoteControllerInterface"}, false};
+const Info<bool> MAIN_MMU{{System::Main, "Core", "MMU"}, false};
+const Info<bool> MAIN_PAUSE_ON_PANIC{{System::Main, "Core", "PauseOnPanic"}, false};
+const Info<int> MAIN_BB_DUMP_PORT{{System::Main, "Core", "BBDumpPort"}, -1};
+const Info<bool> MAIN_SYNC_GPU{{System::Main, "Core", "SyncGPU"}, false};
+const Info<int> MAIN_SYNC_GPU_MAX_DISTANCE{{System::Main, "Core", "SyncGpuMaxDistance"}, 200000};
+const Info<int> MAIN_SYNC_GPU_MIN_DISTANCE{{System::Main, "Core", "SyncGpuMinDistance"}, -200000};
+const Info<float> MAIN_SYNC_GPU_OVERCLOCK{{System::Main, "Core", "SyncGpuOverclock"}, 1.0f};
+const Info<bool> MAIN_FAST_DISC_SPEED{{System::Main, "Core", "FastDiscSpeed"}, false};
+const Info<bool> MAIN_LOW_DCBZ_HACK{{System::Main, "Core", "LowDCBZHack"}, false};
+const Info<bool> MAIN_FLOAT_EXCEPTIONS{{System::Main, "Core", "FloatExceptions"}, false};
+const Info<bool> MAIN_DIVIDE_BY_ZERO_EXCEPTIONS{{System::Main, "Core", "DivByZeroExceptions"},
+                                                false};
+const Info<bool> MAIN_FPRF{{System::Main, "Core", "FPRF"}, false};
+const Info<bool> MAIN_ACCURATE_NANS{{System::Main, "Core", "AccurateNaNs"}, false};
+const Info<bool> MAIN_DISABLE_ICACHE{{System::Main, "Core", "DisableICache"}, false};
+const Info<float> MAIN_EMULATION_SPEED{{System::Main, "Core", "EmulationSpeed"}, 1.0f};
+#if defined(ANDROID)
+// Currently disabled by default on Android for concern of increased power usage while on battery.
+// It is also not yet exposed in the UI on Android.
+constexpr bool DEFAULT_PRECISION_FRAME_TIMING = false;
+#else
+constexpr bool DEFAULT_PRECISION_FRAME_TIMING = true;
+#endif
+const Info<bool> MAIN_PRECISION_FRAME_TIMING{{System::Main, "Core", "PrecisionFrameTiming"},
+                                             DEFAULT_PRECISION_FRAME_TIMING};
+const Info<float> MAIN_OVERCLOCK{{System::Main, "Core", "Overclock"}, 1.0f};
+const Info<bool> MAIN_OVERCLOCK_ENABLE{{System::Main, "Core", "OverclockEnable"}, false};
+const Info<float> MAIN_VI_OVERCLOCK{{System::Main, "Core", "VIOverclock"}, 1.0f};
+const Info<bool> MAIN_VI_OVERCLOCK_ENABLE{{System::Main, "Core", "VIOverclockEnable"}, false};
+const Info<bool> MAIN_RAM_OVERRIDE_ENABLE{{System::Main, "Core", "RAMOverrideEnable"}, false};
+const Info<u32> MAIN_MEM1_SIZE{{System::Main, "Core", "MEM1Size"}, Memory::MEM1_SIZE_RETAIL};
+const Info<u32> MAIN_MEM2_SIZE{{System::Main, "Core", "MEM2Size"}, Memory::MEM2_SIZE_RETAIL};
+const Info<std::string> MAIN_GFX_BACKEND{{System::Main, "Core", "GFXBackend"},
+                                         VideoBackendBase::GetDefaultBackendConfigName()};
+const Info<HSP::HSPDeviceType> MAIN_HSP_DEVICE{{System::Main, "Core", "HSPDevice"},
+                                               HSP::HSPDeviceType::None};
+const Info<u32> MAIN_ARAM_EXPANSION_SIZE{{System::Main, "Core", "ARAMExpansionSize"}, 0x400000};
+
+const Info<std::string> MAIN_GPU_DETERMINISM_MODE{{System::Main, "Core", "GPUDeterminismMode"},
+                                                  "auto"};
+const Info<s32> MAIN_OVERRIDE_BOOT_IOS{{System::Main, "Core", "OverrideBootIOS"}, -1};
+
+GPUDeterminismMode GetGPUDeterminismMode()
+{
+  auto mode = Config::Get(Config::MAIN_GPU_DETERMINISM_MODE);
+  if (mode == "auto")
+    return GPUDeterminismMode::Auto;
+  if (mode == "none")
+    return GPUDeterminismMode::Disabled;
+  if (mode == "fake-completion")
+    return GPUDeterminismMode::FakeCompletion;
+
+  NOTICE_LOG_FMT(CORE, "Unknown GPU determinism mode {}", mode);
+  return GPUDeterminismMode::Auto;
+}
+
+const Info<std::string> MAIN_PERF_MAP_DIR{{System::Main, "Core", "PerfMapDir"}, ""};
+const Info<bool> MAIN_CUSTOM_RTC_ENABLE{{System::Main, "Core", "EnableCustomRTC"}, false};
+// Measured in seconds since the unix epoch (1.1.1970).  Default is 1.1.2000; there are 7 leap years
+// between those dates.
+const Info<u32> MAIN_CUSTOM_RTC_VALUE{{System::Main, "Core", "CustomRTCValue"},
+                                      (30 * 365 + 7) * 24 * 60 * 60};
+const Info<DiscIO::Region> MAIN_FALLBACK_REGION{{System::Main, "Core", "FallbackRegion"},
+                                                GetDefaultRegion()};
+const Info<bool> MAIN_AUTO_DISC_CHANGE{{System::Main, "Core", "AutoDiscChange"}, false};
+const Info<bool> MAIN_ALLOW_SD_WRITES{{System::Main, "Core", "WiiSDCardAllowWrites"}, true};
+const Info<bool> MAIN_ENABLE_SAVESTATES{{System::Main, "Core", "EnableSaveStates"}, false};
+const Info<bool> MAIN_REAL_WII_REMOTE_REPEAT_REPORTS{
+    {System::Main, "Core", "RealWiiRemoteRepeatReports"}, true};
+const Info<bool> MAIN_WII_WIILINK_ENABLE{{System::Main, "Core", "EnableWiiLink"}, false};
+
+// Empty means use the Dolphin default URL
+const Info<std::string> MAIN_WII_NUS_SHOP_URL{{System::Main, "Core", "WiiNusShopUrl"}, ""};
+
+// Main.Display
+
+const Info<std::string> MAIN_FULLSCREEN_DISPLAY_RES{
+    {System::Main, "Display", "FullscreenDisplayRes"}, "Auto"};
+const Info<bool> MAIN_FULLSCREEN{{System::Main, "Display", "Fullscreen"}, false};
+const Info<bool> MAIN_RENDER_TO_MAIN{{System::Main, "Display", "RenderToMain"}, false};
+const Info<int> MAIN_RENDER_WINDOW_XPOS{{System::Main, "Display", "RenderWindowXPos"}, -1};
+const Info<int> MAIN_RENDER_WINDOW_YPOS{{System::Main, "Display", "RenderWindowYPos"}, -1};
+const Info<int> MAIN_RENDER_WINDOW_WIDTH{{System::Main, "Display", "RenderWindowWidth"}, 640};
+const Info<int> MAIN_RENDER_WINDOW_HEIGHT{{System::Main, "Display", "RenderWindowHeight"}, 480};
+const Info<bool> MAIN_RENDER_WINDOW_AUTOSIZE{{System::Main, "Display", "RenderWindowAutoSize"},
+                                             false};
+const Info<bool> MAIN_KEEP_WINDOW_ON_TOP{{System::Main, "Display", "KeepWindowOnTop"}, false};
+const Info<bool> MAIN_DISABLE_SCREENSAVER{{System::Main, "Display", "DisableScreenSaver"}, true};
+
+// Main.DSP
+
+const Info<bool> MAIN_DSP_THREAD{{System::Main, "DSP", "DSPThread"}, false};
+const Info<bool> MAIN_DSP_CAPTURE_LOG{{System::Main, "DSP", "CaptureLog"}, false};
+const Info<bool> MAIN_DSP_JIT{{System::Main, "DSP", "EnableJIT"}, true};
+const Info<bool> MAIN_DUMP_AUDIO{{System::Main, "DSP", "DumpAudio"}, false};
+const Info<bool> MAIN_DUMP_AUDIO_SILENT{{System::Main, "DSP", "DumpAudioSilent"}, false};
+const Info<bool> MAIN_DUMP_UCODE{{System::Main, "DSP", "DumpUCode"}, false};
+const Info<std::string> MAIN_AUDIO_BACKEND{{System::Main, "DSP", "Backend"},
+                                           AudioCommon::GetDefaultSoundBackend()};
+const Info<int> MAIN_AUDIO_VOLUME{{System::Main, "DSP", "Volume"}, 100};
+const Info<bool> MAIN_AUDIO_MUTED{{System::Main, "DSP", "Muted"}, false};
+const Info<bool> MAIN_AUDIO_MUTE_ON_DISABLED_SPEED_LIMIT{
+    {System::Main, "DSP", "MuteOnDisabledSpeedLimit"}, false};
+const Info<bool> MAIN_AUDIO_USE_COMPUTE_MIXER{{System::Main, "Audio", "UseComputeMixer"}, true};
+#ifdef _WIN32
+const Info<std::string> MAIN_WASAPI_DEVICE{{System::Main, "DSP", "WASAPIDevice"}, "Default"};
+#endif
+
+bool ShouldUseDPL2Decoder()
+{
+  return Get(MAIN_DPL2_DECODER) && !Get(MAIN_DSP_HLE);
+}
+
+// Main.General
+
+const Info<std::string> MAIN_DUMP_PATH{{System::Main, "General", "DumpPath"}, ""};
+const Info<std::string> MAIN_LOAD_PATH{{System::Main, "General", "LoadPath"}, ""};
+const Info<std::string> MAIN_RESOURCEPACK_PATH{{System::Main, "General", "ResourcePackPath"}, ""};
+const Info<std::string> MAIN_FS_PATH{{System::Main, "General", "NANDRootPath"}, ""};
+const Info<std::string> MAIN_WII_SD_CARD_IMAGE_PATH{{System::Main, "General", "WiiSDCardPath"}, ""};
+const Info<std::string> MAIN_WII_SD_CARD_SYNC_FOLDER_PATH{
+    {System::Main, "General", "WiiSDCardSyncFolder"}, ""};
+const Info<std::string> MAIN_WFS_PATH{{System::Main, "General", "WFSPath"}, ""};
+const Info<bool> MAIN_SHOW_LAG{{System::Main, "General", "ShowLag"}, false};
+const Info<bool> MAIN_SHOW_FRAME_COUNT{{System::Main, "General", "ShowFrameCount"}, false};
+const Info<std::string> MAIN_WIRELESS_MAC{{System::Main, "General", "WirelessMac"}, ""};
+const Info<std::string> MAIN_GDB_SOCKET{{System::Main, "General", "GDBSocket"}, ""};
+const Info<int> MAIN_GDB_PORT{{System::Main, "General", "GDBPort"}, -1};
+const Info<int> MAIN_ISO_PATH_COUNT{{System::Main, "General", "ISOPaths"}, 0};
+const Info<std::string> MAIN_SKYLANDERS_PATH{{System::Main, "General", "SkylandersCollectionPath"},
+                                             ""};
+const Info<bool> MAIN_TIME_TRACKING{{System::Main, "General", "EnablePlayTimeTracking"}, true};
+
+static Info<std::string> MakeISOPathConfigInfo(size_t idx)
+{
+  return Config::Info<std::string>{{Config::System::Main, "General", fmt::format("ISOPath{}", idx)},
+                                   ""};
+}
+
+std::vector<std::string> GetIsoPaths()
+{
+  size_t count = MathUtil::SaturatingCast<size_t>(Config::Get(Config::MAIN_ISO_PATH_COUNT));
+  std::vector<std::string> paths;
+  paths.reserve(count);
+  for (size_t i = 0; i < count; ++i)
+  {
+    std::string iso_path = Config::Get(MakeISOPathConfigInfo(i));
+    if (!iso_path.empty())
+      paths.emplace_back(std::move(iso_path));
+  }
+  return paths;
+}
+
+void SetIsoPaths(const std::vector<std::string>& paths)
+{
+  size_t old_size = MathUtil::SaturatingCast<size_t>(Config::Get(Config::MAIN_ISO_PATH_COUNT));
+  size_t new_size = paths.size();
+
+  size_t current_path_idx = 0;
+  for (const std::string& p : paths)
+  {
+    if (p.empty())
+    {
+      --new_size;
+      continue;
+    }
+
+    Config::SetBase(MakeISOPathConfigInfo(current_path_idx), p);
+    ++current_path_idx;
+  }
+
+  for (size_t i = current_path_idx; i < old_size; ++i)
+  {
+    // TODO: This actually needs a Config::Erase().
+    Config::SetBase(MakeISOPathConfigInfo(i), "");
+  }
+
+  Config::SetBase(Config::MAIN_ISO_PATH_COUNT, MathUtil::SaturatingCast<int>(new_size));
+}
+
+// Main.GBA
+
+#ifdef HAS_LIBMGBA
+const Info<std::string> MAIN_GBA_BIOS_PATH{{System::Main, "GBA", "BIOS"}, ""};
+const std::array<Info<std::string>, 4> MAIN_GBA_ROM_PATHS{
+    Info<std::string>{{System::Main, "GBA", "Rom1"}, ""},
+    Info<std::string>{{System::Main, "GBA", "Rom2"}, ""},
+    Info<std::string>{{System::Main, "GBA", "Rom3"}, ""},
+    Info<std::string>{{System::Main, "GBA", "Rom4"}, ""}};
+const Info<std::string> MAIN_GBA_SAVES_PATH{{System::Main, "GBA", "SavesPath"}, ""};
+const Info<bool> MAIN_GBA_SAVES_IN_ROM_PATH{{System::Main, "GBA", "SavesInRomPath"}, false};
+const Info<bool> MAIN_GBA_THREADS{{System::Main, "GBA", "Threads"}, true};
+#endif
+
+// Main.Network
+
+const Info<bool> MAIN_NETWORK_SSL_DUMP_READ{{System::Main, "Network", "SSLDumpRead"}, false};
+const Info<bool> MAIN_NETWORK_SSL_DUMP_WRITE{{System::Main, "Network", "SSLDumpWrite"}, false};
+const Info<bool> MAIN_NETWORK_SSL_VERIFY_CERTIFICATES{
+    {System::Main, "Network", "SSLVerifyCertificates"}, true};
+const Info<bool> MAIN_NETWORK_SSL_DUMP_ROOT_CA{{System::Main, "Network", "SSLDumpRootCA"}, false};
+const Info<bool> MAIN_NETWORK_SSL_DUMP_PEER_CERT{{System::Main, "Network", "SSLDumpPeerCert"},
+                                                 false};
+const Info<bool> MAIN_NETWORK_DUMP_BBA{{System::Main, "Network", "DumpBBA"}, false};
+const Info<bool> MAIN_NETWORK_DUMP_AS_PCAP{{System::Main, "Network", "DumpAsPCAP"}, false};
+// Default value based on:
+//  - [RFC 1122] 4.2.3.5 TCP Connection Failures (at least 3 minutes)
+//  - https://dolp.in/pr8759 hwtest (3 minutes and 10 seconds)
+const Info<int> MAIN_NETWORK_TIMEOUT{{System::Main, "Network", "NetworkTimeout"}, 190};
+
+// Main.Interface
+
+const Info<bool> MAIN_USE_HIGH_CONTRAST_TOOLTIPS{
+    {System::Main, "Interface", "UseHighContrastTooltips"}, true};
+const Info<bool> MAIN_USE_PANIC_HANDLERS{{System::Main, "Interface", "UsePanicHandlers"}, true};
+const Info<bool> MAIN_ABORT_ON_PANIC_ALERT{{System::Main, "Interface", "AbortOnPanicAlert"}, false};
+const Info<bool> MAIN_OSD_MESSAGES{{System::Main, "Interface", "OnScreenDisplayMessages"}, true};
+const Info<bool> MAIN_SKIP_NKIT_WARNING{{System::Main, "Interface", "SkipNKitWarning"}, false};
+const Info<bool> MAIN_CONFIRM_ON_STOP{{System::Main, "Interface", "ConfirmStop"}, true};
+const Info<ShowCursor> MAIN_SHOW_CURSOR{{System::Main, "Interface", "CursorVisibility"},
+                                        ShowCursor::OnMovement};
+const Info<bool> MAIN_LOCK_CURSOR{{System::Main, "Interface", "LockCursor"}, false};
+const Info<std::string> MAIN_INTERFACE_LANGUAGE{{System::Main, "Interface", "LanguageCode"}, ""};
+const Info<bool> MAIN_SHOW_ACTIVE_TITLE{{System::Main, "Interface", "ShowActiveTitle"}, true};
+const Info<bool> MAIN_USE_BUILT_IN_TITLE_DATABASE{
+    {System::Main, "Interface", "UseBuiltinTitleDatabase"}, true};
+const Info<std::string> MAIN_THEME_NAME{{System::Main, "Interface", "ThemeName"},
+                                        DEFAULT_THEME_DIR};
+const Info<bool> MAIN_PAUSE_ON_FOCUS_LOST{{System::Main, "Interface", "PauseOnFocusLost"}, false};
+const Info<bool> MAIN_ENABLE_DEBUGGING{{System::Main, "Interface", "DebugModeEnabled"}, false};
+
+// Main.Analytics
+
+const Info<std::string> MAIN_ANALYTICS_ID{{System::Main, "Analytics", "ID"}, ""};
+const Info<bool> MAIN_ANALYTICS_ENABLED{{System::Main, "Analytics", "Enabled"}, false};
+const Info<bool> MAIN_ANALYTICS_PERMISSION_ASKED{{System::Main, "Analytics", "PermissionAsked"},
+                                                 false};
+
+// Main.GameList
+
+const Info<bool> MAIN_GAMELIST_LIST_DRIVES{{System::Main, "GameList", "ListDrives"}, false};
+const Info<bool> MAIN_GAMELIST_LIST_WAD{{System::Main, "GameList", "ListWad"}, true};
+const Info<bool> MAIN_GAMELIST_LIST_ELF_DOL{{System::Main, "GameList", "ListElfDol"}, true};
+const Info<bool> MAIN_GAMELIST_LIST_WII{{System::Main, "GameList", "ListWii"}, true};
+const Info<bool> MAIN_GAMELIST_LIST_GC{{System::Main, "GameList", "ListGC"}, true};
+const Info<bool> MAIN_GAMELIST_LIST_TRI{{System::Main, "GameList", "ListTriforce"}, true};
+const Info<bool> MAIN_GAMELIST_LIST_JPN{{System::Main, "GameList", "ListJap"}, true};
+const Info<bool> MAIN_GAMELIST_LIST_PAL{{System::Main, "GameList", "ListPal"}, true};
+const Info<bool> MAIN_GAMELIST_LIST_USA{{System::Main, "GameList", "ListUsa"}, true};
+const Info<bool> MAIN_GAMELIST_LIST_AUSTRALIA{{System::Main, "GameList", "ListAustralia"}, true};
+const Info<bool> MAIN_GAMELIST_LIST_FRANCE{{System::Main, "GameList", "ListFrance"}, true};
+const Info<bool> MAIN_GAMELIST_LIST_GERMANY{{System::Main, "GameList", "ListGermany"}, true};
+const Info<bool> MAIN_GAMELIST_LIST_ITALY{{System::Main, "GameList", "ListItaly"}, true};
+const Info<bool> MAIN_GAMELIST_LIST_KOREA{{System::Main, "GameList", "ListKorea"}, true};
+const Info<bool> MAIN_GAMELIST_LIST_NETHERLANDS{{System::Main, "GameList", "ListNetherlands"},
+                                                true};
+const Info<bool> MAIN_GAMELIST_LIST_RUSSIA{{System::Main, "GameList", "ListRussia"}, true};
+const Info<bool> MAIN_GAMELIST_LIST_SPAIN{{System::Main, "GameList", "ListSpain"}, true};
+const Info<bool> MAIN_GAMELIST_LIST_TAIWAN{{System::Main, "GameList", "ListTaiwan"}, true};
+const Info<bool> MAIN_GAMELIST_LIST_WORLD{{System::Main, "GameList", "ListWorld"}, true};
+const Info<bool> MAIN_GAMELIST_LIST_UNKNOWN{{System::Main, "GameList", "ListUnknown"}, true};
+const Info<int> MAIN_GAMELIST_LIST_SORT{{System::Main, "GameList", "ListSort"}, 3};
+const Info<int> MAIN_GAMELIST_LIST_SORT_SECONDARY{{System::Main, "GameList", "ListSortSecondary"},
+                                                  0};
+const Info<bool> MAIN_GAMELIST_COLUMN_PLATFORM{{System::Main, "GameList", "ColumnPlatform"}, true};
+const Info<bool> MAIN_GAMELIST_COLUMN_DESCRIPTION{{System::Main, "GameList", "ColumnDescription"},
+                                                  false};
+const Info<bool> MAIN_GAMELIST_COLUMN_BANNER{{System::Main, "GameList", "ColumnBanner"}, true};
+const Info<bool> MAIN_GAMELIST_COLUMN_TITLE{{System::Main, "GameList", "ColumnTitle"}, true};
+const Info<bool> MAIN_GAMELIST_COLUMN_MAKER{{System::Main, "GameList", "ColumnNotes"}, true};
+const Info<bool> MAIN_GAMELIST_COLUMN_FILE_NAME{{System::Main, "GameList", "ColumnFileName"},
+                                                false};
+const Info<bool> MAIN_GAMELIST_COLUMN_FILE_PATH{{System::Main, "GameList", "ColumnFilePath"},
+                                                false};
+const Info<bool> MAIN_GAMELIST_COLUMN_GAME_ID{{System::Main, "GameList", "ColumnID"}, false};
+const Info<bool> MAIN_GAMELIST_COLUMN_REGION{{System::Main, "GameList", "ColumnRegion"}, true};
+const Info<bool> MAIN_GAMELIST_COLUMN_FILE_SIZE{{System::Main, "GameList", "ColumnSize"}, true};
+const Info<bool> MAIN_GAMELIST_COLUMN_FILE_FORMAT{{System::Main, "GameList", "ColumnFileFormat"},
+                                                  false};
+const Info<bool> MAIN_GAMELIST_COLUMN_BLOCK_SIZE{{System::Main, "GameList", "ColumnBlockSize"},
+                                                 false};
+const Info<bool> MAIN_GAMELIST_COLUMN_COMPRESSION{{System::Main, "GameList", "ColumnCompression"},
+                                                  false};
+const Info<bool> MAIN_GAMELIST_COLUMN_TIME_PLAYED{{System::Main, "GameList", "ColumnTimePlayed"},
+                                                  true};
+const Info<bool> MAIN_GAMELIST_COLUMN_TAGS{{System::Main, "GameList", "ColumnTags"}, false};
+
+// Main.FifoPlayer
+
+const Info<bool> MAIN_FIFOPLAYER_LOOP_REPLAY{{System::Main, "FifoPlayer", "LoopReplay"}, true};
+const Info<bool> MAIN_FIFOPLAYER_EARLY_MEMORY_UPDATES{
+    {System::Main, "FifoPlayer", "EarlyMemoryUpdates"}, false};
+
+// Main.AutoUpdate
+
+const Info<std::string> MAIN_AUTOUPDATE_UPDATE_TRACK{{System::Main, "AutoUpdate", "UpdateTrack"},
+                                                     Common::GetScmUpdateTrackStr()};
+const Info<std::string> MAIN_AUTOUPDATE_HASH_OVERRIDE{{System::Main, "AutoUpdate", "HashOverride"},
+                                                      ""};
+
+// Main.Movie
+
+const Info<bool> MAIN_MOVIE_PAUSE_MOVIE{{System::Main, "Movie", "PauseMovie"}, false};
+const Info<std::string> MAIN_MOVIE_MOVIE_AUTHOR{{System::Main, "Movie", "Author"}, ""};
+const Info<bool> MAIN_MOVIE_DUMP_FRAMES{{System::Main, "Movie", "DumpFrames"}, false};
+const Info<bool> MAIN_MOVIE_DUMP_FRAMES_SILENT{{System::Main, "Movie", "DumpFramesSilent"}, false};
+const Info<bool> MAIN_MOVIE_SHOW_INPUT_DISPLAY{{System::Main, "Movie", "ShowInputDisplay"}, false};
+const Info<bool> MAIN_MOVIE_SHOW_RTC{{System::Main, "Movie", "ShowRTC"}, false};
+const Info<bool> MAIN_MOVIE_SHOW_RERECORD{{System::Main, "Movie", "ShowRerecord"}, false};
+
+// Main.Input
+
+const Info<bool> MAIN_INPUT_BACKGROUND_INPUT{{System::Main, "Input", "BackgroundInput"}, false};
+
+// Main.Debug
+
+const Info<bool> MAIN_DEBUG_JIT_OFF{{System::Main, "Debug", "JitOff"}, false};
+const Info<bool> MAIN_DEBUG_JIT_LOAD_STORE_OFF{{System::Main, "Debug", "JitLoadStoreOff"}, false};
+const Info<bool> MAIN_DEBUG_JIT_LOAD_STORE_LXZ_OFF{{System::Main, "Debug", "JitLoadStorelXzOff"},
+                                                   false};
+const Info<bool> MAIN_DEBUG_JIT_LOAD_STORE_LWZ_OFF{{System::Main, "Debug", "JitLoadStorelwzOff"},
+                                                   false};
+const Info<bool> MAIN_DEBUG_JIT_LOAD_STORE_LBZX_OFF{{System::Main, "Debug", "JitLoadStorelbzxOff"},
+                                                    false};
+const Info<bool> MAIN_DEBUG_JIT_LOAD_STORE_FLOATING_OFF{
+    {System::Main, "Debug", "JitLoadStoreFloatingOff"}, false};
+const Info<bool> MAIN_DEBUG_JIT_LOAD_STORE_PAIRED_OFF{
+    {System::Main, "Debug", "JitLoadStorePairedOff"}, false};
+const Info<bool> MAIN_DEBUG_JIT_FLOATING_POINT_OFF{{System::Main, "Debug", "JitFloatingPointOff"},
+                                                   false};
+const Info<bool> MAIN_DEBUG_JIT_INTEGER_OFF{{System::Main, "Debug", "JitIntegerOff"}, false};
+const Info<bool> MAIN_DEBUG_JIT_PAIRED_OFF{{System::Main, "Debug", "JitPairedOff"}, false};
+const Info<bool> MAIN_DEBUG_JIT_SYSTEM_REGISTERS_OFF{
+    {System::Main, "Debug", "JitSystemRegistersOff"}, false};
+const Info<bool> MAIN_DEBUG_JIT_BRANCH_OFF{{System::Main, "Debug", "JitBranchOff"}, false};
+const Info<bool> MAIN_DEBUG_JIT_REGISTER_CACHE_OFF{{System::Main, "Debug", "JitRegisterCacheOff"},
+                                                   false};
+const Info<bool> MAIN_DEBUG_JIT_ENABLE_PROFILING{{System::Main, "Debug", "JitEnableProfiling"},
+                                                 false};
+
+// Main.BluetoothPassthrough
+
+const Info<bool> MAIN_BLUETOOTH_PASSTHROUGH_ENABLED{
+    {System::Main, "BluetoothPassthrough", "Enabled"}, false};
+const Info<int> MAIN_BLUETOOTH_PASSTHROUGH_VID{{System::Main, "BluetoothPassthrough", "VID"}, -1};
+const Info<int> MAIN_BLUETOOTH_PASSTHROUGH_PID{{System::Main, "BluetoothPassthrough", "PID"}, -1};
+const Info<std::string> MAIN_BLUETOOTH_PASSTHROUGH_LINK_KEYS{
+    {System::Main, "BluetoothPassthrough", "LinkKeys"}, ""};
+
+// Main.USBPassthrough
+
+const Info<bool> MAIN_USB_PASSTHROUGH_DISGUISE_PLAYSTATION_AS_WII{
+    {System::Main, "USBPassthrough", "DisguisePlayStationAsWii"}, true};
+const Info<std::string> MAIN_USB_PASSTHROUGH_DEVICES{{System::Main, "USBPassthrough", "Devices"},
+                                                     ""};
+
+static std::set<USBUtils::DeviceInfo> LoadUSBWhitelistFromString(const std::string& devices_string)
+{
+  std::set<USBUtils::DeviceInfo> devices;
+  for (const auto& pair : SplitString(devices_string, ','))
+  {
+    auto device = USBUtils::DeviceInfo::FromString(pair);
+    if (device)
+      devices.emplace(*device);
+  }
+  return devices;
+}
+
+static std::string SaveUSBWhitelistToString(const std::set<USBUtils::DeviceInfo>& devices)
+{
+  std::ostringstream oss;
+  for (const auto& device : devices)
+    oss << device.ToString() << ',';
+  std::string devices_string = oss.str();
+  if (!devices_string.empty())
+    devices_string.pop_back();
+  return devices_string;
+}
+
+std::set<USBUtils::DeviceInfo> GetUSBDeviceWhitelist()
+{
+  return LoadUSBWhitelistFromString(Config::Get(Config::MAIN_USB_PASSTHROUGH_DEVICES));
+}
+
+void SetUSBDeviceWhitelist(const std::set<USBUtils::DeviceInfo>& devices)
+{
+  Config::SetBase(Config::MAIN_USB_PASSTHROUGH_DEVICES, SaveUSBWhitelistToString(devices));
+}
+
+// Main.EmulatedUSBDevices
+
+const Info<bool> MAIN_EMULATE_SKYLANDER_PORTAL{
+    {System::Main, "EmulatedUSBDevices", "EmulateSkylanderPortal"}, false};
+
+const Info<bool> MAIN_EMULATE_INFINITY_BASE{
+    {System::Main, "EmulatedUSBDevices", "EmulateInfinityBase"}, false};
+
+const Info<bool> MAIN_EMULATE_WII_SPEAK{{System::Main, "EmulatedUSBDevices", "EmulateWiiSpeak"},
+                                        false};
+
+const Info<std::string> MAIN_WII_SPEAK_MICROPHONE{
+    {System::Main, "EmulatedUSBDevices", "WiiSpeakMicrophone"}, ""};
+
+const Info<bool> MAIN_WII_SPEAK_MUTED{{System::Main, "EmulatedUSBDevices", "WiiSpeakMuted"}, true};
+const Info<s16> MAIN_WII_SPEAK_VOLUME_MODIFIER{
+    {System::Main, "EmulatedUSBDevices", "WiiSpeakVolumeModifier"}, 0};
+
+// The reason we need this function is because some memory card code
+// expects to get a non-NTSC-K region even if we're emulating an NTSC-K Wii.
+DiscIO::Region ToGameCubeRegion(DiscIO::Region region)
+{
+  if (region != DiscIO::Region::NTSC_K)
+    return region;
+
+  // GameCube has no NTSC-K region. No choice of replacement value is completely
+  // non-arbitrary, but let's go with NTSC-J since Korean GameCubes are NTSC-J.
+  return DiscIO::Region::NTSC_J;
+}
+
+const char* GetDirectoryForRegion(DiscIO::Region region, RegionDirectoryStyle style)
+{
+  if (region == DiscIO::Region::Unknown)
+    region = ToGameCubeRegion(Config::Get(Config::MAIN_FALLBACK_REGION));
+
+  switch (region)
+  {
+  case DiscIO::Region::NTSC_J:
+    return style == RegionDirectoryStyle::Legacy ? JAP_DIR : JPN_DIR;
+
+  case DiscIO::Region::NTSC_U:
+    return USA_DIR;
+
+  case DiscIO::Region::PAL:
+    return EUR_DIR;
+
+  case DiscIO::Region::NTSC_K:
+    // See ToGameCubeRegion
+    ASSERT_MSG(BOOT, false, "NTSC-K is not a valid GameCube region");
+    return style == RegionDirectoryStyle::Legacy ? JAP_DIR : JPN_DIR;
+
+  default:
+    ASSERT_MSG(BOOT, false, "Default case should not be reached");
+    return EUR_DIR;
+  }
+}
+
+std::string GetBootROMPath(const std::string& region_directory)
+{
+  const std::string path =
+      File::GetUserPath(D_GCUSER_IDX) + DIR_SEP + region_directory + DIR_SEP GC_IPL;
+  if (!File::Exists(path))
+    return File::GetSysDirectory() + GC_SYS_DIR + DIR_SEP + region_directory + DIR_SEP GC_IPL;
+  return path;
+}
+
+std::string GetMemcardPath(ExpansionInterface::Slot slot, std::optional<DiscIO::Region> region,
+                           u16 size_mb)
+{
+  return GetMemcardPath(Config::Get(GetInfoForMemcardPath(slot)), slot, region, size_mb);
+}
+
+std::string GetMemcardPath(std::string configured_filename, ExpansionInterface::Slot slot,
+                           std::optional<DiscIO::Region> region, u16 size_mb)
+{
+  const std::string blocks_string = size_mb < Memcard::MBIT_SIZE_MEMORY_CARD_2043 ?
+                                        fmt::format(".{}", Memcard::MbitToFreeBlocks(size_mb)) :
+                                        "";
+
+  if (configured_filename.empty())
+  {
+    // Use default memcard path if there is no user defined one.
+    const bool is_slot_a = slot == ExpansionInterface::Slot::A;
+    const std::string region_string = Config::GetDirectoryForRegion(
+        Config::ToGameCubeRegion(region ? *region : Config::Get(Config::MAIN_FALLBACK_REGION)));
+    return fmt::format("{}{}.{}{}.raw", File::GetUserPath(D_GCUSER_IDX),
+                       is_slot_a ? GC_MEMCARDA : GC_MEMCARDB, region_string, blocks_string);
+  }
+
+  // Custom path is expected to be stored in the form of
+  // "/path/to/file.{region_code}.raw"
+  // with an arbitrary but supported region code.
+  // Try to extract and replace that region code.
+  // If there's no region code just insert one before the extension.
+
+  std::string dir;
+  std::string name;
+  std::string ext;
+  UnifyPathSeparators(configured_filename);
+  SplitPath(configured_filename, &dir, &name, &ext);
+
+  constexpr std::string_view us_region = "." USA_DIR;
+  constexpr std::string_view jp_region = "." JAP_DIR;
+  constexpr std::string_view eu_region = "." EUR_DIR;
+  std::optional<DiscIO::Region> path_region = std::nullopt;
+  if (name.ends_with(us_region))
+  {
+    name = name.substr(0, name.size() - us_region.size());
+    path_region = DiscIO::Region::NTSC_U;
+  }
+  else if (name.ends_with(jp_region))
+  {
+    name = name.substr(0, name.size() - jp_region.size());
+    path_region = DiscIO::Region::NTSC_J;
+  }
+  else if (name.ends_with(eu_region))
+  {
+    name = name.substr(0, name.size() - eu_region.size());
+    path_region = DiscIO::Region::PAL;
+  }
+
+  const DiscIO::Region used_region =
+      region ? *region : (path_region ? *path_region : Config::Get(Config::MAIN_FALLBACK_REGION));
+  return fmt::format("{}{}.{}{}{}", dir, name,
+                     Config::GetDirectoryForRegion(Config::ToGameCubeRegion(used_region)),
+                     blocks_string, ext);
+}
+
+bool IsDefaultMemcardPathConfigured(ExpansionInterface::Slot slot)
+{
+  return Config::Get(GetInfoForMemcardPath(slot)).empty();
+}
+
+std::string GetGCIFolderPath(ExpansionInterface::Slot slot, std::optional<DiscIO::Region> region)
+{
+  return GetGCIFolderPath(Config::Get(GetInfoForGCIPath(slot)), slot, region);
+}
+
+std::string GetGCIFolderPath(std::string configured_folder, ExpansionInterface::Slot slot,
+                             std::optional<DiscIO::Region> region)
+{
+  if (configured_folder.empty())
+  {
+    const auto region_dir = Config::GetDirectoryForRegion(
+        Config::ToGameCubeRegion(region ? *region : Config::Get(Config::MAIN_FALLBACK_REGION)));
+    const bool is_slot_a = slot == ExpansionInterface::Slot::A;
+    return fmt::format("{}{}/Card {}", File::GetUserPath(D_GCUSER_IDX), region_dir,
+                       is_slot_a ? 'A' : 'B');
+  }
+
+  // Custom path is expected to be stored in the form of
+  // "/path/to/folder/{region_code}"
+  // with an arbitrary but supported region code.
+  // Try to extract and replace that region code.
+  // If there's no region code just insert one at the end.
+
+  UnifyPathSeparators(configured_folder);
+  while (configured_folder.ends_with('/'))
+    configured_folder.pop_back();
+
+  constexpr std::string_view us_region = "/" USA_DIR;
+  constexpr std::string_view jp_region = "/" JPN_DIR;
+  constexpr std::string_view eu_region = "/" EUR_DIR;
+  std::string_view base_path = configured_folder;
+  std::optional<DiscIO::Region> path_region = std::nullopt;
+  if (base_path.ends_with(us_region))
+  {
+    base_path = base_path.substr(0, base_path.size() - us_region.size());
+    path_region = DiscIO::Region::NTSC_U;
+  }
+  else if (base_path.ends_with(jp_region))
+  {
+    base_path = base_path.substr(0, base_path.size() - jp_region.size());
+    path_region = DiscIO::Region::NTSC_J;
+  }
+  else if (base_path.ends_with(eu_region))
+  {
+    base_path = base_path.substr(0, base_path.size() - eu_region.size());
+    path_region = DiscIO::Region::PAL;
+  }
+
+  const DiscIO::Region used_region =
+      region ? *region : (path_region ? *path_region : Config::Get(Config::MAIN_FALLBACK_REGION));
+  return fmt::format("{}/{}", base_path,
+                     Config::GetDirectoryForRegion(Config::ToGameCubeRegion(used_region),
+                                                   Config::RegionDirectoryStyle::Modern));
+}
+
+bool IsDefaultGCIFolderPathConfigured(ExpansionInterface::Slot slot)
+{
+  return Config::Get(GetInfoForGCIPath(slot)).empty();
+}
+
+bool AreCheatsEnabled()
+{
+  return Config::Get(::Config::MAIN_ENABLE_CHEATS);
+}
+
+bool IsDebuggingEnabled()
+{
+  return Config::Get(::Config::MAIN_ENABLE_DEBUGGING) &&
+         !AchievementManager::GetInstance().IsHardcoreModeActive();
+}
+
+// --- iCube re-baseline: carried custom Config keys ---
+// INVERTED DEFAULT (false) on this Apple-only fork: the iFly fork measured "remove prefetch on Apple
+// Silicon = +33%" — the manual __builtin_prefetch hints fight Apple's hardware prefetcher, so the FAST
+// state is NO hints. The CIR consumer (CachedInterpreter.cpp) emits hints ONLY when this is true, so
+// the default-off path is byte-identical to the current no-hints HEAD. Flip ON to A/B on-device
+// (expected SLOWER on Apple). Bare false (no platform guard) like the other inlined Apple-fork toggles.
+const Info<bool> MAIN_CACHED_INTERPRETER_PREFETCH{{System::Main, "Core", "CachedInterpreterPrefetch"}, false};
+
+// iOS/tvOS-only fork: these idle-detection toggles default ON (the value of Joe's
+// kDefault* constexprs on Apple mobile); inlined to avoid carrying the platform-guard block.
+const Info<bool> MAIN_FAST_FORWARD_CTR_IDLE{{System::Main, "Core", "FastForwardCtrIdle"}, true};
+
+const Info<bool> MAIN_FP_FAST{{System::Main, "Core", "FpFast"}, false};
+
+const Info<bool> MAIN_RELAXED_IDLE_DETECTION{{System::Main, "Core", "RelaxedIdleDetection"}, true};
+// iCube: skip per-block PMC update on the CachedInterpreter (~4% on CPU-bound titles). Default
+// false (PMC emulated for correctness); flip true to A/B the speedup on titles that don't read PMC.
+const Info<bool> MAIN_CIR_SKIP_PERF_MONITOR{{System::Main, "Core", "CIRSkipPerfMonitor"}, false};
+// iCube: emit specialized, directly-dispatched callbacks for a small whitelist of hot integer-ALU
+// PowerPC ops on the CachedInterpreter. Collapses the two indirect calls (dispatch + per-op handler
+// trampoline) into a direct, inlinable call (full body inline under ThinLTO). Default false (generic
+// path, identical to upstream); flip true to A/B the speedup. RESEARCH-GRADE, MEASUREMENT-GATED.
+// iCube 2509 re-baseline: defaulted ON. (It was briefly reverted to OFF when a no-audio report
+// coincided with this flip — but that turned out to be a device on the silent switch, NOT
+// specialized-ops, so the win is restored.) The path is self-validating
+// (MAIN_CIR_SPECIALIZED_OPS_VALIDATE double-runs each ALU op against the generic Interpreter handler
+// and single-run-checks the load/store bookkeeping), and the dispatched handler is the SAME
+// Interpreter::name function the generic path would call, just by a direct/inlinable pointer. Flip
+// OFF (on-device toggle) to A/B back to the stock pointer-compare chain.
+const Info<bool> MAIN_CIR_SPECIALIZED_OPS{{System::Main, "Core", "CIRSpecializedOps"}, true};
+// iCube: self-validation for CIRSpecializedOps. When true, every specialized callback re-derives the
+// dispatch bookkeeping (pc/npc/return-distance) on a scratch copy and asserts it matches the generic
+// Interpret<write_pc> trampoline contract before committing the real handler. Catches integration
+// bugs (wrong write_pc, wrong return distance, payload mismatch) — NOT handler math (by construction
+// the same Interpreter:: function). Default false; flip true during on-device correctness passes.
+const Info<bool> MAIN_CIR_SPECIALIZED_OPS_VALIDATE{
+    {System::Main, "Core", "CIRSpecializedOpsValidate"}, false};
+// iCube Phase-0 gate-0 SECONDARY/confirmatory discriminators (default 0 = inert). See MainSettings.h and
+// the compile-time CIR_TAPE_PAD_BYTES pad (the decisive knob) in CachedInterpreterEmitter.h.
+const Info<int> MAIN_CIR_TAPE_PREFETCH_DIST{{System::Main, "Core", "CIRTapePrefetchDist"}, 0};
+const Info<int> MAIN_CIR_TAPE_THRASH_STRIDE{{System::Main, "Core", "CIRTapeThrashStride"}, 0};
+// iCube: FP load/store specialization — the FP analogue of MAIN_CIR_SPECIALIZED_OPS, but as its OWN
+// default-OFF flag so it can be A/B-tested on device independently of the (default-ON) integer
+// specialization. Routes the hot FP D-form/indexed load/stores (lfs/lfsu/lfd/lfdu/stfs/stfsu/stfd/stfdu
+// and the X-form lfsx/lfsux/lfdx/lfdux/stfsx/stfsux/stfdx/stfdux/stfiwx) through the same specialized
+// DIRECT jump-table dispatch the integer ops use — one direct, inlinable Interpreter::name call — instead
+// of the generic Interpret<write_pc> trampoline (which costs an extra indirect operands.func call per op).
+// Targets the FP-heavy hottest title (Chibi-Robo: lfs/stfs/lfd/stfd/psq_l dominate the profile).
+//
+// ELIGIBLE BY CONSTRUCTION (do not re-litigate): with both jo.fp_exceptions and jo.div_by_zero_exceptions
+// off (the App-Store jitless default) ShouldHandleFPExceptionForInstruction is always false, and with
+// jo.memcheck off the DoJit guard `(jo.memcheck && FL_LOADSTORE)` is false — so these FP load/stores fall
+// into the SAME else-branch of DoJit where the generic path emits a plain Interpret<write_pc> (NOT
+// InterpretAndCheckExceptions). The specialized switch invokes the exact same Interpreter::name handler the
+// generic GetInterpreterOp returned, so specialized ≡ generic by construction (only the call is direct).
+// The DoJit if/else gates this: when fp-exceptions OR memcheck are ON these ops take the `if` branch
+// (InterpretAndCheckExceptions) and are NEVER specialized; they specialize ONLY in the else branch, i.e.
+// exactly when the generic path would have used Interpret<write_pc>. CheckFPU is still emitted once per
+// block at the first FP instruction, independent of specialization. Single-run validated only (loads can
+// read MMIO, stores write memory — NEVER double-run): reuses MAIN_CIR_SPECIALIZED_OPS_VALIDATE (the
+// single-run LS bookkeeping check is handler-agnostic), so there is no separate FP-LS validate flag.
+// Default OFF pending on-device A/B; flag-off the emitted callback stream is byte-identical to baseline
+// (no marker callback is ever written for FP-LS — they fall through to the unchanged generic emit).
+const Info<bool> MAIN_CIR_SPECIALIZED_FP_LS{{System::Main, "Core", "CIRSpecializedFpLs"}, false};
+// iCube: paired-single quantized load/store DISPATCH specialization — the psq analogue of
+// MAIN_CIR_SPECIALIZED_FP_LS, again as its OWN default-OFF flag so it can be A/B-tested on device
+// independently of both the (default-ON) integer specialization and the FP-LS flag. Routes the hot psq
+// quantized paired load/stores (D-form psq_l/psq_lu/psq_st/psq_stu and the primary-4 indexed
+// psq_lx/psq_lux/psq_stx/psq_stux) through the same specialized DIRECT jump-table dispatch — one direct,
+// inlinable Interpreter::name call — instead of the generic Interpret<write_pc> trampoline (which costs an
+// extra indirect operands.func call per op). psq_l is the SINGLE hottest op in the target title
+// (Chibi-Robo's rank-1 block is five psq_l), so this is the highest-value dispatch cut after FP-LS.
+//
+// ELIGIBLE BY CONSTRUCTION (do not re-litigate; same argument as FP-LS): psq_l/psq_st are FL_LOADSTORE +
+// FL_USE_FPU. With both jo.fp_exceptions and jo.div_by_zero_exceptions off (the App-Store jitless default)
+// ShouldHandleFPExceptionForInstruction is always false, and with jo.memcheck off the DoJit guard
+// `(jo.memcheck && FL_LOADSTORE)` is false — so these fall into the SAME else-branch of DoJit where the
+// generic path emits a plain Interpret<write_pc> (NOT InterpretAndCheckExceptions). The HID2.LSQE privilege
+// check and the GQR quantization/dequantization both live INSIDE the handler (Interpreter::psq_l etc.);
+// specialization just calls that SAME handler by a direct, inlinable pointer instead of via the indirect
+// operands.func — so specialized ≡ generic by construction (only the call is direct). The DoJit if/else
+// gates this: when fp-exceptions OR memcheck are on these take the `if` branch and are NEVER specialized.
+// CheckFPU is still emitted once per block, untouched.
+//
+// ORTHOGONAL to MAIN_CIR_PSQ_FASTPATH: that flag is a COMPUTE optimization inside the dequant/quant switch
+// of the handler body; this flag only changes how the handler is CALLED. They compose (as does PS_NEON).
+// Single-run validated only (psq_l reads memory/MMIO, psq_st writes — NEVER double-run): reuses
+// MAIN_CIR_SPECIALIZED_OPS_VALIDATE (the single-run LS bookkeeping check is handler-agnostic), so there is
+// no separate psq validate flag. Default OFF pending on-device A/B; flag-off the emitted callback stream is
+// byte-identical to baseline (no marker callback is ever written for psq — they fall through to the
+// unchanged generic emit).
+const Info<bool> MAIN_CIR_SPECIALIZED_PSQ{{System::Main, "Core", "CIRSpecializedPsq"}, false};
+// iCube: FP + paired-single ARITHMETIC DISPATCH specialization — the arithmetic analogue of
+// MAIN_CIR_SPECIALIZED_FP_LS, again as its OWN default-OFF flag so it can be A/B-tested on device
+// independently of the (default-ON) integer specialization, the FP-LS flag, and the psq flag. Routes the
+// hot FP arith/compare/FPSCR ops (faddx/fmulx/fmaddx/frspx/fcmpu/... ) and the paired-single arith ops
+// (ps_add/ps_madd/ps_merge*/ps_sel/... ) through the same specialized DIRECT jump-table dispatch the
+// integer/FP-LS/psq ops use — one direct, inlinable Interpreter::name call — instead of the generic
+// Interpret<write_pc> trampoline (which costs an extra indirect operands.func call per op). Targets the
+// FP-heavy hottest titles (Tony Hawk: FP+PS arithmetic dispatch is ~9% of cycles).
+//
+// ELIGIBLE BY CONSTRUCTION (do not re-litigate; same argument as FP-LS/psq): these are FL_USE_FPU but NOT
+// FL_LOADSTORE — pure register-file/FPSCR ops. With both jo.fp_exceptions and jo.div_by_zero_exceptions off
+// (the App-Store jitless default) ShouldHandleFPExceptionForInstruction is always false, so the DoJit guard
+// `(!canEndBlock && ShouldHandleFPExceptionForInstruction)` is false and the generic path emits a plain
+// Interpret<write_pc> (NOT InterpretAndCheckExceptions). The specialized switch invokes the exact same
+// Interpreter::name handler the generic GetInterpreterOp returned, so specialized ≡ generic by construction
+// (only the call is direct). The pass ONLY rewrites plain Interpret/InterpretPC ops; anything ever lowered as
+// InterpretChk (fp-exceptions on / memcheck) auto-skips, so over-inclusion is safe. CheckFPU is still emitted
+// once per block at the first FP instruction, independent of specialization.
+//
+// DOUBLE-RUN-VALIDATE-SAFE (unlike FP-LS/psq): register-file/FPSCR-only and idempotent, no memory writes, no
+// MMIO reads — so these are deliberately NOT added to IsLoadStoreSpecOp and take the ALU double-run validate
+// path. The actual double-run check reuses MAIN_CIR_SPECIALIZED_OPS_VALIDATE (the regime is selected by
+// IsLoadStoreSpecOp, handler-agnostic). MAIN_CIR_SPECIALIZED_FP_ARITH_VALIDATE below is declared for symmetry
+// with the rest of the specialized family and is not separately read (mirrors how FP-LS/psq have no separate
+// validate read). Default OFF pending on-device A/B; flag-off the emitted callback stream is byte-identical to
+// baseline (no marker callback is ever written for these — they fall through to the unchanged generic emit).
+const Info<bool> MAIN_CIR_SPECIALIZED_FP_ARITH{{System::Main, "Core", "CIRSpecializedFpArith"}, false};
+const Info<bool> MAIN_CIR_SPECIALIZED_FP_ARITH_VALIDATE{
+    {System::Main, "Core", "CIRSpecializedFpArithValidate"}, false};
+// iCube: CachedInterpreter block linking. When a block ends at a STATIC direct branch (bx/bcx) whose
+// target block is already compiled with matching feature_flags, let the block continue DIRECTLY into
+// the target's callback stream instead of round-tripping through the dispatcher (Dispatch +
+// GetBlockFromStartAddress, ~3.6% on F-Zero). Reuses the upstream JitBaseBlockCache link/unlink
+// bookkeeping (FinalizeBlock(block_link)/LinkBlock/UnlinkBlock/DestroyBlock); the CIR only supplies
+// the trampoline emission and a real WriteLinkBlock that patches a relative distance. The link
+// callback ALWAYS re-checks the slice boundary (downcount<=0 -> exit so CoreTiming::Advance can
+// service the decrementer/external interrupts) and the npc==expected_pc guard (fail-safe: any
+// mismatch deopts to the dispatcher, never executes the wrong stream). Default ON: the wedge risk is
+// closed by the ExecuteOneBlock safety guard (per-hop Running re-check + a 256-hop dispatcher-yield
+// cap), the npc==expected_pc guard keeps it correctness-safe by construction, and on-device testing
+// showed no crashes. The biggest CIR dispatch win. Flip OFF (on-device toggle) to A/B.
+const Info<bool> MAIN_CIR_BLOCK_LINKING{{System::Main, "Core", "CIRBlockLinking"}, true};
+// iCube: self-validation for CIRBlockLinking. When true, the link callback — before following any
+// patched distance — re-resolves the next block the dispatcher WOULD have selected
+// (GetBlockFromStartAddress(npc, feature_flags)) and asserts (a) it exists, (b) its normalEntry is
+// exactly callback_site+distance (the patched rel is not stale and points at the right block),
+// (c) its feature_flags match the current ppc_state (no MSR/IR/DR context divergence across the
+// link), and (d) downcount>0 at the moment we follow. Catches stale-rel, wrong-target, and
+// feature-flag-divergence bugs directly. Slow (a map lookup per linked exit) — debug builds / on-
+// device correctness passes only. Default false.
+const Info<bool> MAIN_CIR_BLOCK_LINKING_VALIDATE{
+    {System::Main, "Core", "CIRBlockLinkingValidate"}, false};
+// iCube WIN#1: PIC (position-independent-code) direct-pointer load/store on the CachedInterpreter.
+// Integer D-form/X-form load/stores resolve the host RAM pointer directly and do the access with the
+// correct endian swap, bypassing the per-access MMU/region lookup (~15% on memory-bound titles).
+// Default TRUE so on-device A/B starts enabled. The fast path is ALWAYS additionally gated at the
+// emission site on !jo.memcheck (MMU-mode/watchpoints take the generic exception path), jo.fastmem,
+// and integer-only (FL_LOADSTORE && !FL_USE_FPU) regardless of this flag; anything the fast path does
+// not cover delegates to the exact generic interpreter handler. UNVALIDATED on-device — needs a
+// bit-exact dual-run A/B before shipping enabled.
+const Info<bool> MAIN_CIR_PIC_LOADSTORE{{System::Main, "Core", "CIRPICLoadStore"}, true};
+// iCube WIN#2: CachedInterpreter micro-op fusion + CONST32 folding. When on, DoJit recognizes runs of
+// fusable pure-register integer/immediate ops and emits ONE ExecuteMicroOps callback (a computed-goto
+// C++ dispatch over a packed MicroOp array) instead of N generic Interpret trampolines, and folds the
+// addis rt,r0,hi; ori rt,rt,lo idiom into a single CONST32 immediate write (~13% on ALU-bound titles).
+// Jitless-legal (pure C++ execution, no codegen, no W^X). Default FALSE: the entire fusion path in
+// DoJit (CONST32, CONST32_ADDRA, and the ALU packer, including the i-advancement) is gated on this
+// flag, so flag-off DoJit is byte-identical to upstream. RISKIEST of the CIR wins — the fused handlers
+// hand-roll CR0/XER side-effects. Default ON: a code audit confirmed the fused handlers match the
+// real Interpreter (CONST32_ADDRA correctly does (ra+(hi<<16))|lo, the ALU packer is pure-register),
+// the MAIN_CIR_MICROOP_FUSION_VALIDATE harness double-runs each fused op against the generic handler
+// and asserts equality, and on-device testing showed no crashes. Flip OFF (on-device toggle) to A/B,
+// or enable the VALIDATE flag for a bit-exact correctness session.
+const Info<bool> MAIN_CIR_MICROOP_FUSION{{System::Main, "Core", "CIRMicroOpFusion"}, true};
+// iCube: self-validation for CIRMicroOpFusion. When true, every fused ExecuteMicroOps callback FIRST
+// runs the equivalent GENERIC per-op interpretation — the actual Interpreter:: handlers for the
+// ORIGINAL consumed PowerPC instructions (the addis/ori CONST32 fold runs BOTH original handlers) —
+// on the live state, snapshots the resulting GPR/CR/XER(ca,so_ov)/pc/npc/Exceptions, restores, then
+// runs the fused MicroOp dispatch and asserts the same architectural state matches. This is the
+// EXACT analogue of MAIN_CIR_SPECIALIZED_OPS_VALIDATE's double-run, but here the reference is the
+// real interpreter (the fused handlers hand-roll CR0/XER, so this is the check that catches the
+// Luigi's-Mansion-class semantic divergence — unlike specialized ops, the fused math is NOT the same
+// function by construction). The packed ops are pure-register (no LS/FP/MMIO — is_simple_mop excludes
+// them), so double-running is side-effect-safe. Slow (an extra full reference run per fused block);
+// on-device correctness passes only. Default false. Flip ON to A/B-verify fusion before shipping it.
+const Info<bool> MAIN_CIR_MICROOP_FUSION_VALIDATE{
+    {System::Main, "Core", "CIRMicroOpFusionValidate"}, false};
+// iCube: Dive-2 Rank-1 cross-block TAIL-LINK. INTENDED behavior: when a block is linked and all the
+// existing MAIN_CIR_BLOCK_LINKING guards pass (downcount>0, npc==expected_pc, non-stale rel, matching
+// feature_flags, not single-stepping/breakpointing), [[clang::musttail]]-branch straight into the next
+// block's first handler instead of returning the relative distance through ExecuteOneBlock's dispatch
+// loop — eliminating the per-hop callback reload + marker-compare overhead that survives even after
+// MAIN_CIR_BLOCK_LINKING already removed the Dispatch() table-lookup round-trip.
+//
+// STATUS: RESERVED / NOT IMPLEMENTED. The CIR dispatch ABI is distance-return: every handler has the
+// shape `s32 cb(PowerPCState&, const void* operands)` and returns the BYTE DISTANCE to the next
+// callback, which ExecuteOneBlock adds to the CURRENT cursor (`normal_entry += distance`). A musttail
+// from LinkBlock into the destination block's first handler would make that handler's return value —
+// a distance relative to the DESTINATION callback site — propagate back as LinkBlock's return, where
+// the loop adds it to the LINKBLOCK cursor. That corrupts the cursor (a silent wrong-stream / stale-
+// link execution = decrementer/interrupt starvation = hang, NOT a compile error). A correct musttail
+// requires converting EVERY handler to a uniform cursor-threaded `(PowerPCState&, cursor)` shape that
+// ends the chain with `return 0` — i.e. a second, parallel dispatch model. That cannot be flag-off
+// byte-identical without compiling two dispatchers, and is the CPython "1-5%" threaded-interp trap the
+// synthesis doc explicitly ranks against. The reference good branch (feature/icube-testflight) confirms
+// the same distance-return shape (LinkToBlockEndDistance returns the distance); no threaded handler
+// model exists to port. The flag is reserved here (default false, currently UNREAD by the CIR) so the
+// parent can wire a UI toggle without a follow-up MainSettings edit; flipping it has NO effect today.
+const Info<bool> MAIN_CIR_TAIL_LINK{{System::Main, "Core", "CIRTailLink"}, false};
+// iCube: CachedInterpreter hot-block profiler (Flycast/PPSSPP-style sampler). When ON, the CIR
+// accumulates a per-block run-count + total emulated cycles keyed by the block ENTRY guest PC, into
+// a pre-sized fixed open-addressing table (no rehash, lock-free for the cross-thread report read).
+// The block's existing per-block cycle count (the SAME value charged to downcount) is reused — NO
+// per-instruction timing is added. A top-N dump (NSLog + the in-emulation "Copy State" clipboard
+// dump) reports the hottest blocks so we can tell whether time concentrates in a few specializable
+// blocks or spreads evenly (a true throughput wall), and flag any spin/idle loop the idle detector
+// missed (high run-count + tiny cycles/run). Default FALSE: the accumulation is gated once per block
+// on this flag (read once in Init alongside the other CIR flags), so the per-INSTRUCTION hot path in
+// ExecuteOneBlock is byte-for-byte untouched and the flag-off build pays nothing measurable. Flip ON
+// (config key or the icube.cirProfile NSUserDefault) for a profiling session, then Copy State.
+const Info<bool> MAIN_CIR_PROFILE{{System::Main, "Core", "CIRProfile"}, false};
+// iCube: CachedInterpreter dead CR-flag elimination. PowerPC `.`(Rc) integer ops set CR0 and FP Rc ops
+// set CR1; the analyzer (PPCAnalyst) already proves which of those CR results are OVERWRITTEN before any
+// branch/mfcr reads them (op.crDiscardable) and resets that set to empty at every exception/block-exit/
+// interrupt boundary, so a field marked discardable can never be observed. When ON, DoJit skips the CR
+// computation for an Rc-form op whose ENTIRE crOut is discardable, by emitting the op with the Rc bit
+// cleared in a LOCAL copy of its instruction word (the same battle-tested handler then computes the
+// identical GPR result minus the dead flag — no hand-rolled flag math, no new handlers). This is the
+// interpreter equivalent of JitArm64's gpr.DiscardCRRegisters(op.crDiscardable) (skip, never reconstruct),
+// which ships the SAME analyzer data across all titles. The big jitless win: a `.`-op's CR0 update is a
+// large slice of its per-op cost and is dead far more often than not in real code. Default FALSE: when off
+// NO instruction word is ever rewritten and the emitted stream is byte-identical to the flag-off baseline,
+// so this is opt-in A/B + profiler-measured before defaulting on. Flip the VALIDATE flag for a bit-exact
+// correctness session. XER (CA/OV) elimination is intentionally OUT of this first pass (CR0 is the win).
+const Info<bool> MAIN_CIR_DEAD_FLAG_ELIM{{System::Main, "Core", "CIRDeadFlagElim"}, false};
+// iCube: self-validation for CIRDeadFlagElim. EXACT analogue of the Micro-Op Fusion / Specialized-Ops
+// double-run validate harnesses. When ON, every dead-flag-eliminated op runs BOTH ways at execution time:
+// first the REFERENCE (original instruction, Rc set -> CR computed) on the live state, snapshotting the
+// resulting CR fields; then it restores and runs the ELIMINATED form (Rc cleared -> dead CR skipped), the
+// SHIPPING path committed last. It then ASSERTs that every CR field EXCEPT the ones this op was allowed to
+// eliminate (its crOut, all proven discardable) is byte-identical between the two runs — i.e. the
+// elimination touched nothing LIVE. This catches the only real risk (eliminating a field that is actually
+// read downstream), since the analyzer liveness itself is JIT-proven. Slow (an extra reference run per
+// eliminated op); on-device correctness passes only. Default false.
+const Info<bool> MAIN_CIR_DEAD_FLAG_ELIM_VALIDATE{
+    {System::Main, "Core", "CIRDeadFlagElimValidate"}, false};
+// iCube IR engine (CPUCore 6, experimental, NON-DEFAULT) Milestone 2: dead CR-flag elimination as the
+// FIRST optimizer pass over the explicit IRInst vector. SAME transform and SAME PPCAnalyst liveness as
+// the shipping CachedInterpreter's MAIN_CIR_DEAD_FLAG_ELIM (above) — an Rc-form op whose ENTIRE crOut is
+// proven discardable (overwritten before any branch/mfcr reads it, with crDiscardable reset at every
+// exception/block-exit/interrupt boundary so a discardable field is never observed) has the Rc bit cleared
+// in its lowered instruction word, so the same opcode-keyed handler computes the identical GPR result minus
+// the dead CR. Distinct flag from the CIR's because this gates the IR engine's post-lowering pass stage,
+// not the CIR's emit-time skip; the two engines are independent. Default FALSE: when off the IR pass stage
+// makes ZERO edits and the lowered vector is byte-identical to the M1 1:1 lowering.
+const Info<bool> MAIN_CIR_IR_DEAD_FLAG_ELIM{{System::Main, "Core", "CIRIRDeadFlagElim"}, false};
+// iCube IR engine M2: self-validation twin for MAIN_CIR_IR_DEAD_FLAG_ELIM. EXACT analogue of the CIR's
+// MAIN_CIR_DEAD_FLAG_ELIM_VALIDATE. The M1 DOLPHIN_IR_VALIDATE (1:1 lowering-vs-M0-tape check) deliberately
+// does NOT apply to optimized blocks (the pass makes the IR differ from the M0 tape on purpose), so this is
+// the optimizer-pass validate mode. When ON, every eliminated op double-runs at execution time: first the
+// REFERENCE (original Rc-set inst, CR computed) on a snapshot, then the ELIMINATED (Rc-cleared, dead CR
+// skipped — the SHIPPING form, committed last), and ASSERTs every CR field OUTSIDE the eliminated crOut
+// (all the LIVE / continuation-read fields) is byte-identical between the two runs. Catches a wrongly-
+// eliminated live flag, the only real risk since the analyzer liveness is JIT-proven. Slow; correctness
+// passes only. Default false.
+const Info<bool> MAIN_CIR_IR_DEAD_FLAG_ELIM_VALIDATE{
+    {System::Main, "Core", "CIRIRDeadFlagElimValidate"}, false};
+// iCube IR engine (CPUCore 6) Milestone 4: constant-address fusion. The FIRST optimizer pass that the
+// shipping data-interpreted CachedInterpreter cannot easily do — it requires the explicit IRInst layer.
+// Every hot block builds 32-bit base addresses with an `lis rX,hi` (addis rX,r0,hi) immediately followed by
+// an `addi/addis/subi/ori rX,rX,lo`: two interpreter dispatches to materialize one constant into rX. This
+// pass walks the lowered IR vector and, whenever it sees that exact adjacent pair (both plain
+// Interpret<false> ops, same rX written-and-read, rX!=0), folds it into ONE SetRegConst op that just writes
+// the precomputed u32 — halving the dispatch on the single most common pattern in the profiles. Safe by
+// construction: addi/addis/ori (OPCD 14/15/24) have no record form, set no CR/CA, touch no memory, and raise
+// no exception, so matching the exact opcode IS the flag/exception exclusion. Default FALSE: when off the
+// pass never runs and the lowered vector is byte-identical to the M3 lowering.
+const Info<bool> MAIN_CIR_IR_CONST_FUSION{{System::Main, "Core", "CIRIRConstFusion"}, false};
+// iCube IR engine M4: self-validation twin for MAIN_CIR_IR_CONST_FUSION. When ON, every fused SetRegConst
+// op double-runs at execution time: first the REFERENCE (the original two ops, run via the interpreter on a
+// snapshot of rX), capturing the resulting rX, then RESTORES rX and commits the SHIPPING form
+// (gpr[rX]=precomputed value, run last), and ASSERTs the two rX results are byte-identical. The two ops write
+// only gpr[rX] (no CR/CA/mem/pc), so the diff is scoped to that one register. Catches a mis-folded constant.
+// Slow; correctness only. Default false.
+const Info<bool> MAIN_CIR_IR_CONST_FUSION_VALIDATE{
+    {System::Main, "Core", "CIRIRConstFusionValidate"}, false};
+// iCube IR engine (CPUCore 6) Milestone 5: micro-op fusion. Ports the shipping CachedInterpreter's proven
+// micro-op fusion (MAIN_CIR_MICROOP_FUSION) to the IR engine as an optimizer pass. Straight-line integer code
+// — the bulk of every block — is a run of plain Interpret<false> ALU ops, each costing one IRInst dispatch
+// (switch + branch + call). This pass coalesces maximal runs of consecutive fusible integer-ALU ops (the
+// exact is_simple_mop opcode allowlist the CIR uses: no Rc-controlled-live CR, no exception, no PC write, no
+// load/store) into ONE FusedAluRun op whose handler runs the run in a tight inner loop, calling each op's
+// interpreter func in order — collapsing N dispatches to one. Block-linking-safe: a run breaks at any
+// terminal/control/check, so the M3 EndBlockLink invariants are untouched. Default FALSE: when off the pass
+// never runs and the lowered vector is byte-identical to the M4 lowering.
+const Info<bool> MAIN_CIR_IR_MICROOP_FUSION{{System::Main, "Core", "CIRIRMicroOpFusion"}, false};
+// iCube IR engine M5: self-validation twin for MAIN_CIR_IR_MICROOP_FUSION. When ON, every FusedAluRun op
+// double-runs at execution time: snapshot the PPC state, run the run un-fused (one interpreter call per op),
+// capture the result, restore, then run the fused form (the SHIPPING path, committed last), and assert the
+// full GPR/CR/XER/PC state is byte-identical. The fused path calls the SAME funcs in the SAME order, so this
+// proves the PASS built the run correctly (right funcs/insts, right boundary), not that two arithmetic
+// implementations agree (there is only one). Slow; correctness only. Default false.
+const Info<bool> MAIN_CIR_IR_MICROOP_FUSION_VALIDATE{
+    {System::Main, "Core", "CIRIRMicroOpFusionValidate"}, false};
+// iCube IR engine (CPUCore 6) Milestone 6: PIC direct-pointer load/store fast path. Ports the shipping
+// CachedInterpreter's proven LoadStoreDFormPIC/LoadStoreXFormPIC fast path (MAIN_CIR_PIC_LOADSTORE) to the
+// IR engine as an optimizer pass: integer D-form/X-form load/stores resolve the host RAM pointer directly
+// and do the access with the correct endian swap, bypassing the per-access MMU/region lookup — the single
+// biggest IR-vs-CIR gap (the IR ran plain interpreter loads/stores). The pass is gated by the EXISTING
+// MAIN_CIR_PIC_LOADSTORE flag (same toggle as the CIR; default ON) and the same hard gates as the CIR
+// (!jo.memcheck, jo.fastmem, FL_LOADSTORE && !FL_USE_FPU). This flag is ONLY its self-validation twin:
+// when ON, every op that takes the PIC path also runs the plain interpreter op on a PPC-state snapshot and
+// asserts the loaded register / stored memory / update-form rA writeback are bit-identical, committing the
+// PIC result last. Slow; correctness only. Default FALSE.
+const Info<bool> MAIN_CIR_IR_PIC_LOADSTORE_VALIDATE{
+    {System::Main, "Core", "CIRIRPICLoadStoreValidate"}, false};
+// iCube IR engine (CPUCore 6) Milestone 7: specialized-op direct dispatch. Ports the shipping CachedInterpreter's
+// proven InterpretSpecialized fast path (MAIN_CIR_SPECIALIZED_OPS) to the IR engine as an optimizer pass: a
+// whitelisted hot integer ALU / D-form load-store op is dispatched by its compile-time-constant Interpreter::name
+// handler via a jump-table switch keyed on a compact op-id, instead of the generic indirect operands.func call
+// (zero indirect CALL on the hot per-instruction path). The pass is gated by the EXISTING MAIN_CIR_SPECIALIZED_OPS
+// flag (same toggle as the CIR; default ON), with eligibility mirroring the CIR's IsSpecializedOp exactly. This
+// flag is ONLY its self-validation twin: when ON, every specialized op dual-runs vs the plain interpreter op on a
+// PPC-state snapshot (ALU ops double-run and assert bit-identical GPR/CR/XER/PC/Exceptions; load/stores single-run
+// and assert the pc/npc/Exceptions bookkeeping contract), committing the specialized result last. Slow; correctness
+// only. Default FALSE.
+const Info<bool> MAIN_CIR_IR_SPECIALIZED_OPS_VALIDATE{
+    {System::Main, "Core", "CIRIRSpecializedOpsValidate"}, false};
+// iCube: CachedInterpreter dead FP-Result-Flags (FPRF) elimination. The paired-single / floating-point
+// handlers call UpdateFPRFSingle/UpdateFPRFDouble on essentially every arithmetic FP op to classify the
+// result into the FPSCR.FPRF field — but PPCAnalyst's back-to-front pass already computes op.wantsFPRF,
+// the FP analogue of the CR/CA liveness used by dead-flag elim, and (like CA) forces FPRF LIVE across
+// every exception/block-exit boundary (may_exit_block). When ON, DoJit emits an arithmetic FP op whose
+// FPRF is proven dead (op.outputFPRF && !op.wantsFPRF, excluding compares which carry FL_READ_FPRF and
+// write FPCC directly) via a thin InterpretFPRFElim wrapper that sets a thread-local hint for the
+// handler's duration, so UpdateFPRF* early-returns and the dead classify is skipped. This is the JIT's
+// own wantsFPRF optimization, ported to the jitless path; profiling (Chibi-Robo) shows the FP/PS hot
+// path dominates, so the FPRF compute is a real per-op cost dead far more often than not. Default FALSE:
+// when off NO FP op is wrapped and the emitted callback stream is byte-identical to the flag-off
+// baseline. FP correctness is sensitive (physics/netplay), so flip the VALIDATE flag for a bit-exact
+// correctness session before trusting it.
+const Info<bool> MAIN_CIR_DEAD_FPRF_ELIM{{System::Main, "Core", "CIRDeadFprfElim"}, false};
+// iCube: self-validation for CIRDeadFprfElim. Analogue of CIRDeadFlagElimValidate, widened for FP. When
+// ON, every FPRF-eliminated op runs BOTH ways at execution time: first the REFERENCE (no hint -> FPRF
+// computed) on the live state, snapshotting the resulting FPRs + full FPSCR; then it restores and runs
+// the ELIMINATED form (hint set -> FPRF skipped), the SHIPPING path committed last. It then ASSERTs that
+// the FPRs and every FPSCR bit OUTSIDE the FPRF field are byte-identical between the two runs — i.e. the
+// elimination perturbed nothing but the dead FPRF field. A divergence in a result register, an exception
+// bit, a rounding bit, or any non-FPRF FPSCR state is a bug (mis-applied elimination). Slow (an extra
+// reference run per eliminated op); on-device correctness passes only. Default false.
+const Info<bool> MAIN_CIR_DEAD_FPRF_ELIM_VALIDATE{
+    {System::Main, "Core", "CIRDeadFprfElimValidate"}, false};
+// iCube: CachedInterpreter quantized paired-single (psq) FLOAT fast-path. psq_l/psq_st (and the indexed
+// psq_lx/psq_stx + update forms) load/store TWO values with an optional per-element type conversion
+// (float/u8/s8/u16/s16) and a scale, both selected at RUNTIME from the graphics-quantization register the
+// instruction's I field picks (GQR0-7). The generic interpreter handler runs the full GQR decode +
+// type-switch + scale machinery on EVERY execution. But the overwhelmingly common case — and the one the
+// profiled hot block uses (Chibi-Robo's hottest block is psq_l qr0-heavy) — is GQR == {type FLOAT,
+// scale 0}, i.e. "just move two big-endian 32-bit floats, no convert, no scale". When ON, the handler
+// reads the LIVE GQR each execution (GQRs change at runtime — never baked) and, only for that exact case,
+// takes a fast path that performs the SAME leaf ops the generic FLOAT branch already uses (ReadPair<u32>/
+// ReadUnpaired<u32> + ConvertToDouble on load; ConvertToSingleFTZ + WritePair<u32>/WriteUnpaired<u32> on
+// store), skipping the type-switch. Because it reuses the identical accessors, the resulting FPR lanes /
+// memory bytes / fault (EXCEPTION_DSI) behavior are bit-identical to the generic FLOAT case by
+// construction; this is the per-op runtime equivalent of JitArm64's per-block assumeNoPairedQuantize
+// specialization (which proves the GQR is in its default float state for the whole block). The W field
+// (single-value vs paired) is preserved exactly as the generic path handles it. Default FALSE: when off
+// the predicate (one type==FLOAT && scale==0 compare on the already-decoded GQR) is a single
+// predicted-not-taken branch and the handler falls straight into the unchanged generic switch, so behavior
+// is byte-identical to the flag-off baseline. Opt-in A/B + profiler-measured before defaulting on.
+const Info<bool> MAIN_CIR_PSQ_FASTPATH{{System::Main, "Core", "CIRPsqFastPath"}, false};
+// iCube: self-validation for CIRPsqFastPath. EXACT analogue of the dead-flag / FPRF / fusion double-run
+// validate harnesses: the fast path runs alongside an INDEPENDENT reference (the generic FLOAT path, NOT a
+// re-run of the fast helper) and their results are ASSERT'd byte-identical. Because the leaf conversion ops
+// are shared, what this actually exercises is the fast path's ORCHESTRATION — the W (single vs paired)
+// decision, that BOTH FPR lanes are set on a load, the load's DSI-checked-before-write ordering, and the
+// store's single-vs-paired accessor + lane choice. When ON, for every psq op that takes the fast path: on a
+// LOAD the fast path does NOT early-return — it falls through to the generic switch's own FLOAT case (the
+// independent reference), then ASSERT_MSG's the fast (ps0, ps1) against the generic (ps0, ps1) before the
+// single SetBoth commit; on a STORE the fast path independently re-derives the generic FLOAT branch's
+// converted u32 value(s) AND write shape (single vs paired) and ASSERT_MSG's them equal before a SINGLE
+// physical write (memory is never written twice — a double store to MMIO has side effects). A swapped lane,
+// a wrong ps1-for-W=1, or a wrong single-vs-paired decision diverges from the reference and trips the
+// assert. Slow (an extra reference run per fast-path op); on-device correctness passes only. Default false.
+const Info<bool> MAIN_CIR_PSQ_FASTPATH_VALIDATE{
+    {System::Main, "Core", "CIRPsqFastPathValidate"}, false};
+// iCube: CachedInterpreter cache-management loop fast-forward. Default OFF, for on-device A/B. When OFF
+// the CIR is byte-identical to current behavior (no fast-forward callback emitted, recognizer never
+// runs). When ON, DoJit recognizes the EXACT shape "dcbX 0,rB + addi rB,rB,STRIDE + bdnz self-loop"
+// (dcbX in {dcbf,dcbi,dcbst}, rB!=0, STRIDE>0) and emits a CacheLoopFlush callback ALONGSIDE the
+// unchanged cache-op records (emit-alongside, like StoreLoopFill). On the App-Store jitless config
+// (!m_enable_dcache) dcbf/dcbi/dcbst do nothing but per-line JitInterface::InvalidateICacheLine; at
+// runtime the handler fast-forwards the first count-1 line-invalidations in a tight C++ loop (no per-op
+// dispatch), sets CTR=1 and rB += (count-1)*STRIDE, charges (count-1)*per_iter to downcount, then lets
+// the real records execute the final iteration — so CTR/rB/npc/downcount end exactly as the unfused
+// loop. Bails (CTR untouched, real records run) when m_enable_dcache is ON (the ops do a real D-cache
+// flush then) or, for dcbi only, when msr.PR is set (privileged — the real op would fault). Targets the
+// hot Chibi-Robo dcbf/dcbi CTR loops (~2% of all cycles doing nothing but per-line ICache invalidation).
+const Info<bool> MAIN_CIR_CACHE_LOOP_FF{{System::Main, "Core", "CIRCacheLoopFF"}, false};
+// iCube: self-validation for CIRCacheLoopFF. EXACT analogue of the other CIR double-run validators, but
+// no memory snapshot is needed (ICache invalidation is idempotent — double-running the lines is safe):
+// snapshot (rB, CTR, Exceptions); run the REAL per-line loop (InvalidateICacheLine each EA + advance rB)
+// as the authoritative reference and capture (rB, Exceptions); restore rB+CTR; run the fast-forward
+// path; ASSERT the post rB and Exceptions match. Trap on mismatch. Slow; on-device correctness passes
+// only. Default OFF.
+const Info<bool> MAIN_CIR_CACHE_LOOP_FF_VALIDATE{
+    {System::Main, "Core", "CIRCacheLoopFFValidate"}, false};
+// iCube: counted-store-loop (memset) fast-path. Default OFF, for on-device A/B. When OFF the CIR is
+// byte-identical to current behavior (no fill callback emitted, recognizer never runs). When ON, DoJit
+// recognizes the EXACT shape "M contiguous stb rS,k(rB) + addi rB,rB,M + bdnz self-loop" (rS/rB
+// loop-invariant, rS!=rB, rB!=0) and emits a StoreLoopFill callback ALONGSIDE the unchanged store
+// records (emit-alongside, like FastForwardCtrIdle). At runtime the handler bulk-fills the first
+// count-1 strides into host RAM (guarded: the WHOLE [base,base+total) range must translate to
+// contiguous normal RAM via per-page GetTranslatedAddress + GetPointerForRange, else it bails and the
+// real per-store records run), sets CTR=1 and rB += (count-1)*M, charges (count-1)*per_iter to
+// downcount, then lets the real records execute the final iteration — so MMIO/DSI/SMC for the tail
+// store go through the genuine faulting path and rB/CTR/npc/downcount end exactly as the unfused loop.
+const Info<bool> MAIN_CIR_STORE_LOOP_FF{{System::Main, "Core", "CIRStoreLoopFF"}, false};
+// iCube: self-validation for CIRStoreLoopFF. EXACT analogue of the other CIR double-run validators, but
+// the two runs are SEQUENCED on a snapshot (memory can't be written twice): snapshot (rB, CTR, the
+// [base,total) bytes); run the REAL per-store loop (mmu.Write_U8 — the authoritative reference) and
+// capture (rB, CTR, range); restore memory+rB+CTR; run the bulk memset path; ASSERT the filled range,
+// rB, and CTR match. Trap on mismatch. Slow; on-device correctness passes only. Default OFF.
+const Info<bool> MAIN_CIR_STORE_LOOP_FF_VALIDATE{
+    {System::Main, "Core", "CIRStoreLoopFFValidate"}, false};
+// iCube: NEON (ARM64) paired-single ARITHMETIC fast-path. Default OFF. The scalar interpreter emulates each
+// ps_* op as TWO independent scalar f64 lanes; on ARM64 both lanes fit in one float64x2 register, so the
+// multiply/add/FMA runs once instead of twice (this is what Dolphin's JitArm64 already does for these ops,
+// but the interpreter — which iCube's App-Store CachedInterpreter and IR engine both fall back to — does
+// not). The flag is consulted once via a function-local static the first time any accelerated ps_* op runs
+// (thread-safe init; toggling requires an emulation restart, same effective semantics as the psq fast-path
+// which reads at CachedInterpreter::Init). When OFF — and on every non-ARM64 build regardless of the flag —
+// the accelerated ops run their UNCHANGED scalar bodies, so behavior is byte-identical to the baseline. The
+// fast path only fires when it can be proven bit-identical to scalar (default round-to-nearest, NI==0, all
+// input AND output lanes finite-and-normal, and for the FMA family no even-tie that the scalar single-round
+// correction would nudge); any failure runs the whole op scalar (never per-lane, to preserve NI_* FPSCR
+// exception ordering). Opt-in A/B + on-device verified before defaulting on.
+const Info<bool> MAIN_CIR_PS_NEON{{System::Main, "Core", "CIRPsNeon"}, false};
+// iCube: self-validation for CIRPsNeon. EXACT analogue of the other CIR double-run validators. When ON, for
+// every ps_* op that takes the NEON path, ALSO run the original scalar computation and ASSERT_MSG the two FD
+// lanes are bit-identical (compare the u64 bit-patterns, NOT float ==, so a NaN/sign/precision divergence is
+// caught). In the fast-path domain the scalar NI_* calls are side-effect-free (finite/normal operands never
+// mutate FPSCR), so the reference run is pure and the single commit happens once. Trap on mismatch. Slow (an
+// extra scalar run per accelerated op); on-device correctness passes only. Default OFF = zero overhead.
+const Info<bool> MAIN_CIR_PS_NEON_VALIDATE{{System::Main, "Core", "CIRPsNeonValidate"}, false};
+// iCube: stall / wasted-time instrumentation (VideoCommon/StallMetrics). Gates the per-site
+// accumulators and the windowed report. Default TRUE — the cost is one relaxed atomic load per
+// CPU-thread wait when on, and the data drives the "CPU under-utilized, where's the wasted time"
+// investigation, so it ships enabled and is only flipped off for a clean A/B against the overhead.
+const Info<bool> MAIN_STALL_METRICS{{System::Main, "Core", "StallMetrics"}, true};
+
+}  // namespace Config

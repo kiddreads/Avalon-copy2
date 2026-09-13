@@ -1,0 +1,11 @@
+Package: com.joemattiello.iCube
+Name: iCube
+Version: VERSION_NUMBER
+Architecture: iphoneos-arm64
+Description: A GameCube and Wii emulator for iOS
+Homepage: https://oatmealdome.me/
+Depiction: https://cydia.oatmealdome.me/depictions/?p=com.joemattiello.iCube
+Maintainer: OatmealDome <julian@oatmealdome.me>
+Author: OatmealDome <julian@oatmealdome.me>
+Section: Games
+Conflicts: com.joemattiello.iCube-patreon-beta (<= 2.1.0-230)
