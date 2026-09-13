@@ -531,6 +531,90 @@ lack of a shared libretro-common ruled out the option-array collision class that
 GX/Nestopia/mGBA three separate times), all 157 pre-existing tests pass unchanged under C++17, and
 `BsnesCoreTests` proves load → run → save-state round-trip against the real, compiled core.
 
+## 5h. pcsx_rearmed (PS1): the fifth core, and the first with real assembly [verified 2026-09-13]
+
+Continuing the "keep going" instruction after SNES. `libretro/pcsx_rearmed` is GPL-2.0-or-later
+(verified against source-file headers, e.g. `libpcsxcore/psxinterpreter.c`'s "either version 2 ...
+or (at your option) any later version" -- not GitHub's tag). What made it tractable: its own
+`Makefile.libretro` already forces `DYNAREC=0` specifically on `platform=ios-arm64` -- upstream
+has already made the "no JIT on iOS" call for us, the same shape of decision as Citra's dynarmic
+being disabled on aarch64 (§5f) and as every core integrated so far needing none of AvalonJIT's
+services. It also has a genuine HLE BIOS (`libpcsxcore/psxbios.c`), so booting a game needs no
+copyrighted Sony BIOS file, and accepts raw PS-EXE homebrew binaries directly
+(`valid_extensions` includes `"exe"`), which made a real, minimal test fixture far simpler than
+building a CD-ROM image.
+
+**A real per-file build, not a unity build.** Unlike bsnes, pcsx_rearmed's own `Makefile` gives
+each `.o` a distinct `.c`/`.S` source -- no `#include`-chain archaeology needed. The object list
+was extracted by directly running `make -f Makefile.libretro platform=ios-arm64 HAVE_CHD=0 -p -n`
+and reading make's own resolved `OBJS`/`CFLAGS` out of its database, rather than hand-tracing
+every conditional -- the same "ask the real build system" instinct as reading bsnes's actual
+GNUmakefiles, just aimed at `make -p` instead of `cat`. `HAVE_CHD=0` (matching Genesis Plus GX's
+own precedent) trims libchdr/LZMA/zstd/FLAC for this first cut; `.bin`/`.cue` and raw `.exe` still
+load. `NEON_BUILD`/`TEXTURE_CACHE_4BPP`/`TEXTURE_CACHE_8BPP`/`SIMD_BUILD` are per-file `CFLAGS`
+overrides in the real Makefile that SwiftPM's flat per-target `cSettings` can't express per file,
+so they're applied target-wide instead -- confirmed harmless everywhere else they land, the same
+tradeoff already made for mGBA's `GB_INTERNAL`/`DISABLE_DEBUGGER`.
+
+**The only real AArch64 assembly in this repository.** `gte_arm64.S`/`gte_nf_arm64.S` implement
+the GTE (PS1's fixed-point 3D coprocessor) in hand-written assembly. Rather than assume SwiftPM
+handles `.S` sources correctly, a throwaway package proved it first: a two-instruction `.S` file
+called from C, compiling and linking clean. Confirmed, not assumed, before committing to including
+real GTE assembly in the actual target.
+
+**Async GPU processing removed after a real, hand-traced SIGSEGV.** The full default build
+(matching the real Makefile's own `?=1` defaults) uses `USE_ASYNC_GPU`/`USE_ASYNC_SPU`/
+`USE_ASYNC_CDROM` to overlap CPU and GPU/audio work across threads. With `USE_ASYNC_GPU` on and
+`gpu_async.c` linked in, `retro_run()` segfaulted -- reproducibly, but with no usable stack trace
+(`lldb`'s `debugserver` isn't permitted to attach in this sandboxed environment, and
+AddressSanitizer's own unwinder came back empty). Traced by hand instead: a `write(2, ...)`-based
+checkpoint (plain `fprintf`/`fflush` turned out to be actively dangerous here -- see below) placed
+at successive points through `retro_run()` showed execution never reaching even the function's
+first statement once GP1's display-mode command ran, pointing at `gpu_async_notify_screen_change()`
+specifically. Fixed by leaving `USE_ASYNC_GPU` undefined and excluding `gpu_async.c` from
+`sources:` -- `gpu_async.h`'s `gpu_async_enabled()` macro just becomes `0` when the flag is off, so
+`gpu.c` calls the synchronous `renderer_notify_screen_change()` path instead. A first-cut choice
+for build/runtime simplicity over overlapped-thread performance, not a workaround for a mystery:
+the crash's real location was found, not guessed around.
+
+**A second, unrelated hazard found the same way: `fprintf`/`fflush` are landmines here.**
+`deps/libretro-common/include/streams/file_stream_transforms.h` `#define`s `fprintf` to `rfprintf`
+and `fflush` to `rfflush` project-wide (VFS-routed I/O, `USE_LIBRETRO_VFS`) -- and `rfprintf`
+takes an `RFILE *`, a libretro-common virtual-file handle, not a real `FILE *`. A debug `fprintf
+(stderr, ...)` added for the investigation above silently became `rfprintf(stderr, ...)`, handing
+a genuine `FILE *` to a function expecting a completely different struct layout -- a real, separate
+SIGSEGV that had nothing to do with the bug being chased, confusing the investigation until the
+redefinition was found by reading the actual disassembly (`bl _psx_lrc_rfprintf` where a plain libc
+call was expected) and cross-checked against the header. `snprintf`/`printf` are not redefined on
+this platform (only under MSVC/PSP conditionals) and stayed safe to use; `write(2, ...)` sidesteps
+the whole class of macro redefinition since it isn't part of the VFS shim at all.
+
+**A third, genuinely load-bearing vendored-source patch, found via the same crash-chasing.**
+`frontend/libretro.c`'s `retro_init()` unconditionally calls `syscall(SYS_ptrace, 0 /*
+PTRACE_TRACEME */, 0, 0, 0)` on Darwin -- upstream's own comment: "magic sauce to make the dynarec
+work on iOS" (self-tracing tricks the kernel into granting RWX pages without the
+`get-task-allow` entitlement). With `DRC_DISABLE` this is pure dead weight (no dynarec is ever
+linked in to need RWX pages for) -- and actively harmful here: it stopped the test process outright
+(`T`, ptrace-stopped, in `ps`), consuming a build-system lock and requiring a hard process kill to
+recover, confirmed directly rather than inferred. Guarded behind `!defined(DRC_DISABLE)`.
+
+**The `currentFrame() -> nil` result that looked like a bug and wasn't.** After all of the above,
+the test still failed: `runFrame()` ten times, then `currentFrame()` returned `nil`. Traced (with
+the now-safe `write(2, ...)` checkpoint) to `frontend/libretro.c`'s own `vout_fb_dirty` flag: the
+*first* `retro_run()` call correctly reported a real, non-duplicate frame
+(`vout_fb_dirty=1`) -- the fixture's GP1(0x03) Display Enable write worked exactly as intended --
+and every call after it correctly reported a duplicate (`vout_fb_dirty=0`, since nothing draws
+anything new after that). `currentFrame()` only ever reflects the *most recent* call, so checking
+it after ten frames was checking the state of the ninth legitimate duplicate, not a stuck or
+broken core. This is the documented libretro frame-duplication contract working correctly, not a
+defect -- fixed by reading the frame right after the first `runFrame()`, matching what the core
+actually promises rather than what the test assumed.
+
+**Result:** `PCSXCoreTests` proves load → GPU-enable → run → save-state round-trip against the
+real, compiled core, using a hand-built PS-EXE image and a five-instruction MIPS program (enable
+display, then spin) traced against the real `EXE_HEADER` format and GPU register semantics rather
+than guessed. All 165 tests (161 pre-existing plus 4 new) pass.
+
 ## 6. Integration status
 
 See `INTEGRATION-STATUS.md`. Terms used there mean exactly what §12 of the project brief says they mean:

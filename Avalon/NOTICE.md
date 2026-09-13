@@ -110,6 +110,14 @@ Avalon component over a network must be offered the corresponding source.
 - Licence text: `Libretro/nestopia/COPYING`
 - Systems: NES, Famicom
 
+### pcsx_rearmed — GPL-2.0-or-later
+
+- Upstream: https://github.com/libretro/pcsx_rearmed
+- Source: https://github.com/libretro/pcsx_rearmed
+- Copyright: Ryan Schultz, PCSX-df Team, PCSX team, Gražvydas "notaz" Ignotas, Gilead "Exophase" Kutnick, PCSX-Revolution Dev Team
+- Licence text: `Libretro/pcsx_rearmed/COPYING`
+- Systems: PlayStation
+
 ## Drawn from outside this repository
 
 These are separate projects. Avalon uses work from them and the obligation to attribute it is the same as for anything in the tree.

@@ -120,9 +120,9 @@ struct SystemCatalogTests {
         // Grows as real cores land; the point is never "looks like N systems work" without each
         // one actually resolving to a core that runs, which is what LibretroCoreTests and
         // GenesisPlusGXCoreTests independently prove for their respective entries.
-        #expect(SystemCatalog.playable.count == 6)
+        #expect(SystemCatalog.playable.count == 7)
         #expect(Set(SystemCatalog.playable.map(\.id)) ==
-                [.chip8, .genesis, .nes, .gameBoy, .gameBoyAdvance, .snes])
+                [.chip8, .genesis, .nes, .gameBoy, .gameBoyAdvance, .snes, .playStation])
         // Every system without a core has to say what it is waiting for.
         for profile in SystemCatalog.all where !profile.coreStatus.isAvailable {
             guard case .notYet(let note) = profile.coreStatus else { continue }

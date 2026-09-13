@@ -1,0 +1,264 @@
+// Renames pcsx_rearmed's libretro entry points AND its own vendored libretro-common
+// snapshot's internal utility symbols, so this core's symbols don't collide with the
+// other libretro cores statically linked into the same AvalonCore binary. Each of the
+// other three cores' libretro-common snapshots hit this same collision when combined
+// (gpgx_lrc_*, nestopia_lrc_*, mgba_lrc_*); this is pcsx_rearmed's own copy, prefixed
+// psx_lrc_*. Generated from the actual compiled .c files (grep for top-level function
+// definitions), not hand-typed -- cross-checked against real linker output for
+// duplicate/undefined symbols the same way as every other core here.
+//
+// strlcat/strlcpy are deliberately NOT renamed: compat_strl.c guards both out entirely
+// on Darwin (`#if !(defined(__MACH__) && defined(__APPLE__))`), relying on the system
+// libc's own versions -- the same reason Nestopia's namespace header excludes them.
+#ifndef AVALON_PCSX_NAMESPACE_H
+#define AVALON_PCSX_NAMESPACE_H
+
+#define retro_init pcsx_retro_init
+#define retro_deinit pcsx_retro_deinit
+#define retro_api_version pcsx_retro_api_version
+#define retro_get_system_info pcsx_retro_get_system_info
+#define retro_get_system_av_info pcsx_retro_get_system_av_info
+#define retro_set_environment pcsx_retro_set_environment
+#define retro_set_video_refresh pcsx_retro_set_video_refresh
+#define retro_set_audio_sample pcsx_retro_set_audio_sample
+#define retro_set_audio_sample_batch pcsx_retro_set_audio_sample_batch
+#define retro_set_input_poll pcsx_retro_set_input_poll
+#define retro_set_input_state pcsx_retro_set_input_state
+#define retro_set_controller_port_device pcsx_retro_set_controller_port_device
+#define retro_reset pcsx_retro_reset
+#define retro_run pcsx_retro_run
+#define retro_serialize_size pcsx_retro_serialize_size
+#define retro_serialize pcsx_retro_serialize
+#define retro_unserialize pcsx_retro_unserialize
+#define retro_cheat_reset pcsx_retro_cheat_reset
+#define retro_cheat_set pcsx_retro_cheat_set
+#define retro_load_game pcsx_retro_load_game
+#define retro_load_game_special pcsx_retro_load_game_special
+#define retro_unload_game pcsx_retro_unload_game
+#define retro_get_region pcsx_retro_get_region
+#define retro_get_memory_data pcsx_retro_get_memory_data
+#define retro_get_memory_size pcsx_retro_get_memory_size
+
+#define arm_enable_runfast_mode psx_lrc_arm_enable_runfast_mode
+#define check_arm_cpu_feature psx_lrc_check_arm_cpu_feature
+#define cpu_features_get psx_lrc_cpu_features_get
+#define cpu_features_get_core_amount psx_lrc_cpu_features_get_core_amount
+#define cpu_features_get_model_name psx_lrc_cpu_features_get_model_name
+#define cpu_features_get_perf_counter psx_lrc_cpu_features_get_perf_counter
+#define cpu_features_get_time_usec psx_lrc_cpu_features_get_time_usec
+#define cpu_features_probe psx_lrc_cpu_features_probe
+#define cpulist_parse psx_lrc_cpulist_parse
+#define cpulist_read_from psx_lrc_cpulist_read_from
+#define darwin_cpu_feature_present psx_lrc_darwin_cpu_feature_present
+#define dirent_check_err psx_lrc_dirent_check_err
+#define dirent_vfs_init psx_lrc_dirent_vfs_init
+#define filestream_close psx_lrc_filestream_close
+#define filestream_cmp psx_lrc_filestream_cmp
+#define filestream_copy psx_lrc_filestream_copy
+#define filestream_delete psx_lrc_filestream_delete
+#define filestream_eof psx_lrc_filestream_eof
+#define filestream_error psx_lrc_filestream_error
+#define filestream_exists psx_lrc_filestream_exists
+#define filestream_flush psx_lrc_filestream_flush
+#define filestream_get_path psx_lrc_filestream_get_path
+#define filestream_get_size psx_lrc_filestream_get_size
+#define filestream_get_vfs_handle psx_lrc_filestream_get_vfs_handle
+#define filestream_getc psx_lrc_filestream_getc
+#define filestream_getline psx_lrc_filestream_getline
+#define filestream_gets psx_lrc_filestream_gets
+#define filestream_open psx_lrc_filestream_open
+#define filestream_printf psx_lrc_filestream_printf
+#define filestream_putc psx_lrc_filestream_putc
+#define filestream_read psx_lrc_filestream_read
+#define filestream_read_file psx_lrc_filestream_read_file
+#define filestream_rename psx_lrc_filestream_rename
+#define filestream_rewind psx_lrc_filestream_rewind
+#define filestream_scanf psx_lrc_filestream_scanf
+#define filestream_seek psx_lrc_filestream_seek
+#define filestream_tell psx_lrc_filestream_tell
+#define filestream_truncate psx_lrc_filestream_truncate
+#define filestream_vfs_init psx_lrc_filestream_vfs_init
+#define filestream_vprintf psx_lrc_filestream_vprintf
+#define filestream_vscanf psx_lrc_filestream_vscanf
+#define filestream_write psx_lrc_filestream_write
+#define filestream_write_file psx_lrc_filestream_write_file
+#define fill_dated_filename psx_lrc_fill_dated_filename
+#define fill_pathname psx_lrc_fill_pathname
+#define fill_pathname_abbreviate_special psx_lrc_fill_pathname_abbreviate_special
+#define fill_pathname_abbreviated_or_relative psx_lrc_fill_pathname_abbreviated_or_relative
+#define fill_pathname_application_dir psx_lrc_fill_pathname_application_dir
+#define fill_pathname_application_path psx_lrc_fill_pathname_application_path
+#define fill_pathname_base psx_lrc_fill_pathname_base
+#define fill_pathname_basedir psx_lrc_fill_pathname_basedir
+#define fill_pathname_dir psx_lrc_fill_pathname_dir
+#define fill_pathname_expand_special psx_lrc_fill_pathname_expand_special
+#define fill_pathname_home_dir psx_lrc_fill_pathname_home_dir
+#define fill_pathname_join psx_lrc_fill_pathname_join
+#define fill_pathname_join_delim psx_lrc_fill_pathname_join_delim
+#define fill_pathname_join_special psx_lrc_fill_pathname_join_special
+#define fill_pathname_join_special_ext psx_lrc_fill_pathname_join_special_ext
+#define fill_pathname_parent_dir psx_lrc_fill_pathname_parent_dir
+#define fill_pathname_parent_dir_name psx_lrc_fill_pathname_parent_dir_name
+#define fill_pathname_resolve_relative psx_lrc_fill_pathname_resolve_relative
+#define fill_pathname_slash psx_lrc_fill_pathname_slash
+#define fill_str_dated_filename psx_lrc_fill_str_dated_filename
+#define find_last_slash psx_lrc_find_last_slash
+#define fopen_utf8 psx_lrc_fopen_utf8
+#define fs_native_handles psx_lrc_fs_native_handles
+#define fs_parse_spec psx_lrc_fs_parse_spec
+#define fs_scan_char psx_lrc_fs_scan_char
+#define fs_scan_float psx_lrc_fs_scan_float
+#define fs_scan_int psx_lrc_fs_scan_int
+#define fs_scan_pointer psx_lrc_fs_scan_pointer
+#define fs_scan_set psx_lrc_fs_scan_set
+#define fs_scan_str psx_lrc_fs_scan_str
+#define fs_scan_wide psx_lrc_fs_scan_wide
+#define fs_scanset_match psx_lrc_fs_scanset_match
+#define fs_store_int psx_lrc_fs_store_int
+#define fs_store_n psx_lrc_fs_store_n
+#define fs_wscanset_match psx_lrc_fs_wscanset_match
+#define get_pathname_num_slashes psx_lrc_get_pathname_num_slashes
+#define is_path_accessible_using_standard_io psx_lrc_is_path_accessible_using_standard_io
+#define local_to_utf8_string_alloc psx_lrc_local_to_utf8_string_alloc
+#define mb_to_mb_string_alloc psx_lrc_mb_to_mb_string_alloc
+#define parse_decimal psx_lrc_parse_decimal
+#define path_basedir psx_lrc_path_basedir
+#define path_basedir_wrapper psx_lrc_path_basedir_wrapper
+#define path_basename psx_lrc_path_basename
+#define path_basename_nocompression psx_lrc_path_basename_nocompression
+#define path_get_archive_delim psx_lrc_path_get_archive_delim
+#define path_get_extension psx_lrc_path_get_extension
+#define path_get_extension_mutable psx_lrc_path_get_extension_mutable
+#define path_get_size psx_lrc_path_get_size
+#define path_is_absolute psx_lrc_path_is_absolute
+#define path_is_cdrom psx_lrc_path_is_cdrom
+#define path_is_character_special psx_lrc_path_is_character_special
+#define path_is_compressed_file psx_lrc_path_is_compressed_file
+#define path_is_directory psx_lrc_path_is_directory
+#define path_is_saf psx_lrc_path_is_saf
+#define path_is_smb psx_lrc_path_is_smb
+#define path_is_valid psx_lrc_path_is_valid
+#define path_linked_list_add_path psx_lrc_path_linked_list_add_path
+#define path_linked_list_free psx_lrc_path_linked_list_free
+#define path_linked_list_new psx_lrc_path_linked_list_new
+#define path_mkdir psx_lrc_path_mkdir
+#define path_parent_dir psx_lrc_path_parent_dir
+#define path_relative_to psx_lrc_path_relative_to
+#define path_remove_extension psx_lrc_path_remove_extension
+#define path_resolve_realpath psx_lrc_path_resolve_realpath
+#define path_stat psx_lrc_path_stat
+#define path_vfs_init psx_lrc_path_vfs_init
+#define pathname_conform_slashes_to_os psx_lrc_pathname_conform_slashes_to_os
+#define pathname_make_slashes_portable psx_lrc_pathname_make_slashes_portable
+#define ra_clock_gettime psx_lrc_ra_clock_gettime
+#define retro_closedir psx_lrc_retro_closedir
+#define retro_dirent_error psx_lrc_retro_dirent_error
+#define retro_dirent_get_name psx_lrc_retro_dirent_get_name
+#define retro_dirent_is_dir psx_lrc_retro_dirent_is_dir
+#define retro_isblank__ psx_lrc_retro_isblank__
+#define retro_opendir psx_lrc_retro_opendir
+#define retro_opendir_include_hidden psx_lrc_retro_opendir_include_hidden
+#define retro_readdir psx_lrc_retro_readdir
+#define retro_strcasecmp__ psx_lrc_retro_strcasecmp__
+#define retro_strdup__ psx_lrc_retro_strdup__
+#define retro_strtok_r__ psx_lrc_retro_strtok_r__
+#define retro_vfs_closedir_impl psx_lrc_retro_vfs_closedir_impl
+#define retro_vfs_dirent_get_name_impl psx_lrc_retro_vfs_dirent_get_name_impl
+#define retro_vfs_dirent_is_dir_impl psx_lrc_retro_vfs_dirent_is_dir_impl
+#define retro_vfs_dirent_is_dir_smb psx_lrc_retro_vfs_dirent_is_dir_smb
+#define retro_vfs_dirent_is_dir_stat psx_lrc_retro_vfs_dirent_is_dir_stat
+#define retro_vfs_file_close_impl psx_lrc_retro_vfs_file_close_impl
+#define retro_vfs_file_error_impl psx_lrc_retro_vfs_file_error_impl
+#define retro_vfs_file_flush_impl psx_lrc_retro_vfs_file_flush_impl
+#define retro_vfs_file_get_path_impl psx_lrc_retro_vfs_file_get_path_impl
+#define retro_vfs_file_open_impl psx_lrc_retro_vfs_file_open_impl
+#define retro_vfs_file_read_impl psx_lrc_retro_vfs_file_read_impl
+#define retro_vfs_file_remove_impl psx_lrc_retro_vfs_file_remove_impl
+#define retro_vfs_file_rename_impl psx_lrc_retro_vfs_file_rename_impl
+#define retro_vfs_file_seek_impl psx_lrc_retro_vfs_file_seek_impl
+#define retro_vfs_file_seek_internal psx_lrc_retro_vfs_file_seek_internal
+#define retro_vfs_file_size_impl psx_lrc_retro_vfs_file_size_impl
+#define retro_vfs_file_tell_impl psx_lrc_retro_vfs_file_tell_impl
+#define retro_vfs_file_truncate_impl psx_lrc_retro_vfs_file_truncate_impl
+#define retro_vfs_file_write_impl psx_lrc_retro_vfs_file_write_impl
+#define retro_vfs_mkdir_impl psx_lrc_retro_vfs_mkdir_impl
+#define retro_vfs_opendir_impl psx_lrc_retro_vfs_opendir_impl
+#define retro_vfs_readdir_impl psx_lrc_retro_vfs_readdir_impl
+#define retro_vfs_stat_64_impl psx_lrc_retro_vfs_stat_64_impl
+#define retro_vfs_stat_impl psx_lrc_retro_vfs_stat_impl
+#define rfclose psx_lrc_rfclose
+#define rfeof psx_lrc_rfeof
+#define rferror psx_lrc_rferror
+#define rfflush psx_lrc_rfflush
+#define rfgetc psx_lrc_rfgetc
+#define rfgets psx_lrc_rfgets
+#define rfopen psx_lrc_rfopen
+#define rfprintf psx_lrc_rfprintf
+#define rfputc psx_lrc_rfputc
+#define rfread psx_lrc_rfread
+#define rfscanf psx_lrc_rfscanf
+#define rfseek psx_lrc_rfseek
+#define rftell psx_lrc_rftell
+#define rfwrite psx_lrc_rfwrite
+#define rtime_deinit psx_lrc_rtime_deinit
+#define rtime_init psx_lrc_rtime_init
+#define rtime_localtime psx_lrc_rtime_localtime
+#define sanitize_path_part psx_lrc_sanitize_path_part
+#define strftime_am_pm psx_lrc_strftime_am_pm
+#define string_copy_only_ascii psx_lrc_string_copy_only_ascii
+#define string_count_occurrences_single_character psx_lrc_string_count_occurrences_single_character
+#define string_ext_list_append_dedup psx_lrc_string_ext_list_append_dedup
+#define string_ext_list_find psx_lrc_string_ext_list_find
+#define string_ext_list_merge_dedup psx_lrc_string_ext_list_merge_dedup
+#define string_find_index_substring_string psx_lrc_string_find_index_substring_string
+#define string_hex_to_unsigned psx_lrc_string_hex_to_unsigned
+#define string_index_last_occurance psx_lrc_string_index_last_occurance
+#define string_remove_all_chars psx_lrc_string_remove_all_chars
+#define string_remove_all_whitespace psx_lrc_string_remove_all_whitespace
+#define string_replace_all_chars psx_lrc_string_replace_all_chars
+#define string_replace_multi_space_with_single_space psx_lrc_string_replace_multi_space_with_single_space
+#define string_replace_substring psx_lrc_string_replace_substring
+#define string_replace_whitespace_with_single_character psx_lrc_string_replace_whitespace_with_single_character
+#define string_to_lower psx_lrc_string_to_lower
+#define string_to_unsigned psx_lrc_string_to_unsigned
+#define string_to_upper psx_lrc_string_to_upper
+#define string_tokenize psx_lrc_string_tokenize
+#define string_trim_whitespace psx_lrc_string_trim_whitespace
+#define string_trim_whitespace_left psx_lrc_string_trim_whitespace_left
+#define string_trim_whitespace_right psx_lrc_string_trim_whitespace_right
+#define string_ucwords psx_lrc_string_ucwords
+#define strlcpy_append psx_lrc_strlcpy_append
+#define utf16_conv_utf8 psx_lrc_utf16_conv_utf8
+#define utf16_to_char psx_lrc_utf16_to_char
+#define utf16_to_char_string psx_lrc_utf16_to_char_string
+#define utf16_to_utf8_string_alloc psx_lrc_utf16_to_utf8_string_alloc
+#define utf8_conv_utf32 psx_lrc_utf8_conv_utf32
+#define utf8_to_local_string_alloc psx_lrc_utf8_to_local_string_alloc
+#define utf8_to_utf16_string_alloc psx_lrc_utf8_to_utf16_string_alloc
+#define utf8_walk psx_lrc_utf8_walk
+#define utf8cpy psx_lrc_utf8cpy
+#define utf8len psx_lrc_utf8len
+#define utf8skip psx_lrc_utf8skip
+#define word_wrap psx_lrc_word_wrap
+#define word_wrap_wideglyph psx_lrc_word_wrap_wideglyph
+#define x86_cpuid psx_lrc_x86_cpuid
+#define xgetbv_x86 psx_lrc_xgetbv_x86
+
+// Per-language libretro core-option arrays defined directly in frontend/libretro_core_options.h /
+// libretro_core_options_intl.h (included by frontend/libretro.c) -- the same class of collision
+// already seen between Genesis Plus GX, Nestopia and mGBA, this time against Genesis Plus GX
+// specifically (both cores define an "option_defs_us" etc).
+#define option_defs_us psx_option_defs_us
+#define option_defs_tr psx_option_defs_tr
+#define option_defs_intl psx_option_defs_intl
+#define options_us psx_options_us
+#define options_tr psx_options_tr
+#define options_intl psx_options_intl
+#define option_cats_us psx_option_cats_us
+#define option_cats_tr psx_option_cats_tr
+
+// Coincidental naming collision with Genesis Plus GX's own core/vdp_render.c (both define a
+// global, non-static render_line -- nothing to do with libretro-common or unity builds).
+#define render_line psx_render_line
+
+#endif

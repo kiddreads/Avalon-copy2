@@ -270,10 +270,183 @@ let package = Package(
             name: "AvalonBsnesGlue",
             dependencies: ["AvalonLibretro", "AvalonLibretroBsnes"]
         ),
+        // pcsx_rearmed's own source (C), vendored unmodified at Libretro/pcsx_rearmed.
+        // GPL-2.0-or-later, verified against actual source-file headers ("either version 2 of
+        // the License, or (at your option) any later version"), not GitHub's spdx_id tag. The
+        // real per-file OBJS list below was extracted by actually running
+        // `make -f Makefile.libretro platform=ios-arm64 HAVE_CHD=0 -p -n` and reading the
+        // resolved OBJS/CFLAGS variables out of make's own database -- not by hand-tracing
+        // GNUmakefile conditionals the way bsnes's unity build required, since this build is a
+        // real per-file one (each .o a distinct .c/.S, no unity #include chains).
+        //
+        // DRC_DISABLE (-DDRC_DISABLE): upstream's own Makefile.libretro forces DYNAREC=0 on
+        // platform=ios-arm64 -- the "no JIT on iOS" decision already made for us, same spirit as
+        // Citra's dynarmic being disabled on aarch64. Only the plain interpreter
+        // (psxinterpreter.c) runs; no AvalonJIT integration needed.
+        //
+        // HAVE_CHD=0 (matching Genesis Plus GX's own precedent): skips vendoring libchdr's
+        // compressed-disc-image support (LZMA/zstd/FLAC decoders) for this first cut -- .bin/.cue
+        // and raw .exe (PS-EXE homebrew) still load. GPU_NEON selects the NEON-optimized software
+        // rasterizer (gpu_neon), matching Avalon's software-framebuffer contract; nullsnd is the
+        // audio *output* stub (irrelevant here -- plugins/dfsound/spu.c still computes real
+        // samples, which reach Avalon through the standard retro_audio_sample_batch callback like
+        // every other core, never through pcsx_rearmed's own OS-level audio driver).
+        //
+        // gte_arm64.S/gte_nf_arm64.S are hand-written AArch64 assembly (the GTE, PS1's fixed-point
+        // 3D coprocessor) -- the first real assembly in this repository. Confirmed SwiftPM
+        // compiles and links `.S` sources correctly in a plain library target before committing
+        // to including them, rather than assuming.
+        //
+        // Deliberately NOT a dependency on AvalonLibretro, same reason as every other core here
+        // (Clang modules would freeze libretro.h's declarations before pcsx_namespace.h's
+        // #defines run). pcsx_rearmed vendors its own libretro-common snapshot, which -- like
+        // Genesis Plus GX, Nestopia and mGBA before it -- collides with the other three cores'
+        // own snapshots the moment all four share one binary; pcsx_namespace.h namespaces both
+        // the 24 RETRO_API entry points (pcsx_retro_*) and pcsx_rearmed's own internal
+        // libretro-common utility symbols (psx_lrc_*), generated from the actual compiled .c
+        // files the same way as the other three. strlcat/strlcpy are deliberately excluded from
+        // the rename list: compat_strl.c guards both out entirely on Darwin, relying on the
+        // system libc's own versions -- the same reason Nestopia's namespace header excludes them.
+        .target(
+            name: "AvalonLibretroPCSX",
+            path: "Sources/AvalonLibretroPCSXSource",
+            sources: [
+                "libpcsxcore/cdriso.c",
+                "libpcsxcore/cdrom.c",
+                "libpcsxcore/cdrom-async.c",
+                "libpcsxcore/cheat.c",
+                "libpcsxcore/database.c",
+                "libpcsxcore/decode_xa.c",
+                "libpcsxcore/mdec.c",
+                "libpcsxcore/misc.c",
+                "libpcsxcore/plugins.c",
+                "libpcsxcore/ppf.c",
+                "libpcsxcore/psxbios.c",
+                "libpcsxcore/psxcommon.c",
+                "libpcsxcore/psxcounters.c",
+                "libpcsxcore/psxdma.c",
+                "libpcsxcore/psxhw.c",
+                "libpcsxcore/psxinterpreter.c",
+                "libpcsxcore/psxmem.c",
+                "libpcsxcore/psxevents.c",
+                "libpcsxcore/r3000a.c",
+                "libpcsxcore/sio.c",
+                "libpcsxcore/spu.c",
+                "libpcsxcore/gpu.c",
+                "libpcsxcore/pad.c",
+                "libpcsxcore/gte.c",
+                "libpcsxcore/gte_nf.c",
+                "libpcsxcore/gte_divider.c",
+                "libpcsxcore/gte_arm64.S",
+                "libpcsxcore/gte_nf_arm64.S",
+                "libpcsxcore/new_dynarec/emu_if.c",
+                "plugins/dfsound/dma.c",
+                "plugins/dfsound/freeze.c",
+                "plugins/dfsound/registers.c",
+                "plugins/dfsound/spu.c",
+                "plugins/dfsound/out.c",
+                "plugins/dfsound/nullsnd.c",
+                "plugins/gpulib/gpu.c",
+                "plugins/gpulib/vout_pl.c",
+                "plugins/gpulib/prim.c",
+                "plugins/gpu_neon/psx_gpu_if.c",
+                "plugins/gpu_neon/psx_gpu/psx_gpu_simd.c",
+                "deps/miniz/miniz.c",
+                "frontend/cspace.c",
+                "deps/libretro-common/compat/compat_strl.c",
+                "deps/libretro-common/file/file_path.c",
+                "deps/libretro-common/file/file_path_io.c",
+                "deps/libretro-common/string/stdstring.c",
+                "deps/libretro-common/vfs/vfs_implementation.c",
+                "deps/libretro-common/compat/compat_posix_string.c",
+                "deps/libretro-common/compat/fopen_utf8.c",
+                "deps/libretro-common/encodings/encoding_utf.c",
+                "deps/libretro-common/file/retro_dirent.c",
+                "deps/libretro-common/streams/file_stream.c",
+                "deps/libretro-common/streams/file_stream_transforms.c",
+                "deps/libretro-common/time/rtime.c",
+                "frontend/libretro.c",
+                "frontend/pcsxr-threads.c",
+                "deps/libretro-common/features/features_cpu.c",
+                // Renamed from upstream's frontend/main.c (same content): a file literally
+                // named main.c made SwiftPM's executable-target auto-detection kick in even
+                // inside a plain .target(), which broke this file's own quoted #include "menu.h"
+                // resolution -- it picked up the SDK's ncurses menu.h instead of the local one,
+                // "conflicting types for 'menu_init'". Not just a CLI entry point despite the
+                // name: also defines emu_core_init/emu_save_state/set_cd_image/etc, which
+                // frontend/libretro.c genuinely calls into.
+                "frontend/psx_main.c",
+                "frontend/plugin.c",
+            ],
+            cSettings: [
+                .headerSearchPath("."),
+                .headerSearchPath("include"),
+                .headerSearchPath("deps/libretro-common/include"),
+                .headerSearchPath("deps/miniz"),
+                .headerSearchPath("../AvalonLibretro/include"),
+                .define("IOS"),
+                .define("GPU_NEON"),
+                .define("NDEBUG"),
+                .define("P_HAVE_MMAP", to: "1"),
+                .define("P_HAVE_POSIX_MEMALIGN", to: "1"),
+                .define("DISABLE_MEM_LUTS", to: "0"),
+                .define("DRC_DISABLE"),
+                .define("USE_MINIZ"),
+                .define("USE_LIBRETRO_VFS"),
+                .define("HAVE_LIBRETRO"),
+                .define("NO_FRONTEND"),
+                .define("__LIBRETRO__"),
+                // Per-file CFLAGS override in the real Makefile (psx_gpu_if.o and
+                // psx_gpu_simd.o both get -DSIMD_BUILD); SwiftPM has no per-file cSettings
+                // scoping, so this applies target-wide -- harmless elsewhere, checked only by
+                // psx_gpu_simd.c/.h.
+                .define("SIMD_BUILD"),
+                // Another per-file override missed on the first pass: without NEON_BUILD,
+                // psx_gpu.c's own #ifndef NEON_BUILD block defines its *own* generic-C fallback
+                // bodies for the same blend/shade/texture function names psx_gpu_simd.c
+                // implements for real -- both ending up as real, non-static, same-named globals
+                // once linked, hence "duplicate symbol '_blend_blocks_textured_add_fourth_on'".
+                .define("NEON_BUILD"),
+                .define("TEXTURE_CACHE_4BPP"),
+                .define("TEXTURE_CACHE_8BPP"),
+                // USE_ASYNC_GPU deliberately left undefined and gpu_async.c excluded from
+                // sources: rather than the per-file CFLAGS override the real Makefile uses
+                // (gpu_async.h's gpu_async_enabled() macro just becomes 0, so gpu.c calls
+                // renderer_notify_screen_change() directly instead of the async path).
+                // First-cut choice for build/runtime simplicity over overlapped CPU/GPU
+                // threading -- confirmed necessary, not just simpler: with USE_ASYNC_GPU on and
+                // gpu_async.c linked in, retro_run() SIGSEGV'd inside the GP1(0x08) display-mode
+                // handler's gpu_async_notify_screen_change() call, every time, traced via a
+                // temporary debug build (lldb's debugserver isn't permitted to attach in this
+                // environment) that showed the crash landing right after that call and before
+                // any of this core's own retro_run ever printed -- not something worth chasing
+                // down for a first cut when the synchronous path avoids it entirely.
+                .define("USE_ASYNC_SPU"),
+                .define("USE_ASYNC_CDROM"),
+                // SwiftPM always compiles C targets with -fmodules. With it on, merely
+                // including <stdio.h>/<unistd.h>/etc. implicitly pulls in an umbrella SDK module
+                // that also declares ncurses' menu_init() -- so frontend/menu.h's OWN, textually
+                // #include-d, unrelated `void menu_init(void)` collides with the modularly
+                // imported one ("conflicting types for 'menu_init'"), even though nothing here
+                // ever textually includes ncurses. Confirmed via a minimal repro: identical flags
+                // minus -fno-modules reproduce it standalone. -fno-modules avoids the implicit
+                // umbrella import entirely, the same root cause this project already routes
+                // around by never depending on AvalonLibretro from a vendored core's own target.
+                .unsafeFlags(["-fno-modules", "-include", "pcsx_namespace.h"]),
+            ],
+            linkerSettings: [.linkedLibrary("z")]
+        ),
+        // Bridges the namespaced pcsx_retro_* symbols to a vtable, mirroring
+        // AvalonGenesisPlusGXGlue / AvalonNestopiaGlue / AvalonMGBAGlue / AvalonBsnesGlue.
+        .target(
+            name: "AvalonPCSXGlue",
+            dependencies: ["AvalonLibretro", "AvalonLibretroPCSX"]
+        ),
         .target(
             name: "AvalonCore",
             dependencies: ["AvalonPixel", "AvalonJIT", "AvalonAudio", "AvalonChip8", "AvalonLibretro",
-                           "AvalonGenesisPlusGXGlue", "AvalonNestopiaGlue", "AvalonMGBAGlue", "AvalonBsnesGlue"],
+                           "AvalonGenesisPlusGXGlue", "AvalonNestopiaGlue", "AvalonMGBAGlue", "AvalonBsnesGlue",
+                           "AvalonPCSXGlue"],
             resources: [.process("Resources")]
         ),
         .executableTarget(name: "avalon-verify", dependencies: ["AvalonCore"]),
