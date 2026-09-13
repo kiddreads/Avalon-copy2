@@ -124,13 +124,27 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           FOLDER: ${{ matrix.folder }}
           SRC_BRANCH: ${{ steps.branch.outputs.name }}
+          # The target was hardcoded to kiddreads/Avalon, so running this from any other
+          # repository merged into that one instead. It now targets whichever repository it is
+          # running in.
+          TARGET_REPO: ${{ github.repository }}
         run: |
           set -e
-          git clone --bare "https://x-access-token:${GH_TOKEN}@github.com/kiddreads/Avalon.git" avalon.git
+          git clone --bare "https://x-access-token:${GH_TOKEN}@github.com/${TARGET_REPO}.git" avalon.git
           cd avalon.git
           git remote add src ../source.git
           git fetch --quiet src
           export GIT_DIR="$(pwd)"
+
+          # filter-repo has already rewritten the source so every path starts with "$FOLDER/".
+          # Binding that whole tree under --prefix="$FOLDER/" would nest it twice — which is
+          # exactly how the repository ended up with iCube/iCube/Source. Take the subtree.
+          if src_tree=$(git rev-parse -q --verify "src/${SRC_BRANCH}:${FOLDER}" 2>/dev/null); then
+            echo "Source is rewritten under ${FOLDER}/; binding its subtree ${src_tree}"
+          else
+            src_tree="src/${SRC_BRANCH}^{tree}"
+            echo "Source is not prefixed; binding its root tree"
+          fi
 
           success=false
           for attempt in $(seq 1 15); do
@@ -145,9 +159,22 @@ jobs:
               parent_args=()
             fi
 
-            git read-tree --prefix="${FOLDER}/" -i "src/${SRC_BRANCH}"
+            # read-tree --prefix refuses to overlay a path the index already holds:
+            #   error: Entry 'iCube/...' overlaps with 'iCube/...'. Cannot bind.
+            # This workflow could only ever ADD a folder, never refresh one, which is why a
+            # project merged from the wrong branch could not simply be re-merged. Drop the old
+            # copy from the index first. Bare repo, so update-index rather than git rm.
+            action="Merge"
+            if git ls-tree -r --name-only origin/main -- "${FOLDER}" 2>/dev/null | head -1 | grep -q .; then
+              action="Re-merge"
+              git ls-tree -r -z --name-only origin/main -- "${FOLDER}" \
+                | xargs -0 -r -n 100 git update-index --force-remove --
+            fi
+
+            git read-tree -i --prefix="${FOLDER}/" "$src_tree"
             new_tree=$(git write-tree)
-            new_commit=$(git commit-tree "$new_tree" "${parent_args[@]}" -p "src/${SRC_BRANCH}" -m "Merge ${FOLDER} (full history)")
+            new_commit=$(git commit-tree "$new_tree" "${parent_args[@]}" -p "src/${SRC_BRANCH}" \
+              -m "${action} ${FOLDER} from ${SRC_BRANCH} (full history)")
             rm -f "$index_file"
 
             if git push origin "${new_commit}:refs/heads/main"; then
