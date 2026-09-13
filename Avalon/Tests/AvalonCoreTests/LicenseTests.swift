@@ -101,3 +101,22 @@ struct LGPL21LicenseTests {
         #expect(License.combinedLicense(of: [.lgpl21OrLater, .gpl2Only, .agpl3OrLater]) == nil)
     }
 }
+
+@Suite("GPL-3.0-only")
+struct GPL3OnlyLicenseTests {
+    @Test("combines cleanly with AGPL-3.0-or-later, unlike GPL-2.0-only with a v3 target")
+    func combinesWithAGPL() {
+        // bsnes's actual situation: "specifically version 3 ... and no other version." Unlike
+        // GPL-2.0-only (locked to v2, incompatible with a v3-only target), this is already at the
+        // generation AGPL-3.0-or-later occupies -- GPLv3 was written with AGPL combination in mind.
+        #expect(License.combinedLicense(of: [.gpl3Only, .agpl3OrLater]) == .agpl3OrLater)
+        #expect(License.canCombine([.gpl3Only, .mit, .agpl3OrLater]))
+    }
+
+    @Test("cannot be relicensed to any other generation, unlike the -or-later variants")
+    func lockedToV3() {
+        #expect(License.combinedLicense(of: [.gpl3Only, .gpl2Only]) == nil)
+        // On its own, describes a build as exactly what it is.
+        #expect(License.combinedLicense(of: [.gpl3Only]) == .gpl3Only)
+    }
+}

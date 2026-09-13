@@ -42,6 +42,14 @@ public enum License: String, Codable, Sendable, CaseIterable {
     /// `cemu-ios-muffin/src/ios/App/` carries it, so muffin's skin work can enter an AGPL build
     /// with its own files staying MPL and their notices preserved.
     case mpl2 = "MPL-2.0"
+    /// GPL v3 with **no** "or any later version" grant. bsnes's own LICENSE.txt is explicit:
+    /// "specifically version 3 of the License and no other version." Unlike GPL-2.0-only, this is
+    /// NOT a trap: it is already at generation 3, the same generation AGPL-3.0-or-later and
+    /// GPL-3.0-or-later occupy, and GPLv3 was written with AGPLv3 combination in mind (AGPL §13
+    /// exists for exactly this). Modeled as its own case rather than folded into gpl3OrLater,
+    /// which would overstate a licence that cannot actually be relicensed upward from v3 (there is
+    /// no "upward" from v3 to state).
+    case gpl3Only = "GPL-3.0-only"
     case gpl3OrLater = "GPL-3.0-or-later"
     case agpl3OrLater = "AGPL-3.0-or-later"
 
@@ -53,7 +61,7 @@ public enum License: String, Codable, Sendable, CaseIterable {
         case .gpl2Only: return [2]                        // v2 and only v2
         case .gpl2OrLater: return [2, 3]                  // may be exercised as either
         case .mpl2: return [2, 3]                         // §3.3 Secondary Licenses
-        case .gpl3OrLater, .agpl3OrLater, .lgpl3OrLater: return [3]
+        case .gpl3Only, .gpl3OrLater, .agpl3OrLater, .lgpl3OrLater: return [3]
         case .lgpl21OrLater: return [2, 3]     // "or later" reaches v3 the same way GPL-2.0-or-later does
         case .nonCommercial: return []                    // combines with nothing copyleft
         }
@@ -65,7 +73,7 @@ public enum License: String, Codable, Sendable, CaseIterable {
         case .mit, .bsd2Clause, .bsd3Clause: return 0
         case .mpl2: return 1            // copyleft, but per file rather than per work
         case .gpl2Only, .gpl2OrLater, .lgpl21OrLater: return 1
-        case .lgpl3OrLater, .gpl3OrLater: return 2
+        case .lgpl3OrLater, .gpl3OrLater, .gpl3Only: return 2
         case .agpl3OrLater: return 3
         case .nonCommercial: return 4   // never actually returned; combination fails first
         }
