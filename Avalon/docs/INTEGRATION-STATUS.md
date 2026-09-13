@@ -31,6 +31,7 @@ Legend: **discovered → analyzed → selected → adapted → partially integra
 | Layout verifier | **tested** | `Controls/LayoutVerifier.swift`; 132 platform×device×mode checks, 0 fatal |
 | Touch routing | **tested** | `Controls/TouchRouter.swift`; 13 tests incl. an end-to-end press into a core encoding |
 | Control skins | **tested** | `Controls/ControlSkin.swift` + `Resources/controlskins.json`; 22 skins from muffin |
+| iOS build of the package | **tested** | GitHub Actions compiles AvalonCore against the iOS SDK for simulator and device; the first run found `pthread_jit_write_protect_np` is macOS-only |
 | Metal texture upload | *selected* | Presenter is Metal-free by design so it tests off-device; upload is platform code |
 | Shader/pipeline cache | *selected* | PPSSPP's architecture chosen; not yet written |
 | Game library / identification | *analyzed* | Delta's SHA1 + offline OpenVGDB over Manic's network scraping |

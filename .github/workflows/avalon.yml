@@ -111,11 +111,28 @@ jobs:
 
       # The layout solver, verifier and router are pure computation and should behave identically
       # on iOS. "Should" is the word this job exists to remove.
+      # Naming a device pins the job to whatever the runner image happened to ship the day this
+      # was written: 'name=iPhone 16' failed with exit 70 on an image offering only iPhone 17,
+      # 17 Pro, 17e and Air. Resolve whichever iPhone is actually installed instead.
+      - name: Pick an available simulator
+        id: sim
+        run: |
+          udid=$(xcrun simctl list devices available --json | jq -r '
+            [ .devices | to_entries[] | select(.key | test("iOS")) | .value[]
+              | select(.isAvailable and (.name | test("iPhone"))) ][0].udid // empty')
+          if [ -z "$udid" ]; then
+            echo "::error::no iOS Simulator available on this runner"
+            xcrun simctl list devices available
+            exit 1
+          fi
+          echo "Using simulator $udid"
+          echo "udid=$udid" >> "$GITHUB_OUTPUT"
+
       - name: Test on the iOS Simulator
         run: |
           xcodebuild test \
             -scheme Avalon-Package \
-            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
+            -destination "id=${{ steps.sim.outputs.udid }}" \
             -derivedDataPath .build/xcode-test \
             -skipPackagePluginValidation \
             CODE_SIGNING_ALLOWED=NO

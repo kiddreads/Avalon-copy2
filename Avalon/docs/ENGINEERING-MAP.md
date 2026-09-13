@@ -59,6 +59,20 @@ mirror's own `HEAD` — which a `--mirror` clone preserves from the remote's def
 guesses as a last resort, with a warning. It also prints the branch, tip and date it merged, so a
 wrong-branch merge is visible in the log instead of silently becoming a fact about the project.
 
+### The merge workflow could only ever populate an empty repository [verified 2026-09-12]
+
+Re-merging iCube from `develop` failed three times over before it worked, and each fault had been
+invisible because the workflow had only ever been used once, on an empty repository:
+
+1. **It pushed to a hardcoded `kiddreads/Avalon`.** Run from `Avalon-copy2`, where all current work
+   lives, it merged into the older repository instead. Now targets `github.repository`.
+2. **`git read-tree --prefix` refuses to overlay a path the index already holds** —
+   `error: Entry 'iCube/iCube/.editorconfig' overlaps ... Cannot bind.` So a project merged from
+   the wrong branch could not be fixed by re-merging it, which is the one thing anybody would ever
+   want to do. The old subtree is now removed from the index first.
+3. **`filter-repo` already prefixes every path with the folder name, and `--prefix` added it
+   again.** That is where `iCube/iCube/Source` came from. It binds the subtree now.
+
 ### Snapshot freshness, all nine GitHub-hosted projects [verified 2026-09-12]
 
 Measured as the newest non-merge commit touching each folder, against the upstream default

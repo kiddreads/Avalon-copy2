@@ -167,8 +167,12 @@ jobs:
             action="Merge"
             if git ls-tree -r --name-only origin/main -- "${FOLDER}" 2>/dev/null | head -1 | grep -q .; then
               action="Re-merge"
-              git ls-tree -r -z --name-only origin/main -- "${FOLDER}" \
-                | xargs -0 -r -n 100 git update-index --force-remove --
+              # `git rm --cached` and `git update-index --force-remove` both insist on a work
+              # tree, and there isn't one here. `--index-info` with a zero mode is the plumbing
+              # that deletes an index entry in a bare repository.
+              git ls-tree -r --name-only origin/main -- "${FOLDER}" \
+                | sed 's|^|0 0000000000000000000000000000000000000000\t|' \
+                | git update-index --index-info
             fi
 
             git read-tree -i --prefix="${FOLDER}/" "$src_tree"
