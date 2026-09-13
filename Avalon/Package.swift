@@ -158,9 +158,16 @@ let package = Package(
                 .headerSearchPath("src"),
                 .headerSearchPath("src/third-party"),
                 .headerSearchPath("src/platform/libretro"),
+                .headerSearchPath("ns_include"),
                 .headerSearchPath("../AvalonLibretro/include"),
                 .define("__LIBRETRO__"),
-                .unsafeFlags(["-include", "mgba_namespace.h", "-I", "Sources/AvalonLibretroMGBASource/ns_include"]),
+                // headerSearchPath (above) is always relative to this target's own `path` and
+                // resolves correctly regardless of build system; a raw `-I` with a
+                // package-root-relative path here worked for `swift build` (invoked from the
+                // package root) but not for Xcode's own build ("Build AvalonCore for the iOS
+                // Simulator" in CI), which resolves unsafeFlags paths differently --
+                // "'mgba_namespace.h' file not found" the first time this ran against the iOS SDK.
+                .unsafeFlags(["-include", "mgba_namespace.h"]),
             ],
             linkerSettings: [.linkedLibrary("z")]
         ),
