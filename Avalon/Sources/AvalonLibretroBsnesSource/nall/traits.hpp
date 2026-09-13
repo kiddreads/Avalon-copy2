@@ -39,9 +39,19 @@ namespace nall {
   using std::true_type;
 }
 
+// Upstream reopened std:: here to teach std::is_signed/is_unsigned about __int128 on toolchains
+// where the standard library didn't already classify it correctly. Newer libc++ (verified: Xcode
+// 26.6's, which this package's iOS CI job compiles against) marks these traits
+// _LIBCPP_NO_SPECIALIZATIONS and turns any user specialization into a hard compile error --
+// "'is_signed' cannot be specialized" -- while ALSO already answering correctly for __int128 via
+// its own compiler-intrinsic implementation (confirmed directly: `static_assert(std::is_signed<
+// __int128>::value)` and the unsigned equivalent both compile clean with no specialization at all,
+// on both this project's older local libc++ and, by construction, would with or without this
+// block). The one-time-necessary specialization became redundant-then-forbidden as libc++
+// hardened; removing it changes no traits any code here actually observes.
+#if INTMAX_BITS >= 128 && !defined(_LIBCPP_VERSION)
 namespace std {
-  #if INTMAX_BITS >= 128
   template<> struct is_signed<int128_t> : true_type {};
   template<> struct is_unsigned<uint128_t> : true_type {};
-  #endif
 }
+#endif

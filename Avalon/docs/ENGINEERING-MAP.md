@@ -512,6 +512,20 @@ ExHiROM all score zero outright against an image this small (each requires size 
 address + 0x50, far past 32KB), so a bare 32KB image scoring anything above zero as LoROM wins
 the comparison by construction -- no need to also suppress the alternatives.
 
+**The one real vendored-source patch in this repository.** `nall/traits.hpp` reopens `namespace
+std` to specialize `is_signed`/`is_unsigned` for `__int128`. CI's iOS SDK job (Xcode 26.6) failed
+with "'is_signed' cannot be specialized: Users are not allowed to specialize this standard library
+entity" -- newer libc++ marks these traits `_LIBCPP_NO_SPECIALIZATIONS` and makes any user
+specialization a hard error, invisible locally against this machine's older SDK. Confirmed the
+specialization was always redundant before patching it out: `static_assert(std::is_signed<
+__int128>::value)` and the `unsigned` equivalent both compile clean with no specialization at all,
+because libc++'s own intrinsic trait implementation already answers correctly for `__int128` --
+the block taught the standard library something it already knew. Guarded to
+`INTMAX_BITS >= 128 && !defined(_LIBCPP_VERSION)` rather than deleted outright, so it stays live
+for any non-libc++ toolchain upstream's own code might still target; on every platform Avalon
+actually builds for, this is a no-op change in observable behaviour, not a change to how the core
+plays a game.
+
 **Result:** zero symbol collisions with the other three cores once linked into one binary (the
 lack of a shared libretro-common ruled out the option-array collision class that hit Genesis Plus
 GX/Nestopia/mGBA three separate times), all 157 pre-existing tests pass unchanged under C++17, and
