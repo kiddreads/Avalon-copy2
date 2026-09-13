@@ -47,7 +47,7 @@ Legend: **discovered → analyzed → selected → adapted → partially integra
 | iPSX2 | **analyzed** | Native Metal GS and the Darwin JIT strategy selected. |
 | dolphin-ios | **analyzed** | Newest Dolphin base. AbstractGfx abstraction + iOS JIT ladder selected. |
 | Fin | **analyzed** | `.slangp` shader chains, cached-interpreter rewrite, Bell Audio selected. |
-| iCube | **analyzed — recommended for removal** | Stale unbranded copy of dolphin-ios; 0 occurrences of its own name in its source. Contributes nothing. |
+| iCube | **analyzed — snapshot is wrong, needs re-merging** | `Provenance-Emu/iCube`, "Dolphin for iOS, re-reborn", a fork of `brand175/dolphin-ios` and the most recently developed of the three Dolphin lineages here (upstream 2026-09-08). The copy in this repository came from its abandoned `master` and is 167 days stale. Earlier recommendation to remove it is withdrawn. |
 | MeloNX | **analyzed** | Cannot be merged. Plugin-only via its existing C ABI. License unresolved. |
 
 ## Sources outside this repository
@@ -61,8 +61,15 @@ still working in that repo and will say when it is ready.
 
 ## Pending decision
 
-**Removing `iCube`** would delete 7,427 files / 99.9 MB of verified pure duplication. Evidence is in
-ENGINEERING-MAP.md §1. Git history retains it either way. Awaiting the repository owner's call.
+**Re-merge `iCube` from `develop`.** `.github/workflows/merge-emulators.yml` now pins it, so:
+
+```
+gh workflow run merge-emulators.yml -f only=iCube
+```
+
+This rewrites ~800 MB of history into the repository, so it is the owner's call to fire.
+
+**MeloNX** is parked at the owner's request while its licence contradiction is sorted out.
 
 ## Known gaps
 

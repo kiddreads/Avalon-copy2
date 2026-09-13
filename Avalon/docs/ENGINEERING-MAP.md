@@ -25,33 +25,55 @@ the C# UI toolkit vendored inside MeloNX/Ryujinx — unrelated.)
 | `PPSSPP` | PlayStation Portable | C++ | 2,567 | 107.1 MB | GPL-2.0-or-later |
 | `Play!` | PlayStation 2 | C++ | 1,332 | 8.7 MB | **BSD (permissive)** |
 | `dolphin-ios` | GameCube / Wii | C++ / ObjC | 7,381 | 99.2 MB | GPL-2.0-or-later |
-| `iCube` | GameCube / Wii | C++ / ObjC | 7,427 | 99.9 MB | GPL-2.0-or-later |
+| `iCube` | GameCube / Wii | C++ / ObjC | 7,450 | 99.9 MB | GPL-2.0-or-later |
 | `iPSX2` | PlayStation 2 | C++ / Swift | 12,880 | 350.4 MB | GPL-3.0 |
 
 `.github/workflows/merge-emulators.yml` is a leftover one-shot workflow from the repo assembly; it is
 not part of Avalon.
 
-### Three projects are the same emulator, and one of them is a straight copy [verified]
+### Three projects are the same emulator, from three different lineages [verified]
 
-`dolphin-ios`, `iCube` and `Fin` are all Dolphin derivatives.
+`dolphin-ios`, `iCube` and `Fin` are all Dolphin derivatives, but they are not the same lineage:
 
-**`iCube` is not a fork. It is a stale, unbranded copy of DolphiniOS.** The evidence is unambiguous:
+| Folder | Upstream | Lineage | Upstream default branch | Last upstream push |
+|---|---|---|---|---|
+| `dolphin-ios` | `OatmealDome/dolphin-ios` — "Dolphin for iOS, reborn" | root, not a fork | `master` | 2026-06-20 |
+| `iCube` | `Provenance-Emu/iCube` — "Dolphin for iOS, **re-reborn**" | fork of `brand175/dolphin-ios` | **`develop`** | **2026-09-08** |
+| `Fin` | `MuffinFluffin/Fin` | narrow divergence from a near-current DolphiniOS | `main` | 2026-02-08 |
 
-- The string `iCube` appears **0 times** in `iCube/iCube/Source`, which still contains **500
-  `DolphiniOS` references** and ships `Source/iOS/App/DolphiniOS.xcodeproj`.
-- Its `Readme.md` is byte-identical to DolphiniOS's.
-- Its **only** file not present in `dolphin-ios` is an app icon PNG
-  (`Source/iOS/App/DolphiniOS/Assets.xcassets/AppIcon.appiconset/diosblue.png`).
-- `diff -rq` reports 1,007 differing files and 23,456 changed Core lines, but all 15 generation
-  markers put iCube uniformly **older**, not different: `STATE_VERSION` 170 (`Core/State.cpp:102`)
-  vs 175; `VideoCommon/RenderBase.cpp` + `g_renderer` instead of the current
-  `VideoCommon/EFBInterface.cpp`; SDL2 with `static_assert(!SDL_VERSION_ATLEAST(3,0,0))`
-  (`InputCommon/ControllerInterface/SDL/SDL.cpp:474`) vs SDL3.
-- 12,930 of its 14,122 changed iOS lines are two localization `Core.strings` files. Only 1,732 are code.
-- It lacks the iOS JIT acquisition code that `dolphin-ios` has (`Common/MemoryUtil_iOS*.cpp` absent).
+**The `iCube` snapshot in this repository is 167 days stale, and that is a merge bug, not a
+property of the project.** `.github/workflows/merge-emulators.yml` selected a source branch by
+`grep -E '^(main|master)$'` and taking the first hit. iCube has both a `master` — abandoned at
+`8d9c6a9b8`, 2026-03-25 — and a `develop`, where all of its work happens. The workflow took
+`master`. Upstream, iCube is the **newest** of the three; here it is the oldest by six months.
 
-**Recommendation: remove `iCube` (7,427 files, 99.9 MB).** It contributes nothing `dolphin-ios` does
-not already have, in a newer form. Git history retains it, exactly as CEMU was removed earlier.
+Everything the Phase 1 analysis concluded about iCube was measured against that bad snapshot and
+is therefore withdrawn. What was observed remains true *of the snapshot* — 0 occurrences of its own
+name, a byte-identical DolphiniOS readme, `STATE_VERSION` 170 against 175, `RenderBase.cpp` where
+current Dolphin has `EFBInterface.cpp`, no `Common/MemoryUtil_iOS*.cpp`. Upstream `develop` carries
+all four `MemoryUtil_iOS*.cpp` files today. The earlier recommendation to delete iCube is
+**withdrawn**; the correct action is to re-merge it from `develop`.
+
+The workflow now takes an explicit per-repo `ref` (iCube is pinned to `develop`), falls back to the
+mirror's own `HEAD` — which a `--mirror` clone preserves from the remote's default branch — and only
+guesses as a last resort, with a warning. It also prints the branch, tip and date it merged, so a
+wrong-branch merge is visible in the log instead of silently becoming a fact about the project.
+
+### Snapshot freshness, all nine GitHub-hosted projects [verified 2026-09-12]
+
+Measured as the newest non-merge commit touching each folder, against the upstream default
+branch's tip:
+
+| Folder | Upstream tip | Ours | |
+|---|---|---|---|
+| `iCube` | 2026-09-08 | 2026-03-25 | **stale by 167 days** |
+| `dolphin-ios` | 2026-06-19 | 2026-06-16 | 3 days |
+| `PPSSPP` | 2026-09-12 | 2026-09-10 | 2 days |
+| `iPSX2` | 2026-04-25 | 2026-04-23 | 2 days |
+| `Fin`, `Manic EMU`, `Delta`, `Play!`, `Folium` | | | current |
+
+Only iCube is materially wrong. Note that comparing upstream commit SHAs against this repository
+proves nothing — the merge rewrites history into a subdirectory, so no upstream SHA survives.
 
 **`Fin` is a real but narrow divergence** from a near-current DolphiniOS: only 3,675 changed Core
 lines, and identical to `dolphin-ios` on all 15 generation markers (`STATE_VERSION` 175 in both;

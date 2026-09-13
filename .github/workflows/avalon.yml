@@ -1,0 +1,121 @@
+# Avalon CI.
+#
+# Two reasons this exists rather than a local build script:
+#
+#   1. The development machine has Command Line Tools only — no Xcode, no iOS SDK. AvalonCore
+#      declares `.iOS(.v16)` support and until this workflow ran, nothing had ever compiled it
+#      against the iOS SDK. Anything Xcode-shaped happens here.
+#   2. This repository is ~1.9 GB across 154k commits. Every job below uses a blobless partial
+#      clone with a sparse checkout of `Avalon/` only, so a runner fetches tens of megabytes
+#      instead of the whole collection.
+
+name: Avalon
+
+on:
+  push:
+    paths: ['Avalon/**', '.github/workflows/avalon.yml']
+  pull_request:
+    paths: ['Avalon/**', '.github/workflows/avalon.yml']
+  workflow_dispatch:
+
+concurrency:
+  group: avalon-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: Avalon
+
+jobs:
+  package:
+    name: Package — build, test, verify
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: Avalon
+          fetch-depth: 1
+
+      - name: Toolchain
+        run: swift --version && xcodebuild -version
+
+      - name: Build
+        run: swift build
+
+      - name: Test
+        run: swift test
+
+      # `avalon-verify` resolves every `path:line` citation in the docs and source comments.
+      # Source projects are not in this sparse checkout, so their citations report as skipped;
+      # the job fails only on a citation that is genuinely broken.
+      - name: Documentation citations resolve
+        run: swift run avalon-verify
+
+      # Exits non-zero on any fatal layout violation, on any platform, on any device profile.
+      - name: Control layouts verify on every device
+        run: swift run avalon-controls
+
+      # NOTICE.md is generated from projects.json. If it is stale, attribution is wrong.
+      - name: NOTICE.md is up to date
+        run: |
+          swift run avalon-notice > /tmp/NOTICE.generated.md
+          if ! diff -u NOTICE.md /tmp/NOTICE.generated.md; then
+            echo "::error::NOTICE.md is stale — run 'swift run avalon-notice > NOTICE.md'"
+            exit 1
+          fi
+
+  ios:
+    name: iOS — compile against the iOS SDK
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: Avalon
+          fetch-depth: 1
+
+      - name: Toolchain
+        run: xcodebuild -version && xcodebuild -showsdks | grep -i ios
+
+      # The whole point of this job. AvalonCore has C targets (NEON pixel conversion, the JIT
+      # code cache, the audio mixer) whose iOS build has never been exercised anywhere.
+      - name: Build AvalonCore for the iOS Simulator
+        run: |
+          xcodebuild build \
+            -scheme AvalonCore \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath .build/xcode \
+            -skipPackagePluginValidation \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Build AvalonCore for a real device
+        run: |
+          xcodebuild build \
+            -scheme AvalonCore \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath .build/xcode-device \
+            -skipPackagePluginValidation \
+            CODE_SIGNING_ALLOWED=NO
+
+  ios-tests:
+    name: iOS — run the suite on a simulator
+    runs-on: macos-latest
+    needs: ios
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: Avalon
+          fetch-depth: 1
+
+      # The layout solver, verifier and router are pure computation and should behave identically
+      # on iOS. "Should" is the word this job exists to remove.
+      - name: Test on the iOS Simulator
+        run: |
+          xcodebuild test \
+            -scheme Avalon-Package \
+            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
+            -derivedDataPath .build/xcode-test \
+            -skipPackagePluginValidation \
+            CODE_SIGNING_ALLOWED=NO

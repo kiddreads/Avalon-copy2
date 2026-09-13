@@ -25,6 +25,9 @@ jobs:
             folder: Fin
           - url: https://github.com/Provenance-Emu/iCube.git
             folder: iCube
+            # iCube develops on `develop`; its `master` has been stale since 2026-03-25.
+            # Guessing main/master merged a snapshot 167 days behind upstream.
+            ref: develop
           - url: https://github.com/Manic-EMU/ManicEMU.git
             folder: Manic EMU
           - url: https://github.com/rileytestut/Delta.git
@@ -85,12 +88,34 @@ jobs:
         if: steps.gate.outputs.run == 'true'
         id: branch
         working-directory: source.git
+        env:
+          MATRIX_REF: ${{ matrix.ref }}
         run: |
-          branch=$(git for-each-ref --format='%(refname:short)' refs/heads/ | grep -E '^(main|master)$' | head -1)
-          if [ -z "$branch" ]; then
-            branch=$(git for-each-ref --format='%(refname:short)' refs/heads/ | head -1)
+          # Order matters, and getting it wrong is not cosmetic: grepping for main|master
+          # first merged iCube's abandoned `master` instead of its `develop`, so the
+          # collection carried a snapshot 167 days behind upstream and looked like a dead
+          # project. Explicit ref wins; then the mirror's own HEAD, which a --mirror clone
+          # preserves from the remote's default branch; only then a guess.
+          branch="${MATRIX_REF}"
+          if [ -n "$branch" ]; then
+            echo "Using explicit ref from the matrix: $branch"
+          else
+            branch=$(git symbolic-ref --short HEAD 2>/dev/null || true)
+            if [ -n "$branch" ] && git show-ref --verify --quiet "refs/heads/$branch"; then
+              echo "Using the remote's default branch: $branch"
+            else
+              branch=$(git for-each-ref --format='%(refname:short)' refs/heads/ \
+                       | grep -E '^(main|master|develop)$' | head -1)
+              [ -z "$branch" ] && branch=$(git for-each-ref --format='%(refname:short)' refs/heads/ | head -1)
+              echo "::warning::No default branch resolved; guessed $branch"
+            fi
           fi
-          echo "Using branch: $branch"
+          if ! git show-ref --verify --quiet "refs/heads/$branch"; then
+            echo "::error::branch '$branch' does not exist in ${{ matrix.url }}"
+            exit 1
+          fi
+          echo "Merging ${{ matrix.folder }} from $branch, tip $(git rev-parse --short "$branch") \
+                dated $(git log -1 --format=%ad --date=short "$branch")"
           echo "name=$branch" >> "$GITHUB_OUTPUT"
 
       - name: Merge into Avalon (bare, no checkout, retry-on-race)
