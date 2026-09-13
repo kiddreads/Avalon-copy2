@@ -417,6 +417,34 @@ Avalon actually ships for these three systems.
 
 155 tests pass, all three cores linked together, 0 duplicate or undefined symbols.
 
+## 5f. Nintendo 3DS: analysed, not attempted -- a different scale of task [verified 2026-09-13]
+
+Requested directly; investigated properly rather than either faking a quick port or refusing
+without evidence. `libretro/citra` is the candidate: not archived, pushed within days, GPL-2.0-
+**or-later** verified against its own licence text the same way as every other core here.
+
+**Two real findings that help.** First, its `dynarmic` JIT (an ARM recompiler, vendored as a
+submodule) is enabled only for `x86_64` in the Makefile's own architecture conditional --
+`aarch64` (exactly what iOS and Apple Silicon are) falls through to a plain interpreter, with no
+extra work needed to get that. Second, alongside its default Vulkan renderer it ships a genuine
+software rasterizer (`video_core/renderer_software/`), which is what would let a build target
+Avalon's existing software-framebuffer contract at all, the same as every core integrated so far.
+
+**What actually makes this a different scale of task.** `cryptopp` (44 file references in
+`Makefile.common`) and `libressl` (636 lines of build rules) are real, load-bearing dependencies,
+not small utilities like the zlib/inih this project has vendored so far -- 3DS titles are
+AES-encrypted, and CIA/NCCH containers need genuine RSA/SHA signature handling to even parse a
+ROM's header. The core itself is a 61 MB repository (Genesis Plus GX, Nestopia and mGBA combined
+are under 30 MB). Vendoring, auditing and building two real cryptographic libraries, on top of a
+core more than double the size of the largest one integrated so far, is not a "few more missing
+symbols" problem the way each of those three was -- it is comparable in scope to the GameCube/
+PS2/Switch-class systems this document has already said need dedicated, multi-session engineering
+rather than the libretro-hosting pattern used for the smaller consoles.
+
+**Recommendation:** revisit as its own effort, not a continuation of the current pattern. The
+architecture is verified to permit a software-only, interpreter-only build in principle; what
+remains is a genuinely large amount of dependency work, not an unknown.
+
 ## 6. Integration status
 
 See `INTEGRATION-STATUS.md`. Terms used there mean exactly what §12 of the project brief says they mean:
