@@ -46,6 +46,8 @@ jobs:
             folder: Libretro/nestopia
           - url: https://github.com/libretro/Genesis-Plus-GX.git
             folder: Libretro/genesis-plus-gx
+          - url: https://github.com/libretro/bsnes.git
+            folder: Libretro/bsnes
           - url: https://github.com/Thiago-Heleno/iPSX2-src.git
             folder: iPSX2
           - url: https://github.com/jpd002/Play-.git
