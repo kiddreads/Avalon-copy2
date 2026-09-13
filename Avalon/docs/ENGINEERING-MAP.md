@@ -373,6 +373,50 @@ and shared safely regardless of how many cores are linked in.
 Both cores' full test suites, and the whole package, pass together: 151 tests, 0 duplicate or
 undefined symbols.
 
+## 5e. mGBA (GB/GBC/GBA): a full CMake build, hand-resolved [verified 2026-09-13]
+
+MPL-2.0. The only one of the three cores whose real build is full CMake rather than a standalone
+libretro Makefile -- there is no `Makefile.libretro` to read a source list from. Two things had to
+be produced by hand instead of generated.
+
+**Two configure_file templates.** `src/core/flags.h.in` is a plain `#cmakedefine` feature-flag
+template -- boolean presence/absence, no substitution logic -- so it was resolved directly:
+`M_CORE_GB`/`M_CORE_GBA` for the two systems this build hosts, `ENABLE_VFS`/`ENABLE_VFS_FILE` for
+file-backed ROM loading, `HAVE_STRDUP`/`HAVE_STRLCPY`/`HAVE_CRC32`/`HAVE_LOCALE` for what Darwin's
+own libc genuinely provides, `MINIMAL_CORE` to compile out video-logging/replay infrastructure
+this build has no use for (confirmed by reading `core.c`'s own `#ifndef MINIMAL_CORE` guard around
+`GBAVideoProxyRendererCreate`, not assumed), and nothing for GL/GLES rendering, threading toggles,
+or any third-party codec/compression library not vendored. `src/core/version.c.in` is plainer
+still -- static version strings a real build fills in from git metadata this checkout does not
+have, since it is a subtree grafted by the merge workflow rather than mGBA's own git history.
+
+**One genuine third-party dependency, vendored rather than avoided.** `config.c` calls into a
+`Configuration` API only `configuration.c` implements, and that file itself needs `third-party/
+inih/ini.h` -- a real INI file parser, not a libretro-common utility. inih is tiny (BSD-licensed,
+~300 lines total) and was vendored properly rather than excluding `configuration.c` and hoping
+nothing needed its API; something did (`config.c`, which the core genuinely uses).
+
+**A third occurrence of the per-language option-array collision.** With two cores already sharing
+a binary, adding a third revealed the same `option_defs_XX`/`options_XX`/`option_cats_XX`
+collision pattern §5d found between Genesis Plus GX and Nestopia -- mGBA has its own copies of the
+same libretro core-options convention. Namespaced the same way, generated from the actual linker
+output.
+
+**One authoring mistake, instructive in its own right.** A comment written for
+`mgba_namespace.h`, documenting this exact collision, itself contained the literal three-character
+sequence `option_defs_*/options_*` -- and `*/` is the C block-comment terminator. The comment
+closed itself mid-sentence, and the compiler tried to parse the rest of the paragraph as code
+("unknown type name 'options_'"). Fixed by writing the wildcard names without the adjacent slash.
+
+Result: `MGBASpec` (`Sources/AvalonCore/Cores/MGBACore.swift`) and `MGBAInputMap.swift` (the
+verified RETRO-to-GBA button table, read from `libretro.c`'s own polling order -- a clean 1:1,
+like Nestopia, unlike Genesis Plus GX) host the core for Game Boy, Game Boy Color and Game Boy
+Advance alike, exactly as mGBA itself does. `MGBACoreTests` proves load/run/save-state against the
+compiled, linked core. This removes the Gambatte (GPL-2.0-only) blocker entirely: mGBA is what
+Avalon actually ships for these three systems.
+
+155 tests pass, all three cores linked together, 0 duplicate or undefined symbols.
+
 ## 6. Integration status
 
 See `INTEGRATION-STATUS.md`. Terms used there mean exactly what §12 of the project brief says they mean:

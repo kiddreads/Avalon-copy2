@@ -205,6 +205,24 @@
     "Famicom"
    ],
    "notes": "Vendored via the merge workflow at Libretro/nestopia. A C++ core -- unlike Genesis Plus GX, its own build never hit the INLINE/bare-C99-inline trap, since C++ inline functions get proper linkage from the language itself. Hosted through AvalonLibretro (Sources/AvalonLibretroNestopia, namespaced nestopia_retro_* and nestopia_lrc_* symbols -- the latter because its own vendored libretro-common snapshot differs from Genesis Plus GX's, so both cores' internal utility symbols collided the moment both were linked into one binary) and NestopiaSpec (Sources/AvalonCore/Cores/NestopiaCore.swift). Integrated and tested: NestopiaCoreTests loads a ROM, runs frames, and round-trips a save state through the real, compiled core. See docs/ENGINEERING-MAP.md §5d."
+  },
+  {
+   "id": "mgba",
+   "upstream": "https://github.com/libretro/mgba",
+   "origin": "https://github.com/libretro/mgba",
+   "license": "MPL-2.0",
+   "licensePath": "Libretro/mgba/LICENSE",
+   "copyrightHolders": [
+    "Jeffrey Pfau",
+    "mGBA contributors",
+    "endrift"
+   ],
+   "systems": [
+    "Game Boy",
+    "Game Boy Color",
+    "Game Boy Advance"
+   ],
+   "notes": "Vendored via the merge workflow at Libretro/mgba. The only core here whose real build is full CMake, not a standalone libretro Makefile -- two generated files (flags.h, version.c) are hand-resolved instead of generated; see include/mgba/flags.h and src/core/version.c for exactly what was chosen and why. Vendors one genuine third-party dependency, inih (BSD-licensed, a few hundred lines), needed by config.c's Configuration API even though the actual INI-file-reading half of it is never exercised. Removes the Gambatte (GPL-2.0-only) blocker entirely: this is what Avalon actually ships for GB/GBC/GBA. Hosted through AvalonLibretro (Sources/AvalonLibretroMGBA, namespaced mgba_retro_* and, once a third core revealed the same per-language option-array collision already seen between Genesis Plus GX and Nestopia, mgba_lrc_* too) and MGBASpec (Sources/AvalonCore/Cores/MGBACore.swift). Integrated and tested: MGBACoreTests loads a ROM, runs frames, and round-trips a save state through the real, compiled core. See docs/ENGINEERING-MAP.md §5e."
   }
  ],
  "vendoredCores": [

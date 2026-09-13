@@ -137,10 +137,43 @@ let package = Package(
             name: "AvalonNestopiaGlue",
             dependencies: ["AvalonLibretro", "AvalonLibretroNestopia"]
         ),
+        // mGBA's own source (C), vendored unmodified at Libretro/mgba. MPL-2.0. Its real build is
+        // full CMake, with no standalone libretro Makefile the way Genesis Plus GX and Nestopia
+        // have; two of its generated files (flags.h, version.c) are hand-resolved here instead --
+        // see include/mgba/flags.h and src/core/version.c for exactly what was chosen and why.
+        .target(
+            name: "AvalonLibretroMGBA",
+            path: "Sources/AvalonLibretroMGBASource",
+            sources: [
+                "src/arm", "src/core", "src/gb", "src/gba", "src/sm83", "src/util",
+                "src/util/vfs/vfs-dirent.c", "src/util/vfs/vfs-file.c", "src/util/vfs/vfs-mem.c",
+                "src/util/image.c",
+                "src/third-party/inih/ini.c",
+                "src/platform/libretro/libretro.c",
+                "src/platform/libretro/libretro-audio.c",
+                "src/platform/libretro/libretro-vfs.c",
+            ],
+            cSettings: [
+                .headerSearchPath("include"),
+                .headerSearchPath("src"),
+                .headerSearchPath("src/third-party"),
+                .headerSearchPath("src/platform/libretro"),
+                .headerSearchPath("../AvalonLibretro/include"),
+                .define("__LIBRETRO__"),
+                .unsafeFlags(["-include", "mgba_namespace.h", "-I", "Sources/AvalonLibretroMGBASource/ns_include"]),
+            ],
+            linkerSettings: [.linkedLibrary("z")]
+        ),
+        // Bridges the namespaced mgba_retro_* symbols to a vtable, mirroring
+        // AvalonGenesisPlusGXGlue / AvalonNestopiaGlue.
+        .target(
+            name: "AvalonMGBAGlue",
+            dependencies: ["AvalonLibretro", "AvalonLibretroMGBA"]
+        ),
         .target(
             name: "AvalonCore",
             dependencies: ["AvalonPixel", "AvalonJIT", "AvalonAudio", "AvalonChip8", "AvalonLibretro",
-                           "AvalonGenesisPlusGXGlue", "AvalonNestopiaGlue"],
+                           "AvalonGenesisPlusGXGlue", "AvalonNestopiaGlue", "AvalonMGBAGlue"],
             resources: [.process("Resources")]
         ),
         .executableTarget(name: "avalon-verify", dependencies: ["AvalonCore"]),

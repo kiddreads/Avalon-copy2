@@ -86,6 +86,14 @@ Avalon component over a network must be offered the corresponding source.
 - Licence text: `iPSX2/iPSX2/COPYING.GPLv3`
 - Systems: PS2
 
+### mgba — MPL-2.0
+
+- Upstream: https://github.com/libretro/mgba
+- Source: https://github.com/libretro/mgba
+- Copyright: Jeffrey Pfau, mGBA contributors, endrift
+- Licence text: `Libretro/mgba/LICENSE`
+- Systems: Game Boy, Game Boy Color, Game Boy Advance
+
 ### nestopia — GPL-2.0-or-later
 
 - Upstream: https://github.com/libretro/nestopia

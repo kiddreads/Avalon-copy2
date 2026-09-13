@@ -116,6 +116,13 @@ final class Emulator: ObservableObject {
                                displayInterval: 1.0 / 60.0,
                                frameProvider: { core.currentFrame() })
 
+        case .gameBoy, .gameBoyAdvance:
+            let core = LibretroCore<MGBASpec>()
+            guard (try? core.load(game: game.url)) != nil else { return nil }
+            return CoreSession(core: core, audio: sink, inputMap: MGBASpec.inputMap,
+                               displayInterval: 1.0 / 60.0,
+                               frameProvider: { core.currentFrame() })
+
         default:
             return nil
         }

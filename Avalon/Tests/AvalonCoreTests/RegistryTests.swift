@@ -5,10 +5,10 @@ import Foundation
 @Test("The bundled registry loads and covers every project in the repository")
 func registryLoads() throws {
     let r = try ProjectRegistry.bundled()
-    #expect(r.projects.count == 12)
+    #expect(r.projects.count == 13)
     for id in ["Delta", "Fin", "Folium", "Manic EMU", "MeloNX",
                "PPSSPP", "Play!", "dolphin-ios", "iCube", "iPSX2",
-               "genesis-plus-gx", "nestopia"] {
+               "genesis-plus-gx", "nestopia", "mgba"] {
         #expect(r.project(id) != nil, "missing \(id)")
     }
 }

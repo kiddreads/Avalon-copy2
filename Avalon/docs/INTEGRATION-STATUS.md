@@ -51,6 +51,7 @@ Legend: **discovered → analyzed → selected → adapted → partially integra
 | Fin | **analyzed** | `.slangp` shader chains, cached-interpreter rewrite, Bell Audio selected. |
 | Genesis Plus GX | **integrated, tested** | `GenesisPlusGXSpec` + `GenesisPlusGXInputMap.swift`; `GenesisPlusGXCoreTests` proves load/run/save-state against the compiled, linked core; the app selects it for `.genesis` games |
 | Nestopia | **integrated, tested** | `NestopiaSpec` + `NestopiaInputMap.swift`; `NestopiaCoreTests` proves load/run/save-state against the compiled, linked core; a C++ target sharing one binary with Genesis Plus GX required namespacing 262 internal libretro-common symbols too, not just the RETRO_API surface |
+| mGBA | **integrated, tested** | `MGBASpec` + `MGBAInputMap.swift`; `MGBACoreTests` proves load/run/save-state; removes the Gambatte (GPL-2.0-only) blocker for GB/GBC/GBA entirely |
 | iCube | **analyzed — snapshot is wrong, needs re-merging** | `Provenance-Emu/iCube`, "Dolphin for iOS, re-reborn", a fork of `brand175/dolphin-ios` and the most recently developed of the three Dolphin lineages here (upstream 2026-09-08). The copy in this repository came from its abandoned `master` and is 167 days stale. Earlier recommendation to remove it is withdrawn. |
 | MeloNX | **analyzed** | Cannot be merged. Plugin-only via its existing C ABI. License unresolved. |
 
