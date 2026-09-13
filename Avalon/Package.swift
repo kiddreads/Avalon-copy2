@@ -90,10 +90,57 @@ let package = Package(
             name: "AvalonGenesisPlusGXGlue",
             dependencies: ["AvalonLibretro", "AvalonLibretroGenesisPlusGX"]
         ),
+        // Nestopia's own source (C++), vendored unmodified at Libretro/nestopia. GPL-2.0-or-later,
+        // verified against its own COPYING text ("either of that version or of any later
+        // version"), not GitHub's ambiguous "GPL-2.0" tag. Same reason as Genesis Plus GX for
+        // avoiding a dependency on AvalonLibretro here (Clang modules would freeze libretro.h's
+        // declarations before nestopia_namespace.h's #defines run).
+        .target(
+            name: "AvalonLibretroNestopia",
+            path: "Sources/AvalonLibretroNestopiaSource",
+            exclude: [
+                // Both meant to be #included directly, not compiled as their own translation
+                // units; SwiftPM's directory-based source discovery tried to anyway and failed
+                // writing a dependency file for each.
+                "source/nes_ntsc/nes_ntsc.inl",
+                "source/core/NstSoundRenderer.inl",
+            ],
+            sources: [
+                "source", "libretro/libretro.cpp",
+                "libretro-common/compat", "libretro-common/encodings", "libretro-common/file",
+                "libretro-common/streams", "libretro-common/time", "libretro-common/vfs",
+            ],
+            cSettings: [
+                .headerSearchPath("libretro"),
+                .headerSearchPath("libretro-common/include"),
+                .headerSearchPath("../AvalonLibretro/include"),
+                .headerSearchPath("."),
+                .define("__LIBRETRO__"),
+                .unsafeFlags(["-include", "nestopia_namespace.h"]),
+            ],
+            cxxSettings: [
+                .headerSearchPath("libretro"),
+                .headerSearchPath("libretro-common/include"),
+                .headerSearchPath("../AvalonLibretro/include"),
+                .headerSearchPath("."),
+                .define("__LIBRETRO__"),
+                // Upstream's own initializer lists narrow int/double literals into
+                // unsigned/float fields (e.g. libretro.cpp's retro_system_av_info construction).
+                // Their own build doesn't treat it as fatal; this target's vendored source stays
+                // byte-identical to upstream, so the flag is suppressed here instead of editing it.
+                .unsafeFlags(["-include", "nestopia_namespace.h", "-Wno-c++11-narrowing"]),
+            ]
+        ),
+        // Bridges the namespaced nestopia_retro_* symbols to a vtable, mirroring
+        // AvalonGenesisPlusGXGlue.
+        .target(
+            name: "AvalonNestopiaGlue",
+            dependencies: ["AvalonLibretro", "AvalonLibretroNestopia"]
+        ),
         .target(
             name: "AvalonCore",
             dependencies: ["AvalonPixel", "AvalonJIT", "AvalonAudio", "AvalonChip8", "AvalonLibretro",
-                           "AvalonGenesisPlusGXGlue"],
+                           "AvalonGenesisPlusGXGlue", "AvalonNestopiaGlue"],
             resources: [.process("Resources")]
         ),
         .executableTarget(name: "avalon-verify", dependencies: ["AvalonCore"]),
@@ -110,5 +157,10 @@ let package = Package(
             name: "AvalonCoreTests",
             dependencies: ["AvalonCore", "AvalonLibretroTestCore"]
         ),
-    ]
+    ],
+    // Nestopia's core is C++; this sets the standard package-wide rather than per-target, since a
+    // per-target unsafeFlag in cxxSettings leaked "-std=c++14" into the SAME target's .c files
+    // too (a mixed C/C++ target shares one flag set across both file kinds) and clang rejects a
+    // C++ standard flag on a C compile outright.
+    cxxLanguageStandard: .cxx14
 )

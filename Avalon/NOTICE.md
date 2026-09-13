@@ -86,6 +86,14 @@ Avalon component over a network must be offered the corresponding source.
 - Licence text: `iPSX2/iPSX2/COPYING.GPLv3`
 - Systems: PS2
 
+### nestopia — GPL-2.0-or-later
+
+- Upstream: https://github.com/libretro/nestopia
+- Source: https://github.com/libretro/nestopia
+- Copyright: Martin Freij, R. Belmont, Nestopia contributors
+- Licence text: `Libretro/nestopia/COPYING`
+- Systems: NES, Famicom
+
 ## Drawn from outside this repository
 
 These are separate projects. Avalon uses work from them and the obligation to attribute it is the same as for anything in the tree.

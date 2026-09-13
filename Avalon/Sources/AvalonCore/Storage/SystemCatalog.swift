@@ -52,7 +52,7 @@ public enum SystemCatalog {
     public static let all: [SystemProfile] = [
         SystemProfile(id: .nes, displayName: "Nintendo Entertainment System", shortName: "NES",
                       fileExtensions: ["nes", "unf", "unif", "fds"], layoutID: "nes",
-                      coreStatus: .notYet(note: "libretro's Nestopia core is GPL-2.0-or-later, verified against its actual COPYING text. Needs symbol namespacing and an iOS build.")),
+                      coreStatus: .available(coreID: NestopiaSpec.coreID)),
         SystemProfile(id: .snes, displayName: "Super Nintendo", shortName: "SNES",
                       fileExtensions: ["sfc", "smc", "swc", "fig"], layoutID: "snes",
                       coreStatus: .notYet(note: "Delta's SNES core is selected; not yet ported.")),

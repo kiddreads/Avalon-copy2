@@ -188,6 +188,23 @@
     "SG-1000"
    ],
    "notes": "Vendored via the merge workflow at Libretro/genesis-plus-gx. Hosted through AvalonLibretro (Sources/AvalonLibretroGenesisPlusGX, namespaced gpgx_retro_* symbols) and GenesisPlusGXSpec (Sources/AvalonCore/Cores/GenesisPlusGXCore.swift). Integrated and tested: GenesisPlusGXCoreTests loads a ROM, runs frames, and round-trips a save state through the real, compiled core. libretro/scrc32.h, vendored alongside it, carries a non-commercial redistribution restriction and is confirmed dead code in this build -- crc32 is supplied by the system's zlib instead. See docs/ENGINEERING-MAP.md §5c."
+  },
+  {
+   "id": "nestopia",
+   "upstream": "https://github.com/libretro/nestopia",
+   "origin": "https://github.com/libretro/nestopia",
+   "license": "GPL-2.0-or-later",
+   "licensePath": "Libretro/nestopia/COPYING",
+   "copyrightHolders": [
+    "Martin Freij",
+    "R. Belmont",
+    "Nestopia contributors"
+   ],
+   "systems": [
+    "NES",
+    "Famicom"
+   ],
+   "notes": "Vendored via the merge workflow at Libretro/nestopia. A C++ core -- unlike Genesis Plus GX, its own build never hit the INLINE/bare-C99-inline trap, since C++ inline functions get proper linkage from the language itself. Hosted through AvalonLibretro (Sources/AvalonLibretroNestopia, namespaced nestopia_retro_* and nestopia_lrc_* symbols -- the latter because its own vendored libretro-common snapshot differs from Genesis Plus GX's, so both cores' internal utility symbols collided the moment both were linked into one binary) and NestopiaSpec (Sources/AvalonCore/Cores/NestopiaCore.swift). Integrated and tested: NestopiaCoreTests loads a ROM, runs frames, and round-trips a save state through the real, compiled core. See docs/ENGINEERING-MAP.md §5d."
   }
  ],
  "vendoredCores": [

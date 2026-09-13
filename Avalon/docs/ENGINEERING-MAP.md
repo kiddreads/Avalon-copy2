@@ -335,6 +335,44 @@ Genesis A, RETRO A is Genesis C); `SystemCatalog`'s `genesis` entry is `.availab
 rigor `LibretroCoreTests` established for the frontend itself. `swift run
 avalon-genesisplusgx-smoketest` is the from-nothing proof.
 
+## 5d. Nestopia (NES): a C++ core, and a different kind of collision [verified 2026-09-13]
+
+GPL-2.0-or-later, verified against its own COPYING text. Vendored the same way as Genesis Plus GX.
+Two things were genuinely different about getting a second core to coexist with the first.
+
+**The INLINE trap did not apply.** Nestopia's core is C++, and C++ gives `inline` functions
+correct one-definition-rule/COMDAT linkage from the language itself -- there is no equivalent of
+the bare-C99-`inline`-needs-`extern`-elsewhere footgun that broke Genesis Plus GX. Getting Nestopia
+to compile needed only the same Clang-modules avoidance already established, plus suppressing one
+narrowing-conversion warning upstream's own build does not treat as fatal
+(`libretro.cpp`'s aggregate initializers narrow int/double literals into unsigned/float fields --
+a style choice their own toolchain accepts and Avalon's stricter default does not).
+
+**A new class of collision, once two cores shared one binary.** Each libretro core vendors its own
+copy of libretro-common -- a shared utility library -- and Genesis Plus GX's and Nestopia's
+snapshots genuinely differ (different years, different internal structure; `diff` confirms it
+file by file). Namespacing only the 24 RETRO_API entry points, as done for Genesis Plus GX alone,
+was not enough: the moment both cores linked into one binary, their *internal* libretro-common
+helpers -- `filestream_*`, `fill_pathname_*`, dozens of others, 227 symbols in total -- collided as
+duplicate symbols, because those were never namespaced and were never expected to coexist with a
+second core's copy.
+
+Sharing one canonical libretro-common between the two cores was considered and rejected: the two
+snapshots are not proven interchangeable, and silently mixing them risks a subtle behavioural
+difference neither core's own testing ever covered. Each core's own vendored snapshot is namespaced
+instead -- generated programmatically from its own compiled `.c` files and cross-checked against
+the actual linker output, not hand-typed, since a hand-typed list is exactly the kind of thing that
+silently misses one file's header-only symbols (Nestopia's per-language `option_defs_*` arrays live
+in `.h` files a `.c`-only scan never saw) or a header-only-`nm`-catchable case. One genuine
+subtlety found this way: `strlcat`/`strlcpy` are guarded out of `compat_strl.c` on Darwin
+(`#if !(defined(__MACH__) && defined(__APPLE__))`) because the platform's own libc already
+provides them -- renaming their call sites anyway produced a reference to a symbol nothing on this
+platform defines. Both are left unrenamed, resolving to the system's own copy, which is correct
+and shared safely regardless of how many cores are linked in.
+
+Both cores' full test suites, and the whole package, pass together: 151 tests, 0 duplicate or
+undefined symbols.
+
 ## 6. Integration status
 
 See `INTEGRATION-STATUS.md`. Terms used there mean exactly what §12 of the project brief says they mean:
