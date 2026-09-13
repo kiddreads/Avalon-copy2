@@ -14,11 +14,16 @@ struct EmulationView: View {
     let game: Game
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @StateObject private var emulator = Emulator()
     @State private var router: TouchRouter?
     @State private var pressed: Set<String> = []
+    /// Which combination of directions is currently active per d-pad control id (e.g. "up+right"),
+    /// so `ControlsView` can tell a genuine new direction from the same one still held.
+    @State private var directions: [String: String] = [:]
     @State private var mode: ViewMode = .windowed
     @State private var showMenu = false
+    @State private var showCloseConfirmation = false
     @State private var layoutID: String
 
     init(game: Game) {
@@ -38,7 +43,7 @@ struct EmulationView: View {
 
                 screen(in: layout)
 
-                ControlsView(layout: layout, pressed: pressed)
+                ControlsView(layout: layout, pressed: pressed, directions: directions)
 
                 TouchSurface { touches in
                     guard let router else { return }
@@ -48,14 +53,28 @@ struct EmulationView: View {
                         control.source.bindings.contains { router.value(of: $0.control) != 0 }
                             ? control.id : nil
                     })
+                    // Only the d-pad needs finer detail than "held or not": a haptic tap on
+                    // direction change has to tell "still pointing up" from "now up-right", which
+                    // the plain `pressed` set above can't, since it only tracks the control's id.
+                    directions = Dictionary(uniqueKeysWithValues: layout.controls
+                        .filter { $0.kind == .dpad }
+                        .map { control in
+                            let active = control.source.bindings
+                                .filter { router.value(of: $0.control) != 0 }
+                                .map { "\($0.control)" }
+                                .sorted()
+                                .joined(separator: "+")
+                            return (control.id, active)
+                        })
                 }
                 .ignoresSafeArea()
 
                 menuButton
             }
+            .animation(reduceMotion ? nil : .easeInOut(duration: 0.25), value: mode)
             .onAppear {
                 router = TouchRouter(layout: layout)
-                if playable { emulator.start() }
+                if playable { emulator.start(game: game) }
             }
             .onChange(of: geo.size) { _ in
                 // A rotation or a split-view resize re-solves the layout, and anything held is
@@ -86,6 +105,7 @@ struct EmulationView: View {
             if let frame = emulator.frame {
                 Image(decorative: frame, scale: 1, orientation: .up)
                     .interpolation(.none)          // integer-ish scaling; no blurred pixels
+                    .antialiased(false)             // no edge smoothing at fractional scales either
                     .resizable()
                     .aspectRatio(contentMode: .fit)
             } else if !playable {
@@ -117,6 +137,12 @@ struct EmulationView: View {
     }
 
     private var menuButton: some View {
+        // No explicit safe-area handling needed here: this button lives inside the same
+        // GeometryReader `bounds` the layout solver uses, and only `Color.black` and
+        // `TouchSurface` opt out of the safe area above — the reader itself does not, so its
+        // origin already sits inside the safe area on every device profile (notch, Dynamic
+        // Island, and the home indicator alike). The padding below is just breathing room on
+        // top of that, not a substitute for it.
         Button { showMenu = true } label: {
             Image(systemName: "chevron.left.circle.fill")
                 .font(.title2)
@@ -125,6 +151,8 @@ struct EmulationView: View {
         }
         .padding(.leading, 10)
         .padding(.top, 8)
+        .accessibilityLabel("Menu")
+        .accessibilityHint("Pause and show display, controls and game options")
     }
 
     private var menu: some View {
@@ -142,12 +170,23 @@ struct EmulationView: View {
                     Text("Fullscreen hands the whole screen to the game; the controls float over it.")
                 }
 
-                Section("Controls") {
+                Section {
                     Picker("Layout", selection: $layoutID) {
                         ForEach((try? TouchLayoutLibrary.builtIn())?.layouts ?? [], id: \.id) { l in
-                            Text("\(l.name) — \(l.hardware)").tag(l.id)
+                            // One `Text`, two styles: the platform name reads first and heaviest,
+                            // the hardware name follows as a caption — legible at a glance instead
+                            // of one long undifferentiated run of "Name — Hardware".
+                            (Text(l.name)
+                                + Text("  ·  \(l.hardware)")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary))
+                                .tag(l.id)
                         }
                     }
+                } header: {
+                    Text("Controls")
+                } footer: {
+                    Text("Each layout is that system's real controller, resized to fit your screen.")
                 }
 
                 Section("Game") {
@@ -157,9 +196,8 @@ struct EmulationView: View {
                 }
 
                 Section {
-                    Button("Close game", role: .destructive) {
-                        showMenu = false
-                        dismiss()
+                    Button("Close Game", role: .destructive) {
+                        showCloseConfirmation = true
                     }
                 }
             }
@@ -169,6 +207,17 @@ struct EmulationView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Resume") { showMenu = false }
                 }
+            }
+            .confirmationDialog("Close this game?",
+                                isPresented: $showCloseConfirmation,
+                                titleVisibility: .visible) {
+                Button("Close Game", role: .destructive) {
+                    showMenu = false
+                    dismiss()
+                }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("The game stops running immediately.")
             }
         }
         .presentationDetents([.medium, .large])

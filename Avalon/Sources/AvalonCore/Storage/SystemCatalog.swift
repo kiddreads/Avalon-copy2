@@ -64,7 +64,7 @@ public enum SystemCatalog {
                       coreStatus: .notYet(note: "libretro's mGBA core (MPL-2.0, verified) covers this too. Needs symbol namespacing and an iOS build.")),
         SystemProfile(id: .genesis, displayName: "Sega Genesis", shortName: "Genesis",
                       fileExtensions: ["md", "gen", "smd", "32x"], layoutID: "genesis",
-                      coreStatus: .notYet(note: "libretro's Genesis Plus GX is LGPL-2.1-or-later, verified. Needs symbol namespacing and an iOS build.")),
+                      coreStatus: .available(coreID: GenesisPlusGXSpec.coreID)),
         SystemProfile(id: .nintendo64, displayName: "Nintendo 64", shortName: "N64",
                       fileExtensions: ["n64", "z64", "v64"], layoutID: "n64",
                       coreStatus: .notYet(note: "Delta's core is selected; needs the JIT service.")),

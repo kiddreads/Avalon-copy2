@@ -14,9 +14,11 @@ import AvalonCore
 struct AvalonApp: App {
     var body: some Scene {
         WindowGroup {
+            // Status bar and system overlays are hidden by EmulationView itself, for the
+            // immersive gameplay screen only. Applying it here at the scene root also hid the
+            // clock, battery and Dynamic Island while just browsing the library, which is not
+            // an immersive context and has no reason to suppress that system chrome.
             ContentView()
-                .statusBarHidden()
-                .persistentSystemOverlays(.hidden)
         }
     }
 }

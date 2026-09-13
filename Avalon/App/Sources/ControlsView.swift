@@ -23,16 +23,64 @@ struct ControlsView: View {
     let layout: ResolvedLayout
     /// Controls currently held, so a press is visible.
     let pressed: Set<String>
+    /// Which combination of bindings is active per d-pad control id (e.g. "up+right"), so a
+    /// haptic tap can fire on a genuine new direction rather than on every touch-move. Empty for
+    /// any control that isn't a d-pad, and safe to omit for layouts that predate this.
+    let directions: [String: String]
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    // Prepared once and reused for the view's lifetime — never allocated per frame or per press —
+    // and re-primed after firing so the Taptic Engine stays warm for the next one.
+    @State private var buttonImpact = UIImpactFeedbackGenerator(style: .rigid)
+    @State private var dpadImpact = UIImpactFeedbackGenerator(style: .light)
+
+    init(layout: ResolvedLayout, pressed: Set<String>, directions: [String: String] = [:]) {
+        self.layout = layout
+        self.pressed = pressed
+        self.directions = directions
+    }
 
     var body: some View {
         ZStack(alignment: .topLeading) {
             ForEach(layout.controls, id: \.id) { control in
                 shape(for: control)
                     .position(x: control.centre.x, y: control.centre.y)
+                    // Touch goes through `TouchSurface` below, not through these shapes — but a
+                    // VoiceOver user swiping through the screen still deserves to know a D-pad, an
+                    // A button, a Start button and so on are here, and roughly what each is.
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel(accessibilityDescription(for: control))
             }
         }
         .opacity(layout.controlOpacity)
         .allowsHitTesting(false)
+        .onAppear {
+            buttonImpact.prepare()
+            dpadImpact.prepare()
+        }
+    }
+
+    private func fireImpact(_ generator: UIImpactFeedbackGenerator) {
+        generator.impactOccurred()
+        generator.prepare()   // re-arm immediately so the next tap stays low-latency
+    }
+
+    /// A short, spoken description of what a control is. Informational only — there is no
+    /// VoiceOver activation path for these, since real input travels through `TouchSurface`.
+    private func accessibilityDescription(for control: SolvedControl) -> String {
+        if let label = control.source.label, !label.isEmpty {
+            switch control.kind {
+            case .dpad, .trackpad, .stick: return label
+            case .button, .pill, .shoulder: return "\(label) button"
+            }
+        }
+        switch control.kind {
+        case .dpad: return "Direction pad"
+        case .stick: return control.source.isDigitalStick ? "Directional lever" : "Analog stick"
+        case .trackpad: return "Touchpad"
+        case .button, .pill, .shoulder: return "Control"
+        }
     }
 
     @ViewBuilder
@@ -53,10 +101,15 @@ struct ControlsView: View {
                 }
             }
             .frame(width: control.frame.width, height: control.frame.height)
-            // A mechanical press: the cap sinks and darkens rather than merely tinting.
-            .scaleEffect(down ? 0.92 : 1)
+            // A mechanical press: the cap sinks and darkens rather than merely tinting. Reduce
+            // Motion drops the size change — still motion, however quick — but keeps the
+            // darkening, and applies it instantly rather than eased.
+            .scaleEffect(reduceMotion ? 1 : (down ? 0.92 : 1))
             .brightness(down ? -0.12 : 0)
-            .animation(.easeOut(duration: 0.06), value: down)
+            .animation(reduceMotion ? nil : .easeOut(duration: 0.06), value: down)
+            .onChange(of: down) { isDown in
+                if isDown { fireImpact(buttonImpact) }
+            }
 
         case .stick:
             ZStack {
@@ -69,14 +122,22 @@ struct ControlsView: View {
                     .shadow(radius: down ? 1 : 3)
             }
             .frame(width: control.frame.width, height: control.frame.height)
+            // Deliberately no haptic here: a stick is dragged continuously, and tapping on every
+            // frame of that motion would read as a buzz, not a press.
 
         case .dpad:
+            let direction = directions[control.id] ?? ""
             DPadShape()
                 .fill(fill)
                 .overlay(DPadShape().stroke(.white.opacity(0.16), lineWidth: 1))
                 .frame(width: control.frame.width, height: control.frame.height)
-                .scaleEffect(down ? 0.97 : 1)
-                .animation(.easeOut(duration: 0.06), value: down)
+                .scaleEffect(reduceMotion ? 1 : (down ? 0.97 : 1))
+                .animation(reduceMotion ? nil : .easeOut(duration: 0.06), value: down)
+                .onChange(of: direction) { newDirection in
+                    // Fires on a genuine new direction, including the first press. Never fires on
+                    // release (back to "") and never repeats while the same direction is held.
+                    if !newDirection.isEmpty { fireImpact(dpadImpact) }
+                }
 
         case .pill, .shoulder, .trackpad:
             ZStack {
@@ -91,9 +152,13 @@ struct ControlsView: View {
                 }
             }
             .frame(width: control.frame.width, height: control.frame.height)
-            .scaleEffect(down ? 0.96 : 1)
+            .scaleEffect(reduceMotion ? 1 : (down ? 0.96 : 1))
             .brightness(down ? -0.1 : 0)
-            .animation(.easeOut(duration: 0.06), value: down)
+            .animation(reduceMotion ? nil : .easeOut(duration: 0.06), value: down)
+            .onChange(of: down) { isDown in
+                // A trackpad is dragged like a stick, not tapped like a button or shoulder pad.
+                if isDown, control.kind != .trackpad { fireImpact(buttonImpact) }
+            }
         }
     }
 }

@@ -71,6 +71,14 @@ Avalon component over a network must be offered the corresponding source.
 - Licence text: `dolphin-ios/COPYING`
 - Systems: GameCube, Wii
 
+### genesis-plus-gx — LGPL-2.1-or-later
+
+- Upstream: https://github.com/libretro/Genesis-Plus-GX
+- Source: https://github.com/libretro/Genesis-Plus-GX
+- Copyright: Charles MacDonald, Eke-Eke, Genesis Plus GX contributors
+- Licence text: `Libretro/genesis-plus-gx/LICENSE.txt`
+- Systems: Genesis, Master System, Game Gear, SG-1000
+
 ### iPSX2 — GPL-3.0-or-later
 
 - Upstream: PCSX2
@@ -121,6 +129,12 @@ These are present in source projects but must not enter an Avalon build.
 - Location: `Manic EMU/Manic EMU/ManicEmu/ManicEmu/Sources/Tools/Others/EmulationCore.swift` (in Manic EMU)
 - Evidence: `Manic EMU/Manic EMU/ManicEmu/ManicEmu/Sources/Tools/Others/EmulationCore.swift:146-148`
 - Reason: A no-commercial-use term is an additional restriction; GPL section 7 forbids it. These cores cannot be combined into a GPL/AGPL work.
+
+### scrc32 (Genesis Plus GX libretro port) — NonCommercial
+
+- Location: `Libretro/genesis-plus-gx/libretro/scrc32.h` (in genesis-plus-gx)
+- Evidence: `Libretro/genesis-plus-gx/libretro/scrc32.h:9-13 ("Redistributions may not be sold, nor may they be used in a commercial product or activity.")`
+- Reason: Non-commercial redistribution term; excluded from Avalon per GPL section 7 and the same reasoning that already excludes Snes9x and Manic EMU's gated cores. Confirmed dead code: nothing in AvalonLibretroGenesisPlusGX #includes it. crc32 is supplied by the system's zlib instead.
 
 ## Data excluded from redistribution
 

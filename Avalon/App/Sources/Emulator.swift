@@ -19,32 +19,34 @@ final class SilentSink: AudioSink, @unchecked Sendable {
 }
 
 /// Owns a core and its session, advances it once per display refresh, and publishes the frame the
-/// presenter produced. Nothing here knows what CHIP-8 is beyond choosing it as the core to load.
+/// presenter produced.
+///
+/// Which concrete core gets built lives in exactly one place — `makeSession(for:)` — keyed off
+/// `SystemCatalog`, the same source of truth the library screen reads. A system with no core
+/// wired here is a system `SystemCatalog` must also mark `.notYet`; `SystemCatalogTests` in the
+/// package enforces that the two never drift apart.
 final class Emulator: ObservableObject {
     @Published private(set) var frame: CGImage?
     @Published private(set) var status: String = "starting"
 
     private let sink = SilentSink()
     private var session: CoreSession?
-    private var core: Chip8Core?
     private var link: CADisplayLink?
 
-    func start() {
+    /// Starts the real game if a core exists for it; otherwise reports why not rather than
+    /// silently doing nothing. Callers should check `game.profile?.coreStatus.isAvailable` first
+    /// so the UI can show its own "no core yet" state instead of relying on this string.
+    func start(game: Game) {
         guard session == nil else { return }
-        let core = Chip8Core()
-        do {
-            try core.load(rom: Self.demoROM())
-        } catch {
-            status = "ROM failed to load: \(error)"
+        guard let session = Self.makeSession(for: game, sink: sink) else {
+            status = "No core for \(game.profile?.displayName ?? "this system") yet"
             return
         }
 
-        let session = CoreSession(core: core, audio: sink, inputMap: Chip8Core.inputMap,
-                                  displayInterval: 1.0 / 60.0,
-                                  frameProvider: { core.withFrameBuffer { $0 } })
         do {
-            // No Metal backend yet, so the core renders into the presenter's staging buffer and
-            // this app reads it back. A native surface replaces this without touching the session.
+            // No Metal backend yet, so a software core renders into the presenter's staging
+            // buffer and this app reads it back. A native surface replaces this without
+            // touching the session.
             try session.start(surface: RenderSurface(nativeHandle: nil,
                                                      drawableSize: PixelSize(width: 640, height: 320)))
         } catch {
@@ -52,7 +54,6 @@ final class Emulator: ObservableObject {
             return
         }
 
-        self.core = core
         self.session = session
         status = "\(session.descriptor.displayName) \(session.descriptor.version)"
 
@@ -61,12 +62,63 @@ final class Emulator: ObservableObject {
         self.link = link
     }
 
+    /// Also usable without a library entry, for the CHIP-8 built-in demo.
+    func startDemo() {
+        guard session == nil else { return }
+        let core = Chip8Core()
+        do {
+            try core.load(rom: Self.demoROM())
+        } catch {
+            status = "ROM failed to load: \(error)"
+            return
+        }
+        let session = CoreSession(core: core, audio: sink, inputMap: Chip8Core.inputMap,
+                                  displayInterval: 1.0 / 60.0,
+                                  frameProvider: { core.withFrameBuffer { $0 } })
+        do {
+            try session.start(surface: RenderSurface(nativeHandle: nil,
+                                                     drawableSize: PixelSize(width: 640, height: 320)))
+        } catch {
+            status = "session failed to start: \(error)"
+            return
+        }
+        self.session = session
+        status = "\(session.descriptor.displayName) \(session.descriptor.version)"
+        let link = CADisplayLink(target: self, selector: #selector(step))
+        link.add(to: .main, forMode: .common)
+        self.link = link
+    }
+
+    /// One switch, keyed by system, is the only place a new core gets wired into the app. Returns
+    /// nil for anything `SystemCatalog` does not also mark `.available` — the two are asserted to
+    /// agree by `SystemCatalogTests.honestAboutCores` in the package, so this can't silently drift
+    /// into claiming a system works when the catalog says it doesn't, or vice versa.
+    private static func makeSession(for game: Game, sink: AudioSink) -> CoreSession? {
+        switch game.system {
+        case .chip8:
+            let core = Chip8Core()
+            guard (try? core.load(game: game.url)) != nil else { return nil }
+            return CoreSession(core: core, audio: sink, inputMap: Chip8Core.inputMap,
+                               displayInterval: 1.0 / 60.0,
+                               frameProvider: { core.withFrameBuffer { $0 } })
+
+        case .genesis:
+            let core = LibretroCore<GenesisPlusGXSpec>()
+            guard (try? core.load(game: game.url)) != nil else { return nil }
+            return CoreSession(core: core, audio: sink, inputMap: GenesisPlusGXSpec.inputMap,
+                               displayInterval: 1.0 / 60.0,
+                               frameProvider: { core.currentFrame() })
+
+        default:
+            return nil
+        }
+    }
+
     func stop() {
         link?.invalidate()
         link = nil
         session?.stop()
         session = nil
-        core = nil
     }
 
     func send(_ events: [InputEvent]) {

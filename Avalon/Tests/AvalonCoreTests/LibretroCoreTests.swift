@@ -51,95 +51,109 @@ struct LibretroCoreTests {
 
     @Test("descriptor reflects the spec, not a hardcoded value")
     func descriptorFromSpec() {
-        let d = LibretroCore<AvalonTestCoreSpec>.descriptor
-        #expect(d.id == "avalon.test")
-        #expect(d.system == AvalonTestCoreSpec.system)
-        #expect(d.capabilities.contains(.saveStates))
+    try LibretroTestLock.withLock {
+            let d = LibretroCore<AvalonTestCoreSpec>.descriptor
+            #expect(d.id == "avalon.test")
+            #expect(d.system == AvalonTestCoreSpec.system)
+            #expect(d.capabilities.contains(.saveStates))
+    }
     }
 
     @Test("a real core runs and produces a frame")
     func runsAndProducesFrames() throws {
-        let (core, _) = try makeAndStart()
-        core.runFrame(processVideo: true)
-        let frame = try #require(core.currentFrame())
-        #expect(frame.visibleRect.width == 64)
-        #expect(frame.visibleRect.height == 32)
-        #expect(frame.format == .bgra8888)   // negotiated XRGB8888 -> Avalon's bgra8888
-        core.stop()
+    try LibretroTestLock.withLock {
+            let (core, _) = try makeAndStart()
+            core.runFrame(processVideo: true)
+            let frame = try #require(core.currentFrame())
+            #expect(frame.visibleRect.width == 64)
+            #expect(frame.visibleRect.height == 32)
+            #expect(frame.format == .bgra8888)   // negotiated XRGB8888 -> Avalon's bgra8888
+            core.stop()
+    }
     }
 
     @Test("input reaches the core and changes what it renders")
     func inputChangesTheFrame() throws {
-        let (core, _) = try makeAndStart()
-        core.runFrame(processVideo: true)
-        let before = try #require(core.currentFrame())
-        let beforePixels = Array(UnsafeRawBufferPointer(start: before.base, count: 64 * 32 * 4))
+    try LibretroTestLock.withLock {
+            let (core, _) = try makeAndStart()
+            core.runFrame(processVideo: true)
+            let before = try #require(core.currentFrame())
+            let beforePixels = Array(UnsafeRawBufferPointer(start: before.base, count: 64 * 32 * 4))
 
-        core.activate(input: Int(RETRO_DEVICE_ID_JOYPAD_RIGHT), value: 1, playerIndex: 0)
-        core.runFrame(processVideo: true)
-        core.deactivate(input: Int(RETRO_DEVICE_ID_JOYPAD_RIGHT), playerIndex: 0)
+            core.activate(input: Int(RETRO_DEVICE_ID_JOYPAD_RIGHT), value: 1, playerIndex: 0)
+            core.runFrame(processVideo: true)
+            core.deactivate(input: Int(RETRO_DEVICE_ID_JOYPAD_RIGHT), playerIndex: 0)
 
-        let after = try #require(core.currentFrame())
-        let afterPixels = Array(UnsafeRawBufferPointer(start: after.base, count: 64 * 32 * 4))
-        #expect(beforePixels != afterPixels, "moving the cursor produced an identical frame")
-        core.stop()
+            let after = try #require(core.currentFrame())
+            let afterPixels = Array(UnsafeRawBufferPointer(start: after.base, count: 64 * 32 * 4))
+            #expect(beforePixels != afterPixels, "moving the cursor produced an identical frame")
+            core.stop()
+    }
     }
 
     @Test("audio reaches the sink")
     func audioReachesSink() throws {
-        let (core, sink) = try makeAndStart()
-        core.runFrame(processVideo: true)
-        #expect(sink.frameCount == 735)
-        core.stop()
+    try LibretroTestLock.withLock {
+            let (core, sink) = try makeAndStart()
+            core.runFrame(processVideo: true)
+            #expect(sink.frameCount == 735)
+            core.stop()
+    }
     }
 
     @Test("save state round-trips through the real serialize ABI")
     func saveStateRoundTrips() throws {
-        let (core, _) = try makeAndStart()
-        for _ in 0..<5 {
-            core.activate(input: Int(RETRO_DEVICE_ID_JOYPAD_RIGHT), value: 1, playerIndex: 0)
-            core.runFrame(processVideo: true)
-        }
-        let midFrame = try #require(core.currentFrame())
-        let midPixels = Array(UnsafeRawBufferPointer(start: midFrame.base, count: 64 * 32 * 4))
+    try LibretroTestLock.withLock {
+            let (core, _) = try makeAndStart()
+            for _ in 0..<5 {
+                core.activate(input: Int(RETRO_DEVICE_ID_JOYPAD_RIGHT), value: 1, playerIndex: 0)
+                core.runFrame(processVideo: true)
+            }
+            let midFrame = try #require(core.currentFrame())
+            let midPixels = Array(UnsafeRawBufferPointer(start: midFrame.base, count: 64 * 32 * 4))
 
-        let saveURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
-        try core.saveState(to: saveURL)
-        defer { try? FileManager.default.removeItem(at: saveURL) }
+            let saveURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+            try core.saveState(to: saveURL)
+            defer { try? FileManager.default.removeItem(at: saveURL) }
 
-        for _ in 0..<10 { core.runFrame(processVideo: true) }   // diverge
-        try core.loadState(from: saveURL)
-        core.runFrame(processVideo: false)   // re-render at the restored cursor
+            for _ in 0..<10 { core.runFrame(processVideo: true) }   // diverge
+            try core.loadState(from: saveURL)
+            core.runFrame(processVideo: false)   // re-render at the restored cursor
 
-        // Not a byte-exact frame check (the core also renders once more), just that state
-        // actually moved backward rather than the load silently no-opping.
-        let restored = try #require(core.currentFrame())
-        let restoredPixels = Array(UnsafeRawBufferPointer(start: restored.base, count: 64 * 32 * 4))
-        #expect(restoredPixels != midPixels || true)   // load did not crash / reject a valid state
-        core.stop()
+            // Not a byte-exact frame check (the core also renders once more), just that state
+            // actually moved backward rather than the load silently no-opping.
+            let restored = try #require(core.currentFrame())
+            let restoredPixels = Array(UnsafeRawBufferPointer(start: restored.base, count: 64 * 32 * 4))
+            #expect(restoredPixels != midPixels || true)   // load did not crash / reject a valid state
+            core.stop()
+    }
     }
 
     @Test("battery-backed save RAM is exposed through readMemory")
     func sramThroughReadMemory() throws {
-        let (core, _) = try makeAndStart()
-        core.activate(input: Int(RETRO_DEVICE_ID_JOYPAD_A), value: 1, playerIndex: 0)
-        core.runFrame(processVideo: true)
-        let mem = try #require(core.readMemory(at: 0, count: 1))
-        #expect(mem.first == 0xA5)
-        core.stop()
+    try LibretroTestLock.withLock {
+            let (core, _) = try makeAndStart()
+            core.activate(input: Int(RETRO_DEVICE_ID_JOYPAD_A), value: 1, playerIndex: 0)
+            core.runFrame(processVideo: true)
+            let mem = try #require(core.readMemory(at: 0, count: 1))
+            #expect(mem.first == 0xA5)
+            core.stop()
+    }
     }
 
     @Test("only one core may be active at a time, matching libretro's own reality")
     func oneAtATime() throws {
-        let (first, _) = try makeAndStart()
-        let second = LibretroCore<AvalonTestCoreSpec>()
-        let rom = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
-        try Data([1]).write(to: rom)
-        try second.load(game: rom)
-        #expect(throws: Error.self) {
-            try second.start(surface: RenderSurface(nativeHandle: nil, drawableSize: PixelSize(width: 64, height: 32)),
-                             audio: CollectingSink())
-        }
-        first.stop()
+    try LibretroTestLock.withLock {
+            let (first, _) = try makeAndStart()
+            let second = LibretroCore<AvalonTestCoreSpec>()
+            let rom = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+            try Data([1]).write(to: rom)
+            try second.load(game: rom)
+            #expect(throws: Error.self) {
+                try second.start(surface: RenderSurface(nativeHandle: nil, drawableSize: PixelSize(width: 64, height: 32)),
+                                 audio: CollectingSink())
+            }
+            first.stop()
+    }
     }
 }

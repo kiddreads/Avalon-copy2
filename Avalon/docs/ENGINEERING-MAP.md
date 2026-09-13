@@ -295,6 +295,46 @@ cores' SOURCE has been vendored yet — this is a licence and ABI audit, not a p
 needs its symbols namespaced for static linking (`AvalonLibretro.h`'s whole reason for existing) and
 an iOS cross-compile, neither of which fits what has been verified so far.
 
+## 5c. Genesis Plus GX: from "compiles" to "runs" [verified 2026-09-13]
+
+The audit in §5b cleared this core's licence. Getting it to actually LINK took finding a real bug
+in the core's own build, not in Avalon's frontend.
+
+**The bug.** `libretro/libretro-common/include/retro_inline.h` resolves the `INLINE` macro to a
+bare C99 `inline` — which provides no callable out-of-line definition on its own — the moment ANY
+file's include chain reaches it before `core/macros.h`'s own `#define INLINE static __inline__`
+does. A bare `inline` function is a hint for calls within the file that saw it; nothing guarantees
+an actual linkable body exists. Every "undefined symbol" this took to find — `CALC_FCSLOT`,
+`fd_9e`, `word_ram_switch`, dozens more, each a `static`-intended helper — was this one cause,
+confirmed directly: `clang -E` on the affected files showed `inline void word_ram_switch(...)` in
+the preprocessed output, not `static __inline__ void`. It was never an optimisation-level artifact,
+despite `-O2` appearing to fix isolated cases — that was `-O2`'s dead-code elimination coincidentally
+discarding some of the now-multiply-defined-or-undefined functions before they'd have surfaced,
+not evidence about the actual defect.
+
+Upstream's own `Makefile.libretro` already works around this — `LIBRETRO_CFLAGS +=
+-DINLINE="static inline"` — rather than trusting the header's `#ifndef` fallback.
+`AvalonLibretroGenesisPlusGX`'s `Package.swift` target does the same. Once applied, the whole
+target links in plain debug configuration, no special flags required.
+
+**The second finding, licence-relevant.** `libretro/scrc32.h`, vendored alongside the core,
+declares the `crc32` function several files call for save-RAM checksums — under a licence with the
+same non-commercial redistribution restriction that already excludes Snes9x and Manic EMU's gated
+cores (`"Redistributions may not be sold, nor may they be used in a commercial product or
+activity"`). It is confirmed dead code: nothing in this build `#include`s it, and it must stay
+excluded. `crc32` is supplied instead by the system's own zlib (`-lz`), permissively licensed,
+ABI-compatible (`uLong`/`Bytef`/`uInt` are `unsigned long`/`unsigned char`/`unsigned int` on this
+platform, matching the plain signature these callers expect) — upstream's own bundled zlib, used
+under the `HAVE_CHD` path this build deliberately excludes, would have supplied the same function.
+
+**Result:** `GenesisPlusGXSpec` (`Sources/AvalonCore/Cores/GenesisPlusGXCore.swift`) hosts the core
+through `LibretroCore<Spec>`; `GenesisPlusGXInputMap.swift` carries the verified
+RETRO-id-to-Genesis-button table (read from `libretro.c`'s own switch, not assumed — RETRO Y is
+Genesis A, RETRO A is Genesis C); `SystemCatalog`'s `genesis` entry is `.available`;
+`GenesisPlusGXCoreTests` proves load/run/save-state against the real, compiled core, the same
+rigor `LibretroCoreTests` established for the frontend itself. `swift run
+avalon-genesisplusgx-smoketest` is the from-nothing proof.
+
 ## 6. Integration status
 
 See `INTEGRATION-STATUS.md`. Terms used there mean exactly what §12 of the project brief says they mean:

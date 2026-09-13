@@ -169,6 +169,25 @@
     "PS2"
    ],
    "notes": "Real ARM64 PCSX2 port (ARMSX2 lineage, 3804 vixl call sites). 838 SPDX headers, no GPL-2.0-only files. The repository's only NATIVE Metal renderer (GS/Renderers/Metal, 8 .metal shaders)."
+  },
+  {
+   "id": "genesis-plus-gx",
+   "upstream": "https://github.com/libretro/Genesis-Plus-GX",
+   "origin": "https://github.com/libretro/Genesis-Plus-GX",
+   "license": "LGPL-2.1-or-later",
+   "licensePath": "Libretro/genesis-plus-gx/LICENSE.txt",
+   "copyrightHolders": [
+    "Charles MacDonald",
+    "Eke-Eke",
+    "Genesis Plus GX contributors"
+   ],
+   "systems": [
+    "Genesis",
+    "Master System",
+    "Game Gear",
+    "SG-1000"
+   ],
+   "notes": "Vendored via the merge workflow at Libretro/genesis-plus-gx. Hosted through AvalonLibretro (Sources/AvalonLibretroGenesisPlusGX, namespaced gpgx_retro_* symbols) and GenesisPlusGXSpec (Sources/AvalonCore/Cores/GenesisPlusGXCore.swift). Integrated and tested: GenesisPlusGXCoreTests loads a ROM, runs frames, and round-trips a save state through the real, compiled core. libretro/scrc32.h, vendored alongside it, carries a non-commercial redistribution restriction and is confirmed dead code in this build -- crc32 is supplied by the system's zlib instead. See docs/ENGINEERING-MAP.md §5c."
   }
  ],
  "vendoredCores": [
@@ -211,6 +230,14 @@
    "license": "LGPL-3.0-or-later",
    "evidence": "MeloNX/README.md:220; distribution/legal/THIRDPARTY.md",
    "hazard": ""
+  },
+  {
+   "host": "genesis-plus-gx",
+   "path": "Libretro/genesis-plus-gx/libretro/scrc32.h",
+   "name": "scrc32 (Genesis Plus GX libretro port)",
+   "license": "NonCommercial",
+   "evidence": "Libretro/genesis-plus-gx/libretro/scrc32.h:9-13 (\"Redistributions may not be sold, nor may they be used in a commercial product or activity.\")",
+   "hazard": "Non-commercial redistribution term; excluded from Avalon per GPL section 7 and the same reasoning that already excludes Snes9x and Manic EMU's gated cores. Confirmed dead code: nothing in AvalonLibretroGenesisPlusGX #includes it. crc32 is supplied by the system's zlib instead."
   }
  ],
  "excludedData": [

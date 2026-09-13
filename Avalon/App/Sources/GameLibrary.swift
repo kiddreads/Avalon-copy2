@@ -62,7 +62,9 @@ final class GameLibrary: ObservableObject {
         let ext = source.pathExtension
         let candidates = SystemCatalog.profiles(forExtension: ext)
         guard let profile = chosenSystem.flatMap(SystemCatalog.profile(for:)) ?? candidates.first else {
-            lastError = "Avalon does not recognise .\(ext) files."
+            lastError = ext.isEmpty
+                ? "Avalon does not recognise that file — it has no file extension to go on."
+                : "Avalon does not recognise .\(ext) files."
             return
         }
 
@@ -86,7 +88,7 @@ final class GameLibrary: ObservableObject {
             games.sort { $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending }
             save()
         } catch {
-            lastError = "Could not import that file: \(error.localizedDescription)"
+            lastError = "Avalon could not import that file: \(error.localizedDescription)"
         }
     }
 
