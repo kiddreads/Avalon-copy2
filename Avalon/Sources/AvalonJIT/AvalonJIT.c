@@ -10,6 +10,24 @@
 #include <pthread.h>
 #include <mach/mach.h>
 #include <libkern/OSCacheControl.h>
+
+/* `pthread_jit_write_protect_np` is macOS-only. Apple declares it in the shared Darwin headers
+   and marks it unavailable on iOS, so a package that has only ever been built for macOS compiles
+   clean and still cannot be built for the platform it claims to support. This one did, until CI
+   compiled it against the iOS SDK for the first time.
+
+   The consequence is bigger than a guard. On iOS there is no per-thread W^X toggle at all: a
+   MAP_JIT region comes back executable and stays that way, so selecting MAP_JIT there would
+   produce a region nothing can write to. Dual mapping through `vm_remap` is the whole strategy on
+   iOS, which is exactly the ladder DolphiniOS settled on
+   (`dolphin-ios/Source/Core/Common/MemoryUtil_iOS.cpp`). */
+#if TARGET_OS_OSX
+#define AVALON_JIT_HAS_WX_TOGGLE 1
+#else
+#define AVALON_JIT_HAS_WX_TOGGLE 0
+#endif
+#else
+#define AVALON_JIT_HAS_WX_TOGGLE 0
 #endif
 
 const char *avalon_jit_mode_name(avalon_jit_mode mode) {
@@ -29,6 +47,8 @@ int avalon_jit_mode_allows_concurrent_codegen(avalon_jit_mode mode) {
        threaded, and it must be reported honestly rather than assumed away. */
     return mode == AVALON_JIT_SIMULATOR || mode == AVALON_JIT_MAPJIT || mode == AVALON_JIT_DUALMAP;
 }
+
+int avalon_jit_has_wx_toggle(void) { return AVALON_JIT_HAS_WX_TOGGLE; }
 
 void avalon_jit_flush_icache(const void *addr, size_t size) {
 #if defined(__APPLE__)
@@ -79,11 +99,18 @@ avalon_jit_mode avalon_jit_detect(void) {
 #if defined(__APPLE__)
 #if TARGET_OS_SIMULATOR
     return AVALON_JIT_SIMULATOR;
-#else
-    /* Preference order is by cost, not by novelty. MAP_JIT is the cheapest correct option on
-       modern Apple silicon; dual mapping costs an extra VA mapping but never reprotects, which
+#elif AVALON_JIT_HAS_WX_TOGGLE
+    /* macOS. Preference order is by cost, not by novelty. MAP_JIT is the cheapest correct option
+       on modern Apple silicon; dual mapping costs an extra VA mapping but never reprotects, which
        matters when a second core is executing while this one compiles. */
     if (probe_mapjit()) return AVALON_JIT_MAPJIT;
+    if (probe_dualmap()) return AVALON_JIT_DUALMAP;
+    return AVALON_JIT_UNAVAILABLE;
+#else
+    /* iOS and its relatives. MAP_JIT is deliberately NOT offered here even though the mmap
+       succeeds: without a W^X toggle the region can never be made writable, so choosing it would
+       hand back a region that faults on the first store. Dual mapping is the only mode that
+       works, and if the process cannot get it, JIT is honestly unavailable rather than broken. */
     if (probe_dualmap()) return AVALON_JIT_DUALMAP;
     return AVALON_JIT_UNAVAILABLE;
 #endif
@@ -164,11 +191,15 @@ int avalon_jit_begin_write(avalon_jit_region *region) {
     if (!region || !region->rx) return -1;
     switch (region->mode) {
         case AVALON_JIT_MAPJIT:
-#if defined(__APPLE__)
+#if AVALON_JIT_HAS_WX_TOGGLE
             pthread_jit_write_protect_np(0);
-#endif
             region->writable = 1;
             return 0;
+#else
+            /* Refuse rather than lie. A caller told "writable" that then faults on its first
+               store is far worse than one told it cannot have this mode here. */
+            return -1;
+#endif
         case AVALON_JIT_PROTECT_TOGGLE:
             if (mprotect(region->rx, region->size, PROT_READ | PROT_WRITE) != 0) return -1;
             region->writable = 1;
@@ -185,11 +216,13 @@ int avalon_jit_end_write(avalon_jit_region *region) {
     if (!region || !region->rx) return -1;
     switch (region->mode) {
         case AVALON_JIT_MAPJIT:
-#if defined(__APPLE__)
+#if AVALON_JIT_HAS_WX_TOGGLE
             pthread_jit_write_protect_np(1);
-#endif
             region->writable = 0;
             break;
+#else
+            return -1;
+#endif
         case AVALON_JIT_PROTECT_TOGGLE:
             if (mprotect(region->rx, region->size, PROT_READ | PROT_EXEC) != 0) return -1;
             region->writable = 0;

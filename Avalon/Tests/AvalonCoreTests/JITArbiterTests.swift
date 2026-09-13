@@ -74,3 +74,43 @@ func unavailableRefuses() {
     let arbiter = JITArbiter(mode: .unavailable, totalBudget: 0)
     #expect(throws: (any Error).self) { _ = try arbiter.reserve(owner: "any", byteCount: 1) }
 }
+
+@Suite("JIT platform strategy")
+struct JITPlatformStrategyTests {
+
+    @Test("the W^X toggle is macOS-only, and the detected mode never needs one it lacks")
+    func toggleAvailability() {
+        // `pthread_jit_write_protect_np` is declared in the shared Darwin headers and marked
+        // unavailable on iOS. Building only for macOS hides that completely — this package
+        // claimed `.iOS(.v16)` support and did not compile for iOS until CI first tried it.
+        #if os(macOS)
+        #expect(JITMode.hasWriteProtectToggle)
+        #else
+        #expect(!JITMode.hasWriteProtectToggle)
+        #endif
+
+        // Whatever this platform detects has to be a mode this platform can actually write to.
+        if JITMode.detect() == .mapJIT {
+            #expect(JITMode.hasWriteProtectToggle,
+                    "MAP_JIT was selected on a platform with no way to unprotect it")
+        }
+    }
+
+    @Test("a region in the detected mode can be written and executed")
+    func detectedModeRoundTrips() throws {
+        let mode = JITMode.detect()
+        try #require(mode != .unavailable, "no JIT strategy on this platform")
+
+        let arbiter = JITArbiter(mode: mode, totalBudget: 1 << 20)
+        let cache = try CodeCache(owner: "platform-strategy-test", byteCount: 4096, arbiter: arbiter)
+        defer { cache.release() }
+
+        // The claim under test: writing through the *detected* mode succeeds. On iOS this is
+        // exactly what fails if MAP_JIT is ever selected — there is nothing to unprotect it with.
+        let written = try cache.write { buffer -> Int in
+            buffer.storeBytes(of: UInt32(0xD65F03C0), toByteOffset: 0, as: UInt32.self) // ret
+            return 4
+        }
+        #expect(written == 4)
+    }
+}

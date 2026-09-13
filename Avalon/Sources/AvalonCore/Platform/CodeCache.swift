@@ -32,6 +32,13 @@ public extension JITMode {
 
     /// What this process can actually do, probed rather than assumed.
     static func detect() -> JITMode { JITMode(avalon_jit_detect()) }
+
+    /// Whether this platform has a per-thread W^X toggle (`pthread_jit_write_protect_np`).
+    ///
+    /// True on macOS, false on iOS. It matters because `.mapJIT` is only writable where this is
+    /// true: on iOS the `MAP_JIT` mmap still succeeds, but nothing can ever unprotect the result.
+    /// `detect()` will not return `.mapJIT` there, and this is how a caller can check why.
+    static var hasWriteProtectToggle: Bool { avalon_jit_has_wx_toggle() != 0 }
 }
 
 /// A block of executable memory lent to one core.

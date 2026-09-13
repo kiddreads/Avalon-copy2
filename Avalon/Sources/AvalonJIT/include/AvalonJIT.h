@@ -86,6 +86,12 @@ int avalon_jit_end_write(avalon_jit_region *region);
 /* Invalidate icache for a sub-range after writing it. */
 void avalon_jit_flush_icache(const void *addr, size_t size);
 
+/** Whether this platform has a per-thread W^X toggle (`pthread_jit_write_protect_np`).
+ *
+ *  True on macOS, false on iOS and everywhere else. `AVALON_JIT_MAPJIT` is only usable where this
+ *  is true, which is why `avalon_jit_detect()` will not return it on iOS. */
+int avalon_jit_has_wx_toggle(void);
+
 #ifdef __cplusplus
 }
 #endif
