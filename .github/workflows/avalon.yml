@@ -30,6 +30,10 @@ jobs:
   package:
     name: Package — build, test, verify
     runs-on: macos-latest
+    # A hard ceiling on the whole job -- see the "Test" step's own comment for why. Without
+    # this, a hung compiler just burns runner-hours in the default 6-hour job timeout instead of
+    # failing fast.
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
         with:
@@ -38,13 +42,22 @@ jobs:
           fetch-depth: 1
 
       - name: Toolchain
-        run: swift --version && xcodebuild -version
+        run: swift --version && xcodebuild -version && ls /Applications | grep -i Xcode
 
       - name: Build
         run: swift build
 
+      # Reproducibly hung for hours (twice, at the identical point: compiling
+      # processor/arm7tdmi/arm7tdmi.cpp in AvalonLibretroBsnes) under this runner's Xcode 26.6 /
+      # clang-2100.1.1.101 -- confirmed environment-specific, not a code bug: the same source
+      # compiles clean in well under a minute on this project's own dev machine (clang 17), in
+      # both debug and -c release configuration, and nothing about the file changed between the
+      # two hung CI attempts. `-c release` here as an attempt to dodge whatever debug-info/
+      # template-instantiation pathology this specific newer clang hits -- if this job times out
+      # again, the fix is likely pinning an older available Xcode via DEVELOPER_DIR (the
+      # Toolchain step above now lists what's installed) rather than more guessing.
       - name: Test
-        run: swift test
+        run: swift test -c release
 
       # `avalon-verify` resolves every `path:line` citation in the docs and source comments.
       # Source projects are not in this sparse checkout, so their citations report as skipped;
