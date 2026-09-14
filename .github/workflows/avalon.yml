@@ -30,12 +30,18 @@ jobs:
   package:
     name: Package — build, test, verify
     runs-on: macos-latest
-    # A hard ceiling on the whole job -- see the "Test" step's own comment for why. Without
-    # this, a hung compiler just burns runner-hours in the default 6-hour job timeout instead of
-    # failing fast.
-    # -j 1 below trades speed for a real test of the resource-contention theory; a fully serial
-    # build of five cores needs more headroom than the 25 minutes generous parallel builds got.
-    timeout-minutes: 45
+    # This job's own native-macOS build has hung for hours, twice, compiling AvalonLibretroBsnes
+    # (once on processor/arm7tdmi/arm7tdmi.cpp, once -- a separate attempt -- on lzma/lzma.cpp):
+    # confirmed not tied to one file, not fixed by pinning an older installed Xcode (26.0.1 hung
+    # exactly like the runner's default 26.6), not fixed by -c release instead of debug, and not
+    # reliably fixed by fully serial compilation (-j 1 got further before hanging on a different
+    # file than the parallel build had). The same source builds clean in well under a minute on
+    # this project's own dev machine every time, and every functionally-relevant check already
+    # passes independently: 165 local tests, this workflow's own iOS SDK compile (simulator and
+    # device) and iOS Simulator test run, and the .ipa build. Genuinely unresolved rather than
+    # worked around -- this timeout exists so a repeat hang fails fast (burns 25 minutes, not the
+    # default 6-hour job ceiling) instead of masking the real state of this job.
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
         with:
@@ -46,23 +52,11 @@ jobs:
       - name: Toolchain
         run: swift --version && xcodebuild -version && ls /Applications | grep -i Xcode
 
-      # Compiling processor/arm7tdmi/arm7tdmi.cpp in AvalonLibretroBsnes reproducibly hung for
-      # hours -- confirmed under both this runner's default Xcode (26.6, clang-2100.1.1.101) and
-      # the oldest one the runner image has installed (26.0.1), ruling out a specific-clang-
-      # version regression, and under both plain `swift test` and `-c release`, ruling out
-      # debug-info generation. The same source compiles clean in well under a minute on this
-      # project's own dev machine every time. What's left standing: hosted macOS runners have far
-      # less RAM/CPU than this dev machine, and swift build's default full-parallelism can launch
-      # several of AvalonLibretroBsnes's other heavy nall/template-instantiation-heavy files
-      # (arm7tdmi's disassembler is one of many) as concurrent clang jobs -- plausible resource
-      # contention/swap-thrashing on a constrained runner, not a true infinite hang, where a
-      # process starved of memory can go silent for a very long time rather than erroring
-      # cleanly. `-j 1` forces fully serial compilation to test that directly.
       - name: Build
-        run: swift build -j 1
+        run: swift build
 
       - name: Test
-        run: swift test -j 1
+        run: swift test
 
       # `avalon-verify` resolves every `path:line` citation in the docs and source comments.
       # Source projects are not in this sparse checkout, so their citations report as skipped;
